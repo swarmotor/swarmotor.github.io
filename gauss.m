@@ -1,3 +1,4 @@
+%data in
 mu1 = mean(data1);
 sigma1 = std(data1);
 mu2 = mean(data2);
