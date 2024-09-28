@@ -1,0 +1,1 @@
+### Pour préparer le cours de probabilité et de statistique mathématique qui sera enseigné en français la prochaine session, pendant cette période, je vais présenter mes notes de préparation en plusieurs langues pour une utilisation ultérieure.
