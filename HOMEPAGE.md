@@ -1,17 +1,17 @@
-## FLYING MOTOR
+# FLYING MOTOR
 
 
-### LANGUAGE
+## LANGUAGE
 
 ENGLISH -CET-6  (2024.6)
 
 FRENCH -TCF-B1 (2024.6)
 
-### EDUCATION
+## EDUCATION
 
 AUTOMATIC Anhui University (2023.9- ~)
 
-### Professional Courses:
+## Professional Courses:
 1. Data Structures
 2. Electronic Technology
 3. Matrix Theory
@@ -23,8 +23,8 @@ AUTOMATIC Anhui University (2023.9- ~)
 
 
 
-### PROGRAMS
-### i.engineering
+### == PROGRAMS ==
+## i.engineering
 A.Fix a bike 
 B.Make up an old phone 
 C.Self-balancing Lerro Triangle Robot
@@ -33,10 +33,10 @@ C.Self-balancing Lerro Triangle Robot
 ## ii.science
 A. Robotic swarms (null temp )
 
-### READINGS
+## READINGS
 
 null temp
 
-### PHOTOS
+## PHOTOS
 
 null temp
