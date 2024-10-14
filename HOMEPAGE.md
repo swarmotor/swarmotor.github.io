@@ -25,13 +25,22 @@ AUTOMATIC Anhui University (2023.9- ~)
 
 ##  PROGRAMS 
 ## i.engineering：
+
 A. Fix a bike 
+
+
 B. Make up an old phone 
+
 C. Self-balancing Lerro Triangle Robot
+
 D. ROBOMaster.Team/Algorithem-vision：
+
    i. Linux.Ubuntu
+
    ii. Opencv
+
    iii. YOLO V8 & TensorRt
+
    iv. Kalman control
 
 
