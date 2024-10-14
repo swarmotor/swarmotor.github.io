@@ -9,7 +9,7 @@ FRENCH -TCF-B1 (2024.6)
 
 ## EDUCATION
 
-AUTOMATIC Anhui University (2023.9- ~)
+AUTOMATIC --  Anhui University (2023.9- ~)
 
 ## Professional Courses:
 1. Data Structures (cpp11 based)
