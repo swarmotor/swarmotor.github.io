@@ -14,12 +14,12 @@ AUTOMATIC --  Anhui University (2023.9- ~)
 ## Professional Courses:
 1. Data Structures (cpp11 based)
 2. Electronic Technology
-3. Matrix Theory
+3. Matrix Theory ＊
 4. Principles of Automatic Control
-5. Intelligent Systems
+5. Intelligent Systems ＊
 6. Introduction to SLAM (Simultaneous Localization and Mapping)
-7. Mathematical Modeling with MATLAB
-8. Scientific Visualization
+7. Mathematical Modeling with MATLAB ＊
+8. Scientific Visualization ＊
 
 
 
@@ -56,3 +56,4 @@ null temp
 
 ![20231122_123806](https://github.com/user-attachments/assets/9dc8dfec-2789-46a0-8ac3-c12857b73341)
 ![20231118_123017](https://github.com/user-attachments/assets/2b8c4bdd-bba4-4126-944f-fd3a1e144ff1)
+
