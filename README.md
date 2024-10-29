@@ -1,4 +1,4 @@
-# FLYING MOTOR
+# HI, I'M SWARMOTOR
 
 
 ## LANGUAGE
@@ -11,10 +11,10 @@ FRENCH -TCF-B1 (2024.6)
 
 AUTOMATION & AUTOMATIQUE --  Anhui University (2023.9- ~)
 
-## Professional Courses:
+## Courses:
 1. Data Structures (cpp11 based)
 2. Electronic Technology
-3. Matrix Theory ＊ (PYTHON&MATLAB)
+3. Matrix Theory ＊ (PYTHON & MATLAB)
 4. Principles of Automatic Control (MATLAB)
 5. Intelligent Systems ＊ (MATLAB)
 6. Introduction to SLAM (Simultaneous Localization and Mapping) (SLAM-ORB2)
@@ -53,7 +53,7 @@ D. ROBOMaster.Team/Algorithem-vision&location
  https://cma-es.github.io/
  https://arxiv.org/abs/1604.00772
  https://github.com/WindyLab/
- 
+ AND so on
 
 ## READINGS
 
