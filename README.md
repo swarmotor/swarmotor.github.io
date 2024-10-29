@@ -9,17 +9,17 @@ FRENCH -TCF-B1 (2024.6)
 
 ## EDUCATION
 
-AUTOMATIC --  Anhui University (2023.9- ~)
+AUTOMATION & AUTOMATIQUE --  Anhui University (2023.9- ~)
 
 ## Professional Courses:
 1. Data Structures (cpp11 based)
 2. Electronic Technology
-3. Matrix Theory ＊
-4. Principles of Automatic Control
-5. Intelligent Systems ＊
-6. Introduction to SLAM (Simultaneous Localization and Mapping)
-7. Mathematical Modeling with MATLAB ＊
-8. Scientific Visualization ＊
+3. Matrix Theory ＊ (PYTHON&MATLAB)
+4. Principles of Automatic Control (MATLAB)
+5. Intelligent Systems ＊ (MATLAB)
+6. Introduction to SLAM (Simultaneous Localization and Mapping) (SLAM-ORB2)
+7. Mathematical Modeling with MATLAB ＊ 
+8. Scientific Visualization *
 
 
 
@@ -55,6 +55,8 @@ D. ROBOMaster.Team/Algorithem-vision：
 Sharing about L'Étranger (not public)
 
 ## PHOTOS
+![QQ图片20241030001846](https://github.com/user-attachments/assets/a33d5694-5dc1-4595-8397-2b96eba413bf)
+
 ![QQ图片20241030001902](https://github.com/user-attachments/assets/2ea1ae1e-bf1d-4ce9-ad8b-4b564780ed61)
 
 ![20231122_123806](https://github.com/user-attachments/assets/9dc8dfec-2789-46a0-8ac3-c12857b73341)
