@@ -1,5 +1,6 @@
 # HI, I'M SWARMOTOR
 
+![background](https://github.com/user-attachments/assets/084d0975-711a-428f-b274-88b0cf8250b8)
 
 ## LANGUAGE
 
