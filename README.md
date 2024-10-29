@@ -39,20 +39,23 @@ D. ROBOMaster.Team/Algorithem-vision：
 
    ii. Opencv
 
-   iii. YOLO V8 & TensorRt
+   iii. YOLO V8 & TensorRt 
 
-   iv. Kalman control
+   iv. Kalman&Control (now)
+
+   v. lidar (december)
 
 
-## ii.science
+## ii.science works
 
- Robotic swarms (null public temp )
+ Robotic swarms (not public)
 
 ## READINGS
 
-null temp
+Sharing about L'Étranger (not public)
 
 ## PHOTOS
+![QQ图片20241030001902](https://github.com/user-attachments/assets/2ea1ae1e-bf1d-4ce9-ad8b-4b564780ed61)
 
 ![20231122_123806](https://github.com/user-attachments/assets/9dc8dfec-2789-46a0-8ac3-c12857b73341)
 ![20231118_123017](https://github.com/user-attachments/assets/2b8c4bdd-bba4-4126-944f-fd3a1e144ff1)
