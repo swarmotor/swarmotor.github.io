@@ -33,7 +33,7 @@ B. Make up an old phone
 
 C. Self-balancing Lerro Triangle Robot
 
-D. ROBOMaster.Team/Algorithem-vision：
+D. ROBOMaster.Team/Algorithem-vision&location
 
    i. Linux.Ubuntu
 
@@ -49,6 +49,11 @@ D. ROBOMaster.Team/Algorithem-vision：
 ## ii.science works
 
  Robotic swarms (not public)
+ citae:
+ https://cma-es.github.io/
+ https://arxiv.org/abs/1604.00772
+ https://github.com/WindyLab/
+ 
 
 ## READINGS
 
