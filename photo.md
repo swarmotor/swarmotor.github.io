@@ -1,4 +1,6 @@
 ## MY PHOTO
+
+![background](https://github.com/user-attachments/assets/084d0975-711a-428f-b274-88b0cf8250b8)
 ![QQ图片20241030001846](https://github.com/user-attachments/assets/a33d5694-5dc1-4595-8397-2b96eba413bf)
 
 ![QQ图片20241030001902](https://github.com/user-attachments/assets/2ea1ae1e-bf1d-4ce9-ad8b-4b564780ed61)
