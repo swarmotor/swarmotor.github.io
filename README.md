@@ -1,6 +1,6 @@
 
 
-![background](https://github.com/user-attachments/assets/084d0975-711a-428f-b274-88b0cf8250b8)
+
 # HI, I'M SWARMOTOR
 ## LANGUAGE
 
@@ -60,6 +60,6 @@ D. ROBOMaster.Team/Algorithem-vision&location
 
 Sharing about L'Étranger (not public)
 
-## PHOTOS
-(photo.md)
+## PHOTOS (photo.md)
+
 
