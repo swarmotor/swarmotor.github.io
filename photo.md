@@ -1,4 +1,6 @@
 ## MY PHOTO
+![image](https://github.com/user-attachments/assets/0a1a9710-42df-4774-aa48-1735bb1d9772)
+
 ![image](https://github.com/user-attachments/assets/c7004f74-d182-4d13-a297-361614cceefc)
 
 ![background](https://github.com/user-attachments/assets/084d0975-711a-428f-b274-88b0cf8250b8)
