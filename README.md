@@ -36,16 +36,17 @@ C. Self-balancing Lerro Triangle Robot
 
 D. ROBOMaster.Team/Algorithem-vision&location
 
-   i. Linux.Ubuntu
+   i. Linux.Ubuntu 
 
    ii. Opencv
 
-   iii. YOLO V8 & TensorRt 
+   iii. YOLO V8 & TensorRt （https://developer.nvidia.com/tensorrt）
 
    iv. Kalman&Control (now)
 
    v. lidar (december)
-
+   
+The relevant information will be made open source after the end of this season. 
 
 ## ii.science works
 
@@ -58,7 +59,7 @@ D. ROBOMaster.Team/Algorithem-vision&location
 
 ## READINGS
 
-Sharing about L'Étranger (not public)
+ (not public yet Oh)
 
 ## PHOTOS 
 [photo](photo.md)
