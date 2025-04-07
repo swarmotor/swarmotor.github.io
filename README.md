@@ -40,7 +40,7 @@ D. ROBOMaster.Team/Algorithem-vision&location
 
    ii. Opencv
 
-   iii. YOLO V8 & TensorRt （https://developer.nvidia.com/tensorrt）
+   iii. YOLO V8 & TensorRt （https://developer.nvidia.com/tensorrt）(https://zcneat2vzro8.feishu.cn/drive/folder/JLgMfiEKcl945WdRzvrcncYRnPe)
 
    iv. Kalman&Control (now)
 
