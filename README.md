@@ -10,7 +10,7 @@ FRENCH -TCF-B1 (2024.6)
 
 ## EDUCATION
 
-AUTOMATION & AUTOMATIQUE --  Anhui University (2023.9- ~)
+AUTOMATION & AUTOMATIQUE -- Anhui University (2023.9- ~)
 
 ## Courses:
 1. Data Structures (cpp11 based)
@@ -25,7 +25,7 @@ AUTOMATION & AUTOMATIQUE --  Anhui University (2023.9- ~)
 
 
 ##  PROGRAMS 
-## i.engineering：
+## i.Engineering：
 
 A. Fix a bike 
 
@@ -43,10 +43,10 @@ D. ROBOMaster.Team/Algorithem-vision&location
 
    iv. Kalman
 
-   v. lidar & SLAM
+   v. Lidar & SLAM
    
 
-## ii.science works
+## ii.Science works
 
  Bio-inspired neighbor selection mechanism and performance evaluation for UAV Swarm: An extended visual-attention model
 
@@ -57,7 +57,7 @@ D. ROBOMaster.Team/Algorithem-vision&location
  https://github.com/WindyLab/
  AND so on
 
-## READINGS
+## CROUSE
 
  (not public yet Oh)
 
