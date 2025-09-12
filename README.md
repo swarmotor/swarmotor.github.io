@@ -29,7 +29,6 @@ AUTOMATION & AUTOMATIQUE --  Anhui University (2023.9- ~)
 
 A. Fix a bike 
 
-
 B. Make up an old phone 
 
 C. Self-balancing Lerro Triangle Robot
@@ -42,13 +41,14 @@ D. ROBOMaster.Team/Algorithem-vision&location
 
    iii. YOLO V8 & TensorRt （https://developer.nvidia.com/tensorrt）(https://zcneat2vzro8.feishu.cn/drive/folder/JLgMfiEKcl945WdRzvrcncYRnPe)
 
-   iv. Kalman&Control (now)
+   iv. Kalman
 
-   v. lidar (december)
+   v. lidar & SLAM
    
-The relevant information will be made open source after the end of this season. 
 
 ## ii.science works
+
+ Bio-inspired neighbor selection mechanism and performance evaluation for UAV Swarm: An extended visual-attention model
 
  Robotic swarms (not public)
  citae:
