@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZHANG Jun - Portfolio</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/inter-ui@3.19.3/inter.min.css">
+    <style>
+        :root {
+            --latex-gray: #555;
+            --latex-blue: #00008b;
+            --bg-color: #fcfcfc;
+        }
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            line-height: 1.5;
+            color: #333;
+            max-width: 850px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            background-color: var(--bg-color);
+        }
+
+        /* 互动导航栏 */
+        .nav-bar {
+            position: sticky;
+            top: 0;
+            background: rgba(252, 252, 252, 0.9);
+            padding: 10px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 30px;
+            z-index: 100;
+        }
+        .lang-switcher button {
+            cursor: pointer;
+            padding: 6px 12px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+        .lang-switcher button:hover { background: #f0f0f0; }
+        .lang-switcher button.active {
+            background: var(--latex-blue);
+            color: white;
+            border-color: var(--latex-blue);
+        }
+
+        /* LaTeX 风格样式 */
+        .header { text-align: center; margin-bottom: 20px; }
+        .header h1 { font-size: 2.2em; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; }
+        .header p { margin: 5px 0; font-size: 0.95em; }
+        
+        section { margin-top: 15px; }
+        h2 { 
+            font-variant: small-caps; 
+            border-bottom: 1px solid gray; 
+            font-size: 1.3em; 
+            margin-bottom: 8px;
+            color: #222;
+        }
+
+        .entry { display: flex; justify-content: space-between; font-weight: bold; margin-top: 8px; }
+        .sub-entry { display: flex; justify-content: space-between; font-style: italic; font-size: 0.9em; color: var(--latex-gray); }
+        
+        ul { margin-top: 5px; padding-left: 20px; list-style-type: square; }
+        li { margin-bottom: 4px; font-size: 0.92em; }
+        
+        a { color: var(--latex-blue); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+
+        .hidden { display: none; }
+        .btn-download {
+            background: #27ae60;
+            color: white !important;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="nav-bar">
+    <div class="lang-switcher">
+        <button id="btn-en" class="active" onclick="switchLang('en')">English</button>
+        <button id="btn-zh" onclick="switchLang('zh')">中文</button>
+    </div>
+    <a href="cv_en.pdf" class="btn-download" target="_blank">📄 Download CV (PDF)</a>
+</div>
+
+<div id="content-en">
+    <div class="header">
+        <h1>ZHANG Jun [cite: 1]</h1>
+        <p>
+            <a href="mailto:jzhang1@supmicrotech.fr">jzhang1@supmicrotech.fr</a> [cite: 2] | 
+            +33 07 43 55 91 27 [cite: 2] | 
+            Besançon, France (ENSMM) [cite: 2]
+        </p>
+    </div>
+
+    <section>
+        <h2>Research Interests</h2>
+        <p style="font-size: 0.92em;">Multi-Agent Systems (MAS), Distributed Machine Learning, Swarm Intelligence, Autonomous Navigation & Robotics, Topology-Aware Perception. [cite: 4]</p>
+    </section>
+
+    <section>
+        <h2>Education</h2>
+        <div class="entry"><span>SUPMICROTECH–ENSMM [cite: 6]</span><span>Besançon, France [cite: 9]</span></div>
+        <div class="sub-entry"><span>Exchange Engineering Program (L3) [cite: 7]</span><span>2025 -- 2026 [cite: 10]</span></div>
+        <ul>
+            <li>Selected Coursework: Signal Processing (15/20), Mathematics (13/20), Object-Oriented Programming (Java, 12.5/20). </li>
+        </ul>
+
+        <div class="entry"><span>Anhui University </span><span>Anhui, China [cite: 12]</span></div>
+        <div class="sub-entry"><span>B.S. in Intelligent Science and Technology (L1-L2) [cite: 8]</span><span>2023 -- 2025 [cite: 12]</span></div>
+        <ul>
+            <li>Key Scores: Advanced Mathematics (89/100), Programming & Experiments (91/100), GPA: 3.1/5.0. [cite: 13]</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>Publications</h2>
+        <ul>
+            <li><strong>Instantaneous Strong Connectivity: A Novel Perceptual Paradigm for Swarm Guidance</strong> <br> <i>First Author</i>, Under Review, 2026. [cite: 15, 16]</li>
+            <li><strong>Bio-inspired Neighbor Selection Mechanism for UAV Swarms</strong> <br> <i>First Author</i>, IFAC-ACA 2025 (Accepted). [cite: 17, 18]</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>Research & Project Experience</h2>
+        <div class="entry"><span>Spotlight: Topology-Preserving Swarm Perception [cite: 23]</span><span>2025--Present [cite: 25]</span></div>
+        <div class="sub-entry"><span>SUPMICROTECH–ENSMM | FEMTO-ST Laboratory [cite: 24]</span></div>
+        <ul>
+            <li>Formulated a topology-preserving perceptual paradigm guaranteeing instantaneous strong connectivity. [cite: 26]</li>
+            <li>Proved convergence and stability properties via Lyapunov-based analysis. [cite: 28]</li>
+        </ul>
+
+        <div class="entry"><span>Autonomous Perception & Navigation (RoboMaster) [cite: 43]</span><span>2023--2025 [cite: 43]</span></div>
+        <ul>
+            <li>Improved inference efficiency from 40 FPS to 90 FPS via TensorRT optimization. </li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>Technical Skills</h2>
+        <ul>
+            <li><strong>Languages:</strong> Python, C/C++, MATLAB, Java. [cite: 47]</li>
+            <li><strong>AI & Robotics:</strong> ROS2, PyTorch, TensorRT, OpenCV, Git. [cite: 48]</li>
+            <li><strong>Theory:</strong> Distributed Optimization, Graph Theory, Lyapunov Stability, MARL. [cite: 50]</li>
+        </ul>
+    </section>
+</div>
+
+<div id="content-zh" class="hidden">
+    <div class="header">
+        <h1>张骏</h1>
+        <p>jzhang1@supmicrotech.fr | 法国贝桑松 (ENSMM)</p>
+    </div>
+
+    <section>
+        <h2>研究方向</h2>
+        <p>多智能体系统 (MAS)、分布式机器学习、群体智能、自主导航与机器人。</p>
+    </section>
+
+    <section>
+        <h2>教育背景</h2>
+        <div class="entry"><span>法国国立高等机械与微技术大学 (SUPMICROTECH-ENSMM)</span><span>法国 贝桑松</span></div>
+        <div class="sub-entry"><span>工程师交换项目 (L3)</span><span>2025 -- 2026</span></div>
+        <ul>
+            <li>核心课程：信号处理 (15/20), 面向对象编程 (Java, 12.5/20)。</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>科研与项目经历</h2>
+        <div class="entry"><span>重点项目：拓扑保持的集群感知</span><span>2025--至今</span></div>
+        <ul>
+            <li>提出了一种保证动态交互图中瞬时强连通性的拓扑保持感知范式。</li>
+            <li>通过 Lyapunov 分析证明了收敛性和稳定性。</li>
+        </ul>
+        <div class="entry"><span>RoboMaster 2025 自主感知与导航</span><span>2023--2025</span></div>
+        <ul>
+            <li>利用 TensorRT 优化将推理效率从 40 FPS 提升至 90 FPS。</li>
+        </ul>
+    </section>
+</div>
+
+<script>
+    function switchLang(lang) {
+        // 切换内容显示
+        document.getElementById('content-en').classList.toggle('hidden', lang !== 'en');
+        document.getElementById('content-zh').classList.toggle('hidden', lang !== 'zh');
+        
+        // 切换按钮状态
+        document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+        document.getElementById('btn-zh').classList.toggle('active', lang === 'zh');
+    }
+</script>
+
+</body>
+</html>
