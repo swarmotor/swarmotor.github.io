@@ -1,207 +1,751 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZHANG Jun - Portfolio</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/inter-ui@3.19.3/inter.min.css">
+    <title>SWARMOTOR - 简历</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;500;600&family=Noto+Sans+SC:wght@300;400;500;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --latex-gray: #555;
-            --latex-blue: #00008b;
-            --bg-color: #fcfcfc;
-        }
-        body {
-            font-family: 'Inter', -apple-system, sans-serif;
-            line-height: 1.5;
-            color: #333;
-            max-width: 850px;
-            margin: 0 auto;
-            padding: 40px 20px;
-            background-color: var(--bg-color);
+            --bg-primary: #fafaf9;
+            --bg-secondary: #ffffff;
+            --text-primary: #1a1a1a;
+            --text-secondary: #525252;
+            --text-muted: #737373;
+            --accent: #0f4c5c;
+            --accent-light: #e8f4f6;
+            --border: #e5e5e5;
+            --shadow: rgba(0, 0, 0, 0.04);
+            --section-gap: 2.5rem;
         }
 
-        /* 互动导航栏 */
-        .nav-bar {
-            position: sticky;
-            top: 0;
-            background: rgba(252, 252, 252, 0.9);
-            padding: 10px 0;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'DM Sans', 'Noto Sans SC', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.7;
+            font-size: 15px;
+            min-height: 100vh;
+        }
+
+        .lang-toggle {
+            position: fixed;
+            top: 1.5rem;
+            right: 1.5rem;
+            z-index: 1000;
+            display: flex;
+            gap: 0.25rem;
+            background: var(--bg-secondary);
+            padding: 0.25rem;
+            border-radius: 2rem;
+            box-shadow: 0 2px 12px var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .lang-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            border-radius: 1.5rem;
+            transition: all 0.25s ease;
+            color: var(--text-muted);
+        }
+
+        .lang-btn.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        .lang-btn:hover:not(.active) {
+            color: var(--text-primary);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        h1 {
+            font-family: 'Crimson Pro', serif;
+            font-size: 2.75rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .contact-info {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem 2rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .contact-item a {
+            color: var(--accent);
+            text-decoration: none;
+            transition: opacity 0.2s;
+        }
+
+        .contact-item a:hover {
+            opacity: 0.7;
+        }
+
+        section {
+            margin-bottom: var(--section-gap);
+        }
+
+        h2 {
+            font-family: 'Crimson Pro', serif;
+            font-size: 1.35rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        h2::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(to right, var(--border), transparent);
+        }
+
+        .section-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .research-interests {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+
+        .entry {
+            margin-bottom: 1.5rem;
+        }
+
+        .entry-header {
             display: flex;
             justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 0.5rem;
+        }
+
+        .entry-title {
+            font-weight: 600;
+            font-size: 1rem;
+            color: var(--text-primary);
+        }
+
+        .entry-meta {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-align: right;
+            min-width: 180px;
+        }
+
+        .entry-subtitle {
+            font-size: 0.9rem;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .entry-details {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            padding-left: 0;
+            list-style: none;
+        }
+
+        .entry-details li {
+            position: relative;
+            padding-left: 1rem;
+            margin-bottom: 0.35rem;
+        }
+
+        .entry-details li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+            font-size: 0.7rem;
+        }
+
+        .pub-item {
+            margin-bottom: 1rem;
+            padding: 0.75rem 1rem;
+            background: var(--bg-secondary);
+            border-left: 3px solid var(--accent);
+            border-radius: 0 6px 6px 0;
+        }
+
+        .pub-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .pub-meta {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .pub-meta .venue {
+            color: var(--accent);
+            font-weight: 500;
+        }
+
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .skill-category {
+            background: var(--bg-secondary);
+            padding: 1rem 1.25rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .skill-category-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--accent);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .skill-list {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .award-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .award-item:last-child {
+            border-bottom: none;
+        }
+
+        .award-name {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .award-year {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        /* Language toggle for bilingual content */
+        [data-lang="en"] { display: none; }
+        [data-lang="zh"] { display: block; }
+        
+        body.lang-en [data-lang="zh"] { display: none; }
+        body.lang-en [data-lang="en"] { display: block; }
+
+        /* ==================== Scroll Animations ==================== */
+        
+        /* Base animation state */
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+            will-change: opacity, transform;
+        }
+
+        .animate-on-scroll.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Staggered delay for list items */
+        .entry-details li.animate-on-scroll {
+            transition-delay: 0.1s;
+        }
+
+        .pub-item.animate-on-scroll {
+            transition-delay: 0.15s;
+        }
+
+        .skill-category.animate-on-scroll {
+            transition-delay: calc(var(--skill-index, 0) * 0.1s);
+        }
+
+        .award-item.animate-on-scroll {
+            transition-delay: calc(var(--award-index, 0) * 0.15s);
+        }
+
+        /* Section animations */
+        section.animate-on-scroll {
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+
+        /* Header animation */
+        header.animate-on-scroll {
+            transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+        }
+
+        header.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Hover effects for interactive elements */
+        .pub-item {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .pub-item:hover {
+            transform: translateX(8px);
+            box-shadow: 0 4px 20px rgba(15, 76, 92, 0.12);
+        }
+
+        .skill-category {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .skill-category:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(15, 76, 92, 0.1);
+        }
+
+        .award-item {
+            transition: background-color 0.3s ease, padding-left 0.3s ease;
+        }
+
+        .award-item:hover {
+            background-color: var(--accent-light);
+            padding-left: 0.5rem;
+        }
+
+        /* Smooth anchor scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Loading animation */
+        .page-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-primary);
+            display: flex;
             align-items: center;
-            border-bottom: 1px solid #eee;
-            margin-bottom: 30px;
-            z-index: 100;
-        }
-        .lang-switcher button {
-            cursor: pointer;
-            padding: 6px 12px;
-            border: 1px solid #ddd;
-            background: white;
-            border-radius: 4px;
-            font-size: 14px;
-            transition: 0.3s;
-        }
-        .lang-switcher button:hover { background: #f0f0f0; }
-        .lang-switcher button.active {
-            background: var(--latex-blue);
-            color: white;
-            border-color: var(--latex-blue);
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
         }
 
-        /* LaTeX 风格样式 */
-        .header { text-align: center; margin-bottom: 20px; }
-        .header h1 { font-size: 2.2em; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; }
-        .header p { margin: 5px 0; font-size: 0.95em; }
-        
-        section { margin-top: 15px; }
-        h2 { 
-            font-variant: small-caps; 
-            border-bottom: 1px solid gray; 
-            font-size: 1.3em; 
-            margin-bottom: 8px;
-            color: #222;
+        .page-loader.hidden {
+            opacity: 0;
+            visibility: hidden;
         }
 
-        .entry { display: flex; justify-content: space-between; font-weight: bold; margin-top: 8px; }
-        .sub-entry { display: flex; justify-content: space-between; font-style: italic; font-size: 0.9em; color: var(--latex-gray); }
-        
-        ul { margin-top: 5px; padding-left: 20px; list-style-type: square; }
-        li { margin-bottom: 4px; font-size: 0.92em; }
-        
-        a { color: var(--latex-blue); text-decoration: none; }
-        a:hover { text-decoration: underline; }
+        .loader-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
 
-        .hidden { display: none; }
-        .btn-download {
-            background: #27ae60;
-            color: white !important;
-            padding: 8px 15px;
-            border-radius: 5px;
-            font-size: 14px;
-            font-weight: bold;
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Print styles */
+        @media print {
+            .lang-toggle, .page-loader { display: none; }
+            body { background: white; }
+            .container { max-width: 100%; padding: 1rem; }
+            .pub-item { box-shadow: none; border: 1px solid #eee; }
+            .animate-on-scroll { 
+                opacity: 1; 
+                transform: none; 
+            }
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 600px) {
+            .container { padding: 1.5rem 1rem; }
+            h1 { font-size: 2rem; }
+            .entry-header { flex-direction: column; gap: 0.25rem; }
+            .entry-meta { text-align: left; }
+            .skills-grid { grid-template-columns: 1fr; }
+            .contact-info { flex-direction: column; align-items: center; }
+            .award-item { flex-direction: column; gap: 0.25rem; }
+            .award-year { text-align: left; }
         }
     </style>
 </head>
 <body>
-
-<div class="nav-bar">
-    <div class="lang-switcher">
-        <button id="btn-en" class="active" onclick="switchLang('en')">English</button>
-        <button id="btn-zh" onclick="switchLang('zh')">中文</button>
-    </div>
-    <a href="cv_en.pdf" class="btn-download" target="_blank">📄 Download CV (PDF)</a>
-</div>
-
-<div id="content-en">
-    <div class="header">
-        <h1>ZHANG Jun [cite: 1]</h1>
-        <p>
-            <a href="mailto:jzhang1@supmicrotech.fr">jzhang1@supmicrotech.fr</a> [cite: 2] | 
-            +33 07 43 55 91 27 [cite: 2] | 
-            Besançon, France (ENSMM) [cite: 2]
-        </p>
+    <!-- Page Loader -->
+    <div class="page-loader" id="pageLoader">
+        <div class="loader-spinner"></div>
     </div>
 
-    <section>
-        <h2>Research Interests</h2>
-        <p style="font-size: 0.92em;">Multi-Agent Systems (MAS), Distributed Machine Learning, Swarm Intelligence, Autonomous Navigation & Robotics, Topology-Aware Perception. [cite: 4]</p>
-    </section>
-
-    <section>
-        <h2>Education</h2>
-        <div class="entry"><span>SUPMICROTECH–ENSMM [cite: 6]</span><span>Besançon, France [cite: 9]</span></div>
-        <div class="sub-entry"><span>Exchange Engineering Program (L3) [cite: 7]</span><span>2025 -- 2026 [cite: 10]</span></div>
-        <ul>
-            <li>Selected Coursework: Signal Processing (15/20), Mathematics (13/20), Object-Oriented Programming (Java, 12.5/20). </li>
-        </ul>
-
-        <div class="entry"><span>Anhui University </span><span>Anhui, China [cite: 12]</span></div>
-        <div class="sub-entry"><span>B.S. in Intelligent Science and Technology (L1-L2) [cite: 8]</span><span>2023 -- 2025 [cite: 12]</span></div>
-        <ul>
-            <li>Key Scores: Advanced Mathematics (89/100), Programming & Experiments (91/100), GPA: 3.1/5.0. [cite: 13]</li>
-        </ul>
-    </section>
-
-    <section>
-        <h2>Publications</h2>
-        <ul>
-            <li><strong>Instantaneous Strong Connectivity: A Novel Perceptual Paradigm for Swarm Guidance</strong> <br> <i>First Author</i>, Under Review, 2026. [cite: 15, 16]</li>
-            <li><strong>Bio-inspired Neighbor Selection Mechanism for UAV Swarms</strong> <br> <i>First Author</i>, IFAC-ACA 2025 (Accepted). [cite: 17, 18]</li>
-        </ul>
-    </section>
-
-    <section>
-        <h2>Research & Project Experience</h2>
-        <div class="entry"><span>Spotlight: Topology-Preserving Swarm Perception [cite: 23]</span><span>2025--Present [cite: 25]</span></div>
-        <div class="sub-entry"><span>SUPMICROTECH–ENSMM | FEMTO-ST Laboratory [cite: 24]</span></div>
-        <ul>
-            <li>Formulated a topology-preserving perceptual paradigm guaranteeing instantaneous strong connectivity. [cite: 26]</li>
-            <li>Proved convergence and stability properties via Lyapunov-based analysis. [cite: 28]</li>
-        </ul>
-
-        <div class="entry"><span>Autonomous Perception & Navigation (RoboMaster) [cite: 43]</span><span>2023--2025 [cite: 43]</span></div>
-        <ul>
-            <li>Improved inference efficiency from 40 FPS to 90 FPS via TensorRT optimization. </li>
-        </ul>
-    </section>
-
-    <section>
-        <h2>Technical Skills</h2>
-        <ul>
-            <li><strong>Languages:</strong> Python, C/C++, MATLAB, Java. [cite: 47]</li>
-            <li><strong>AI & Robotics:</strong> ROS2, PyTorch, TensorRT, OpenCV, Git. [cite: 48]</li>
-            <li><strong>Theory:</strong> Distributed Optimization, Graph Theory, Lyapunov Stability, MARL. [cite: 50]</li>
-        </ul>
-    </section>
-</div>
-
-<div id="content-zh" class="hidden">
-    <div class="header">
-        <h1>张骏</h1>
-        <p>jzhang1@supmicrotech.fr | 法国贝桑松 (ENSMM)</p>
+    <!-- Language Toggle -->
+    <div class="lang-toggle">
+        <button class="lang-btn active" onclick="setLang('zh')">中文</button>
+        <button class="lang-btn" onclick="setLang('en')">EN</button>
     </div>
 
-    <section>
-        <h2>研究方向</h2>
-        <p>多智能体系统 (MAS)、分布式机器学习、群体智能、自主导航与机器人。</p>
-    </section>
+    <div class="container">
+        <header class="animate-on-scroll">
+            <h1 data-lang="zh">张俊</h1>
+            <h1 data-lang="en">ZHANG Jun</h1>
+            
+            <div class="contact-info">
+                <span class="contact-item">
+                    <a href="mailto:jzhang1@supmicrotech.fr">jzhang1@supmicrotech.fr</a>
+                </span>
+                <span class="contact-item">+33 07 43 55 91 27</span>
+                <span class="contact-item" data-lang="zh">法国贝桑松 (ENSMM)</span>
+                <span class="contact-item" data-lang="en">Besançon, France (ENSMM)</span>
+            </div>
+        </header>
 
-    <section>
-        <h2>教育背景</h2>
-        <div class="entry"><span>法国国立高等机械与微技术大学 (SUPMICROTECH-ENSMM)</span><span>法国 贝桑松</span></div>
-        <div class="sub-entry"><span>工程师交换项目 (L3)</span><span>2025 -- 2026</span></div>
-        <ul>
-            <li>核心课程：信号处理 (15/20), 面向对象编程 (Java, 12.5/20)。</li>
-        </ul>
-    </section>
+        <section class="animate-on-scroll">
+            <h2><span class="section-title" data-lang="zh">研究兴趣</span><span class="section-title" data-lang="en">Research Interests</span></h2>
+            <p class="research-interests" data-lang="zh">
+                多智能体系统 (MAS)、分布式机器学习、群体智能、自主导航与机器人、拓扑感知
+            </p>
+            <p class="research-interests" data-lang="en">
+                Multi-Agent Systems (MAS), Distributed Machine Learning, Swarm Intelligence, Autonomous Navigation & Robotics, Topology-Aware Perception
+            </p>
+        </section>
 
-    <section>
-        <h2>科研与项目经历</h2>
-        <div class="entry"><span>重点项目：拓扑保持的集群感知</span><span>2025--至今</span></div>
-        <ul>
-            <li>提出了一种保证动态交互图中瞬时强连通性的拓扑保持感知范式。</li>
-            <li>通过 Lyapunov 分析证明了收敛性和稳定性。</li>
-        </ul>
-        <div class="entry"><span>RoboMaster 2025 自主感知与导航</span><span>2023--2025</span></div>
-        <ul>
-            <li>利用 TensorRT 优化将推理效率从 40 FPS 提升至 90 FPS。</li>
-        </ul>
-    </section>
-</div>
+        <section class="animate-on-scroll">
+            <h2><span class="section-title" data-lang="zh">教育背景</span><span class="section-title" data-lang="en">Education</span></h2>
+            
+            <div class="entry">
+                <div class="entry-header">
+                    <span class="entry-title">SUPMICROTECH--ENSMM</span>
+                    <span class="entry-meta" data-lang="zh">2025 -- 2026</span>
+                    <span class="entry-meta" data-lang="en">2025 -- 2026</span>
+                </div>
+                <div class="entry-subtitle" data-lang="zh">交换生项目 (L3)</div>
+                <div class="entry-subtitle" data-lang="en">Exchange Engineering Program (L3)</div>
+                <ul class="entry-details">
+                    <li data-lang="zh">信号处理 (15/20)</li>
+                    <li data-lang="zh">数学 (13/20)</li>
+                    <li data-lang="zh">面向对象编程 (Java, 12.5/20)</li>
+                    <li data-lang="en">Signal Processing (15/20)</li>
+                    <li data-lang="en">Mathematics (13/20)</li>
+                    <li data-lang="en">Object-Oriented Programming (Java, 12.5/20)</li>
+                </ul>
+            </div>
 
-<script>
-    function switchLang(lang) {
-        // 切换内容显示
-        document.getElementById('content-en').classList.toggle('hidden', lang !== 'en');
-        document.getElementById('content-zh').classList.toggle('hidden', lang !== 'zh');
-        
-        // 切换按钮状态
-        document.getElementById('btn-en').classList.toggle('active', lang === 'en');
-        document.getElementById('btn-zh').classList.toggle('active', lang === 'zh');
-    }
-</script>
+            <div class="entry">
+                <div class="entry-header">
+                    <span class="entry-title">安徽大学</span>
+                    <span class="entry-meta" data-lang="zh">2023 -- 2025</span>
+                    <span class="entry-meta" data-lang="en">2023 -- 2025</span>
+                </div>
+                <div class="entry-subtitle" data-lang="zh">智能科学与技术学士 (L1-L2)</div>
+                <div class="entry-subtitle" data-lang="en">B.S. in Intelligent Science and Technology (L1-L2)</div>
+                <ul class="entry-details">
+                    <li data-lang="zh">高等数学: <strong>89/100</strong></li>
+                    <li data-lang="zh">编程与实验: <strong>91/100</strong></li>
+                    <li data-lang="zh">GPA: <strong>3.1/5.0</strong></li>
+                    <li data-lang="en">Advanced Mathematics: <strong>89/100</strong></li>
+                    <li data-lang="en">Programming & Experiments: <strong>91/100</strong></li>
+                    <li data-lang="en">GPA: <strong>3.1/5.0</strong></li>
+                </ul>
+            </div>
+        </section>
 
+        <section class="animate-on-scroll">
+            <h2><span class="section-title" data-lang="zh">发表论文</span><span class="section-title" data-lang="en">Publications</span></h2>
+            
+            <div class="pub-item">
+                <div class="pub-title">Instantaneous Strong Connectivity: A Novel Perceptual Paradigm for Swarm Guidance in Communication-Denied Environments</div>
+                <div class="pub-meta">
+                    <span data-lang="zh">第一作者</span><span data-lang="en">First Author</span> | 
+                    <span class="venue">Under Review</span> | 2026
+                </div>
+            </div>
+
+            <div class="pub-item">
+                <div class="pub-title">Bio-inspired Neighbor Selection Mechanism and Performance Evaluation for UAV Swarms</div>
+                <div class="pub-meta">
+                    <span data-lang="zh">第一作者</span><span data-lang="en">First Author</span> | 
+                    <span class="venue">IFAC-ACA 2025</span> (Accepted)
+                </div>
+            </div>
+
+            <div class="pub-item">
+                <div class="pub-title">Adaptive Encirclement Control Strategy for Swarm Robots Based on Multi-Sensor Dynamic Fusion</div>
+                <div class="pub-meta">
+                    <span data-lang="zh">共同作者</span><span data-lang="en">Co-author</span> | 
+                    <span class="venue">Control Engineering of China</span> 2025 (Accepted)
+                </div>
+            </div>
+
+            <div class="pub-item">
+                <div class="pub-title">Multi-robot Capture Strategy for Observation-Limited Scenarios</div>
+                <div class="pub-meta">
+                    <span data-lang="zh">共同作者</span><span data-lang="en">Co-author</span> | 
+                    <span class="venue">ROBOMECH</span> 2025 (Accepted)
+                </div>
+            </div>
+        </section>
+
+        <section class="animate-on-scroll">
+            <h2><span class="section-title" data-lang="zh">科研与项目经验</span><span class="section-title" data-lang="en">Research & Project Experience</span></h2>
+            
+            <div class="entry">
+                <div class="entry-header">
+                    <span class="entry-title" data-lang="zh">拓扑保持的群体感知研究</span>
+                    <span class="entry-title" data-lang="en">Spotlight: Topology-Preserving Swarm Perception</span>
+                </div>
+                <div class="entry-subtitle">SUPMICROTECH–ENSMM | FEMTO-ST Laboratory | 2025--Present</div>
+                <ul class="entry-details">
+                    <li data-lang="zh">提出了保证动态交互图中即时强连通性的拓扑保持感知范式</li>
+                    <li data-lang="zh">建立了通信约束下结构信息传播的理论保证，防止网络分裂</li>
+                    <li data-lang="zh">通过李雅普诺夫分析方法证明了收敛性和稳定性</li>
+                    <li data-lang="zh">展示了相对于传统KNN拓扑策略的鲁棒性优势</li>
+                    <li data-lang="en">Formulated a topology-preserving perceptual paradigm guaranteeing instantaneous strong connectivity in dynamic interaction graphs</li>
+                    <li data-lang="en">Established structural information propagation guarantees preventing network fragmentation under communication constraints</li>
+                    <li data-lang="en">Proved convergence and stability properties via Lyapunov-based analysis</li>
+                    <li data-lang="en">Demonstrated robustness superiority over conventional KNN-based topology strategies</li>
+                </ul>
+            </div>
+
+            <div class="entry">
+                <div class="entry-header">
+                    <span class="entry-title" data-lang="zh">分布式无人机群体轨迹优化</span>
+                    <span class="entry-title" data-lang="en">Distributed UAV Swarm Trajectory Optimization</span>
+                </div>
+                <div class="entry-subtitle" data-lang="zh">项目负责人 | 导师: 张亮教授 | 2023--2025</div>
+                <div class="entry-subtitle" data-lang="en">Project Leader | Supervisor: Prof. Zhang Liang | 2023--2025</div>
+                <ul class="entry-details">
+                    <li data-lang="zh">开发了基于CMA-ES的轨迹优化框架，实现去中心化多智能体协调</li>
+                    <li data-lang="zh">设计了通信约束下的拓扑感知协调机制</li>
+                    <li data-lang="zh">建立了定量连接性和鲁棒性评估指标</li>
+                    <li data-lang="en">Developed a CMA-ES-based trajectory optimization framework for decentralized multi-agent coordination</li>
+                    <li data-lang="en">Designed topology-aware coordination mechanisms under communication constraints</li>
+                    <li data-lang="en">Established quantitative connectivity and robustness evaluation metrics</li>
+                </ul>
+            </div>
+
+            <div class="entry">
+                <div class="entry-header">
+                    <span class="entry-title" data-lang="zh">生成式强化学习用于去中心化群体协调</span>
+                    <span class="entry-title" data-lang="en">Generative Reinforcement Learning for Decentralized Swarm Coordination</span>
+                </div>
+                <div class="entry-subtitle" data-lang="zh">2024--Present</div>
+                <ul class="entry-details">
+                    <li data-lang="zh">开发了通信约束多智能体系统的去中心化强化学习框架</li>
+                    <li data-lang="zh">在大规模仿真中评估了可扩展性和收敛稳定性</li>
+                    <li data-lang="en">Developed decentralized reinforcement learning framework for communication-constrained multi-agent systems</li>
+                    <li data-lang="en">Evaluated scalability and convergence stability in large-scale simulations</li>
+                </ul>
+            </div>
+
+            <div class="entry">
+                <div class="entry-header">
+                    <span class="entry-title" data-lang="zh">基于视觉的抗风无人机稳定控制</span>
+                    <span class="entry-title" data-lang="en">Vision-Based Wind-Resistant UAV Stabilization</span>
+                </div>
+                <div class="entry-subtitle" data-lang="zh">2024--2025</div>
+                <ul class="entry-details">
+                    <li data-lang="zh">设计了抗扰动无人机的视觉状态估计算法</li>
+                    <li data-lang="zh">量化了气动扰动下的稳定性性能</li>
+                    <li data-lang="en">Designed visual state-estimation algorithms for disturbance-resilient UAV control</li>
+                    <li data-lang="en">Quantified stability performance under aerodynamic perturbations</li>
+                </ul>
+            </div>
+
+            <div class="entry">
+                <div class="entry-header">
+                    <span class="entry-title" data-lang="zh">自主感知与导航 (RoboMaster 2025)</span>
+                    <span class="entry-title" data-lang="en">Autonomous Perception & Navigation (RoboMaster 2025)</span>
+                </div>
+                <div class="entry-subtitle" data-lang="zh">2023--2025</div>
+                <ul class="entry-details">
+                    <li data-lang="zh">实现了实时视觉检测和基于LiDAR的导航系统</li>
+                    <li data-lang="zh">通过TensorRT优化将推理效率从40 FPS提升至90 FPS</li>
+                    <li data-lang="en">Implemented real-time visual detection and LiDAR-based navigation system</li>
+                    <li data-lang="en">Improved inference efficiency from 40 FPS to 90 FPS via TensorRT optimization</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="animate-on-scroll">
+            <h2><span class="section-title" data-lang="zh">技术技能</span><span class="section-title" data-lang="en">Technical Skills</span></h2>
+            
+            <div class="skills-grid">
+                <div class="skill-category animate-on-scroll" style="--skill-index: 0;">
+                    <div class="skill-category-title" data-lang="zh">编程语言</div>
+                    <div class="skill-category-title" data-lang="en">Languages</div>
+                    <div class="skill-list">Python, C/C++, MATLAB, Java, etc.</div>
+                </div>
+                <div class="skill-category animate-on-scroll" style="--skill-index: 1;">
+                    <div class="skill-category-title" data-lang="zh">人工智能与机器人</div>
+                    <div class="skill-category-title" data-lang="en">AI & Robotics</div>
+                    <div class="skill-list">ROS2, PyTorch, TensorRT, OpenCV, Git, LaTeX</div>
+                </div>
+                <div class="skill-category animate-on-scroll" style="--skill-index: 2;">
+                    <div class="skill-category-title" data-lang="zh">仿真工具</div>
+                    <div class="skill-category-title" data-lang="en">Simulation</div>
+                    <div class="skill-list">Isaac Sim, Genesis, Gazebo</div>
+                </div>
+                <div class="skill-category animate-on-scroll" style="--skill-index: 3;">
+                    <div class="skill-category-title" data-lang="zh">理论基础</div>
+                    <div class="skill-category-title" data-lang="en">Theory</div>
+                    <div class="skill-list">Distributed Optimization, Graph Theory, Lyapunov Stability, MARL</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="animate-on-scroll">
+            <h2><span class="section-title" data-lang="zh">获奖荣誉</span><span class="section-title" data-lang="en">Awards</span></h2>
+            
+            <div class="award-item animate-on-scroll" style="--award-index: 0;">
+                <span class="award-name" data-lang="zh"> RoboMaster机甲大师赛全国三等奖</span>
+                <span class="award-name" data-lang="en">Third National Prize, RoboMaster University League</span>
+                <span class="award-year">2025.04</span>
+            </div>
+            <div class="award-item animate-on-scroll" style="--award-index: 1;">
+                <span class="award-name" data-lang="zh"> 蓝桥杯程序设计竞赛 (C++ A组) 省级三等奖</span>
+                <span class="award-name" data-lang="en">Third Regional Prize, Blue Bridge Cup Programming Contest (C++, Group A)</span>
+                <span class="award-year">2024.04</span>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // ==================== Language Toggle ====================
+        function setLang(lang) {
+            document.body.classList.remove('lang-en');
+            if (lang === 'en') {
+                document.body.classList.add('lang-en');
+            }
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if ((btn.textContent === 'EN' && lang === 'en') || 
+                    (btn.textContent === '中文' && lang === 'zh')) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+
+        // ==================== Page Loader ====================
+        window.addEventListener('load', function() {
+            const loader = document.getElementById('pageLoader');
+            setTimeout(() => {
+                loader.classList.add('hidden');
+            }, 800);
+        });
+
+        // ==================== Scroll Animation Observer ====================
+        function initScrollAnimations() {
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.1
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        // Optionally stop observing after animation
+                        // observer.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+
+            // Observe all animated elements
+            document.querySelectorAll('.animate-on-scroll').forEach(el => {
+                observer.observe(el);
+            });
+        }
+
+        // Initialize animations when DOM is ready
+        document.addEventListener('DOMContentLoaded', initScrollAnimations);
+
+        // ==================== Smooth Scroll for Anchor Links ====================
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // ==================== Keyboard Navigation ====================
+        document.addEventListener('keydown', function(e) {
+            // Arrow keys for section navigation
+            if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+                const sections = Array.from(document.querySelectorAll('section, header'));
+                const currentSection = sections.find(section => {
+                    const rect = section.getBoundingClientRect();
+                    return rect.top <= 100 && rect.bottom > 100;
+                });
+                
+                if (currentSection) {
+                    const currentIndex = sections.indexOf(currentSection);
+                    const nextIndex = e.key === 'ArrowDown' 
+                        ? Math.min(currentIndex + 1, sections.length - 1)
+                        : Math.max(currentIndex - 1, 0);
+                    
+                    sections[nextIndex].scrollIntoView({ behavior: 'smooth' });
+                }
+            }
+        });
+    </script>
 </body>
 </html>
