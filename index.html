@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SWARMOTOR - 简历</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;500;600&family=Noto+Sans+SC:wght@300;400;500;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;500;600&family=Noto+Sans+SC:wght@300;400;500;700&family=DM+Sans:wght@400;500;600&display=swap"
+        rel="stylesheet">
     <style>
         /* Game of Life Background Canvas */
         #game-of-life {
@@ -16,8 +19,8 @@
             width: 100%;
             height: 100%;
             z-index: -1;
-            opacity: 0.12;
-            pointer-events: none;
+            opacity: 0.15;
+            pointer-events: auto;
         }
 
         :root {
@@ -81,6 +84,44 @@
 
         .lang-btn:hover:not(.active) {
             color: var(--text-primary);
+        }
+
+        .game-toggle {
+            position: fixed;
+            top: 4.5rem;
+            right: 1.5rem;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 0.15rem;
+            background: var(--bg-secondary);
+            padding: 0.25rem;
+            border-radius: 2rem;
+            box-shadow: 0 2px 12px var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .game-btn {
+            width: 2rem;
+            height: 2rem;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 1rem;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .game-btn:hover {
+            background: var(--accent-light);
+            transform: scale(1.1);
+        }
+
+        .game-btn.active {
+            background: var(--accent);
         }
 
         .container {
@@ -292,14 +333,24 @@
         }
 
         /* Language toggle for bilingual content */
-        [data-lang="en"] { display: none; }
-        [data-lang="zh"] { display: block; }
-        
-        body.lang-en [data-lang="zh"] { display: none; }
-        body.lang-en [data-lang="en"] { display: block; }
+        [data-lang="en"] {
+            display: none;
+        }
+
+        [data-lang="zh"] {
+            display: block;
+        }
+
+        body.lang-en [data-lang="zh"] {
+            display: none;
+        }
+
+        body.lang-en [data-lang="en"] {
+            display: block;
+        }
 
         /* ==================== Scroll Animations ==================== */
-        
+
         /* Base animation state */
         .animate-on-scroll {
             opacity: 0;
@@ -408,34 +459,85 @@
         }
 
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         /* Print styles */
         @media print {
-            .lang-toggle, .page-loader { display: none; }
-            body { background: white; }
-            .container { max-width: 100%; padding: 1rem; }
-            .pub-item { box-shadow: none; border: 1px solid #eee; }
-            .animate-on-scroll { 
-                opacity: 1; 
-                transform: none; 
+
+            .lang-toggle,
+            .page-loader {
+                display: none;
+            }
+
+            body {
+                background: white;
+            }
+
+            .container {
+                max-width: 100%;
+                padding: 1rem;
+            }
+
+            .pub-item {
+                box-shadow: none;
+                border: 1px solid #eee;
+            }
+
+            .animate-on-scroll {
+                opacity: 1;
+                transform: none;
             }
         }
 
         /* Mobile responsive */
         @media (max-width: 600px) {
-            .container { padding: 1.5rem 1rem; }
-            h1 { font-size: 2rem; }
-            .entry-header { flex-direction: column; gap: 0.25rem; }
-            .entry-meta { text-align: left; }
-            .skills-grid { grid-template-columns: 1fr; }
-            .contact-info { flex-direction: column; align-items: center; }
-            .award-item { flex-direction: column; gap: 0.25rem; }
-            .award-year { text-align: left; }
+            .container {
+                padding: 1.5rem 1rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .entry-header {
+                flex-direction: column;
+                gap: 0.25rem;
+            }
+
+            .entry-meta {
+                text-align: left;
+            }
+
+            .skills-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .contact-info {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .award-item {
+                flex-direction: column;
+                gap: 0.25rem;
+            }
+
+            .award-year {
+                text-align: left;
+            }
+
+            .game-toggle {
+                top: 1.5rem;
+                right: 1rem;
+                transform: scale(0.85);
+            }
         }
     </style>
 </head>
+
 <body>
     <!-- Page Loader -->
     <div class="page-loader" id="pageLoader">
@@ -451,11 +553,21 @@
         <button class="lang-btn" onclick="setLang('en')">EN</button>
     </div>
 
+    <!-- Game Toggle -->
+    <div class="game-toggle">
+        <button class="game-btn active" onclick="setGame('flocking', this)" title="Flocking">🦎</button>
+        <button class="game-btn" onclick="setGame('pursuit', this)" title="Pursuit-Evasion">🎯</button>
+        <button class="game-btn" onclick="setGame('rps', this)" title="Rock-Paper-Scissors">✊</button>
+        <button class="game-btn" onclick="setGame('sweep', this)" title="Particle Sweep">💨</button>
+        <button class="game-btn" onclick="setGame('ant', this)" title="Ant Colony">🐜</button>
+        <button class="game-btn" onclick="setGame('life', this)" title="Game of Life">🎲</button>
+    </div>
+
     <div class="container">
         <header class="animate-on-scroll">
             <h1 data-lang="zh">张俊</h1>
             <h1 data-lang="en">ZHANG Jun</h1>
-            
+
             <div class="contact-info">
                 <span class="contact-item">
                     <a href="mailto:jzhang1@supmicrotech.fr">jzhang1@supmicrotech.fr</a>
@@ -467,8 +579,9 @@
         </header>
 
         <section class="animate-on-scroll">
-            <h2><span class="section-title" data-lang="zh">技术技能</span><span class="section-title" data-lang="en">Technical Skills</span></h2>
-            
+            <h2><span class="section-title" data-lang="zh">技术技能</span><span class="section-title"
+                    data-lang="en">Technical Skills</span></h2>
+
             <div class="skills-grid">
                 <div class="skill-category animate-on-scroll" style="--skill-index: 0;">
                     <div class="skill-category-title" data-lang="zh">编程语言</div>
@@ -494,15 +607,16 @@
         </section>
 
         <section class="animate-on-scroll">
-            <h2><span class="section-title" data-lang="zh">教育背景</span><span class="section-title" data-lang="en">Education</span></h2>
-            
+            <h2><span class="section-title" data-lang="zh">教育背景</span><span class="section-title"
+                    data-lang="en">Education</span></h2>
+
             <div class="entry">
                 <div class="entry-header">
                     <span class="entry-title">SUPMICROTECH--ENSMM</span>
                     <span class="entry-meta" data-lang="zh">2025 -- 2026</span>
                     <span class="entry-meta" data-lang="en">2025 -- 2026</span>
                 </div>
-                
+
                 <ul class="entry-details">
                     <li data-lang="zh">信号处理 (15/20)</li>
                     <li data-lang="zh">数学 (13/20)</li>
@@ -519,8 +633,6 @@
                     <span class="entry-meta" data-lang="zh">2023 -- 2025</span>
                     <span class="entry-meta" data-lang="en">2023 -- 2025</span>
                 </div>
-                <div class="entry-subtitle" data-lang="zh">智能科学与技术学士</div>
-                <div class="entry-subtitle" data-lang="en">B.S. in Intelligent Science and Technology</div>
                 <ul class="entry-details">
                     <li data-lang="zh">高等数学: <strong>89/100</strong></li>
                     <li data-lang="zh">编程与实验: <strong>91/100</strong></li>
@@ -533,48 +645,54 @@
         </section>
 
         <section class="animate-on-scroll">
-            <h2><span class="section-title" data-lang="zh">发表论文</span><span class="section-title" data-lang="en">Publications</span></h2>
-            
+            <h2><span class="section-title" data-lang="zh">发表论文</span><span class="section-title"
+                    data-lang="en">Publications</span></h2>
+
             <div class="pub-item">
-                <div class="pub-title">Instantaneous Strong Connectivity: A Novel Perceptual Paradigm for Swarm Guidance in Communication-Denied Environments</div>
+                <div class="pub-title">Instantaneous Strong Connectivity: A Novel Perceptual Paradigm for Swarm Guidance
+                    in Communication-Denied Environments</div>
                 <div class="pub-meta">
-                    <span data-lang="zh">第一作者</span><span data-lang="en">First Author</span> | 
-                    <span class="venue">Under Review</span> | 2026
+                    <span data-lang="zh">第一作者</span><span data-lang="en">First Author</span> |
+                    <span class="venue">IEEE Transactions on Control of Network Systems</span> (Under Review) | 2026
                 </div>
             </div>
 
-            <div class="pub-item">
-                <div class="pub-title">
-                    <a href="https://www.sciencedirect.com/science/article/pii/S2405896325020579" target="_blank" style="color: inherit; text-decoration: none;">
-                        Bio-inspired Neighbor Selection Mechanism and Performance Evaluation for UAV Swarms ↗
-                    </a>
-                </div>
-                <div class="pub-meta">
-                    <span data-lang="zh">第一作者</span><span data-lang="en">First Author</span> | 
-                    <span class="venue">IFAC-ACA 2025</span> (Accepted)
-                </div>
-            </div>
 
             <div class="pub-item">
-                <div class="pub-title">Adaptive Encirclement Control Strategy for Swarm Robots Based on Multi-Sensor Dynamic Fusion</div>
+                <div class="pub-title">Adaptive Encirclement Control Strategy for Swarm Robots Based on Multi-Sensor
+                    Dynamic Fusion</div>
                 <div class="pub-meta">
-                    <span data-lang="zh">本科生第一作者</span><span data-lang="en">Undergraduate First Author</span> | 
-                    <span class="venue">Control Engineering of China</span> 2025 (Accepted)
+                    <span data-lang="zh">本科生第一作者</span><span data-lang="en">Undergraduate First Author</span> |
+                    <span class="venue">Control Engineering of China</span> (Accepted) | 2026
                 </div>
             </div>
 
             <div class="pub-item">
                 <div class="pub-title">Multi-robot Capture Strategy for Observation-Limited Scenarios</div>
                 <div class="pub-meta">
-                    <span data-lang="zh">本科生第一作者</span><span data-lang="en">Undergraduate First Author</span> | 
-                    <span class="venue">ROBOMECH</span> 2025 (Accepted)
+                    <span data-lang="zh">本科生第一作者</span><span data-lang="en">Undergraduate First Author</span> |
+                    <span class="venue">ROBOMECH</span> (Accepted) | 2026
+                </div>
+            </div>
+
+            <div class="pub-item">
+                <div class="pub-title">
+                    <a href="https://www.sciencedirect.com/science/article/pii/S2405896325020579" target="_blank"
+                        style="color: inherit; text-decoration: none;">
+                        Bio-inspired Neighbor Selection Mechanism and Performance Evaluation for UAV Swarms ↗
+                    </a>
+                </div>
+                <div class="pub-meta">
+                    <span data-lang="zh">第一作者</span><span data-lang="en">First Author</span> |
+                    <span class="venue">IFAC-ACA 2025</span> (Published)
                 </div>
             </div>
         </section>
 
         <section class="animate-on-scroll">
-            <h2><span class="section-title" data-lang="zh">科研与项目经验</span><span class="section-title" data-lang="en">Research & Project Experience</span></h2>
-            
+            <h2><span class="section-title" data-lang="zh">科研与项目经验</span><span class="section-title"
+                    data-lang="en">Research & Project Experience</span></h2>
+
             <div class="pub-item">
                 <div class="pub-title" data-lang="zh">拓扑保持的群体感知研究</div>
                 <div class="pub-title" data-lang="en">Spotlight: Topology-Preserving Swarm Perception</div>
@@ -582,12 +700,15 @@
                 <ul class="entry-details">
                     <li data-lang="zh">提出了保证动态交互图中即时强连通性的拓扑保持感知范式</li>
                     <li data-lang="zh">建立了通信约束下结构信息传播的理论保证，防止网络分裂</li>
-                    <li data-lang="zh">通过李雅普诺夫分析方法证明了收敛性和稳定性</li>
+                    <li data-lang="zh">通过Lyapunov分析方法证明了收敛性和稳定性</li>
                     <li data-lang="zh">展示了相对于传统KNN拓扑策略的鲁棒性优势</li>
-                    <li data-lang="en">Formulated a topology-preserving perceptual paradigm guaranteeing instantaneous strong connectivity in dynamic interaction graphs</li>
-                    <li data-lang="en">Established structural information propagation guarantees preventing network fragmentation under communication constraints</li>
+                    <li data-lang="en">Formulated a topology-preserving perceptual paradigm guaranteeing instantaneous
+                        strong connectivity in dynamic interaction graphs</li>
+                    <li data-lang="en">Established structural information propagation guarantees preventing network
+                        fragmentation under communication constraints</li>
                     <li data-lang="en">Proved convergence and stability properties via Lyapunov-based analysis</li>
-                    <li data-lang="en">Demonstrated robustness superiority over conventional KNN-based topology strategies</li>
+                    <li data-lang="en">Demonstrated robustness superiority over conventional KNN-based topology
+                        strategies</li>
                 </ul>
             </div>
 
@@ -600,8 +721,10 @@
                     <li data-lang="zh">开发了基于CMA-ES的轨迹优化框架，实现去中心化多智能体协调</li>
                     <li data-lang="zh">设计了通信约束下的拓扑感知协调机制</li>
                     <li data-lang="zh">建立了定量连接性和鲁棒性评估指标</li>
-                    <li data-lang="en">Developed a CMA-ES-based trajectory optimization framework for decentralized multi-agent coordination</li>
-                    <li data-lang="en">Designed topology-aware coordination mechanisms under communication constraints</li>
+                    <li data-lang="en">Developed a CMA-ES-based trajectory optimization framework for decentralized
+                        multi-agent coordination</li>
+                    <li data-lang="en">Designed topology-aware coordination mechanisms under communication constraints
+                    </li>
                     <li data-lang="en">Established quantitative connectivity and robustness evaluation metrics</li>
                 </ul>
             </div>
@@ -615,22 +738,28 @@
                     <li data-lang="zh">设计了在通信受限环境下基于注意力机制的策略网络，支持去中心化群体协调</li>
                     <li data-lang="zh">开发了通信约束多智能体系统的去中心化强化学习框架</li>
                     <li data-lang="zh">在大规模仿真中评估了可扩展性和收敛稳定性</li>
-                    <li data-lang="en">Built physics-based Isaac Sim + Genesis simulation for end-to-end UAV training from perception to decision-making</li>
-                    <li data-lang="en">Designed attention-based policy network for decentralized swarm coordination under communication constraints</li>
-                    <li data-lang="en">Developed decentralized RL framework for communication-constrained multi-agent systems</li>
+                    <li data-lang="en">Built physics-based Isaac Sim + Genesis simulation for end-to-end UAV training
+                        from perception to decision-making</li>
+                    <li data-lang="en">Designed attention-based policy network for decentralized swarm coordination
+                        under communication constraints</li>
+                    <li data-lang="en">Developed decentralized RL framework for communication-constrained multi-agent
+                        systems</li>
                     <li data-lang="en">Evaluated scalability and convergence stability in large-scale simulations</li>
                 </ul>
             </div>
 
             <div class="pub-item">
                 <div class="pub-title" data-lang="zh">基于GNN的自组织无人机群拓扑强化学习框架</div>
-                <div class="pub-title" data-lang="en">GNN-Based Self-Organizing Swarm Topology Reinforcement Learning</div>
+                <div class="pub-title" data-lang="en">GNN-Based Self-Organizing Swarm Topology Reinforcement Learning
+                </div>
                 <div class="pub-meta">2024--Present | PyTorch | PyG | PettingZoo | MAPPO | CUDA</div>
                 <ul class="entry-details">
                     <li data-lang="zh">提出基于图神经网络(GNN)的动态拓扑表示学习方法，实现通信拓扑的自适应优化</li>
                     <li data-lang="zh">结合拓扑感知注意力机制，设计图强化学习框架，支持可扩展的群体协同</li>
-                    <li data-lang="en">Proposed GNN-based dynamic topology representation for adaptive communication topology optimization</li>
-                    <li data-lang="en">Designed graph reinforcement learning framework with topology-aware attention for scalable swarm coordination</li>
+                    <li data-lang="en">Proposed GNN-based dynamic topology representation for adaptive communication
+                        topology optimization</li>
+                    <li data-lang="en">Designed graph reinforcement learning framework with topology-aware attention for
+                        scalable swarm coordination</li>
                 </ul>
             </div>
 
@@ -641,7 +770,8 @@
                 <ul class="entry-details">
                     <li data-lang="zh">设计了抗扰动无人机的视觉状态估计算法</li>
                     <li data-lang="zh">量化了气动扰动下的稳定性性能</li>
-                    <li data-lang="en">Designed visual state-estimation algorithms for disturbance-resilient UAV control</li>
+                    <li data-lang="en">Designed visual state-estimation algorithms for disturbance-resilient UAV control
+                    </li>
                     <li data-lang="en">Quantified stability performance under aerodynamic perturbations</li>
                 </ul>
             </div>
@@ -651,17 +781,20 @@
                 <div class="pub-title" data-lang="en">Autonomous Perception & Navigation (RoboMaster 2025)</div>
                 <div class="pub-meta">2023--2025</div>
                 <ul class="entry-details">
-                    <li data-lang="zh">实现了实时视觉检测和基于LiDAR的导航系统（MID-360  + FAST-LIO2）</li>
+                    <li data-lang="zh">实现了实时视觉检测和基于LiDAR的导航系统（MID-360 + FAST-LIO2）</li>
                     <li data-lang="zh">通过TensorRT优化将推理效率从40 FPS提升至90 FPS</li>
-                    <li data-lang="en">Implemented real-time visual detection and LiDAR-based navigation system（MID-360  + FAST-LIO2）</li>
-                    <li data-lang="en">Improved inference efficiency from 40 FPS to 90 FPS via TensorRT optimization</li>
+                    <li data-lang="en">Implemented real-time visual detection and LiDAR-based navigation system（MID-360
+                        + FAST-LIO2）</li>
+                    <li data-lang="en">Improved inference efficiency from 40 FPS to 90 FPS via TensorRT optimization
+                    </li>
                 </ul>
             </div>
         </section>
 
         <section class="animate-on-scroll">
-            <h2><span class="section-title" data-lang="zh">获奖荣誉</span><span class="section-title" data-lang="en">Awards</span></h2>
-            
+            <h2><span class="section-title" data-lang="zh">获奖荣誉</span><span class="section-title"
+                    data-lang="en">Awards</span></h2>
+
             <div class="award-item animate-on-scroll" style="--award-index: 0;">
                 <span class="award-name" data-lang="zh"> RoboMaster机甲大师赛全国三等奖</span>
                 <span class="award-name" data-lang="en">Third National Prize, RoboMaster University League</span>
@@ -669,7 +802,8 @@
             </div>
             <div class="award-item animate-on-scroll" style="--award-index: 1;">
                 <span class="award-name" data-lang="zh"> 蓝桥杯程序设计竞赛 (C++ A组) 省级三等奖</span>
-                <span class="award-name" data-lang="en">Third Regional Prize, Blue Bridge Cup Programming Contest (C++, Group A)</span>
+                <span class="award-name" data-lang="en">Third Regional Prize, Blue Bridge Cup Programming Contest (C++,
+                    Group A)</span>
                 <span class="award-year">2024.04</span>
             </div>
         </section>
@@ -684,7 +818,7 @@
             }
             document.querySelectorAll('.lang-btn').forEach(btn => {
                 btn.classList.remove('active');
-                if ((btn.textContent === 'EN' && lang === 'en') || 
+                if ((btn.textContent === 'EN' && lang === 'en') ||
                     (btn.textContent === '中文' && lang === 'zh')) {
                     btn.classList.add('active');
                 }
@@ -692,7 +826,7 @@
         }
 
         // ==================== Page Loader ====================
-        window.addEventListener('load', function() {
+        window.addEventListener('load', function () {
             const loader = document.getElementById('pageLoader');
             setTimeout(() => {
                 loader.classList.add('hidden');
@@ -728,7 +862,7 @@
 
         // ==================== Smooth Scroll for Anchor Links ====================
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function(e) {
+            anchor.addEventListener('click', function (e) {
                 e.preventDefault();
                 const target = document.querySelector(this.getAttribute('href'));
                 if (target) {
@@ -740,16 +874,581 @@
             });
         });
 
-        // ==================== Game of Life Background ====================
+        // ==================== Game System ====================
+        let currentGame = 'flocking';
+
+        function setGame(game, btn) {
+            currentGame = game;
+            document.querySelectorAll('.game-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        }
+
+        // Flocking Simulation
+        (function initFlocking() {
+            const canvas = document.getElementById('game-of-life');
+            const ctx = canvas.getContext('2d');
+            let agents = [], width, height;
+
+            function resize() {
+                width = window.innerWidth;
+                height = window.innerHeight;
+                canvas.width = width;
+                canvas.height = height;
+            }
+
+            function initAgents(count = 60) {
+                agents = [];
+                for (let i = 0; i < count; i++) {
+                    agents.push({
+                        x: Math.random() * width,
+                        y: Math.random() * height,
+                        vx: (Math.random() - 0.5) * 3,
+                        vy: (Math.random() - 0.5) * 3,
+                        hue: 180 + Math.random() * 40
+                    });
+                }
+            }
+
+            function update() {
+                const perceptionRadius = 80;
+                const separationDist = 25;
+
+                for (let i = 0; i < agents.length; i++) {
+                    let avgX = 0, avgY = 0, avgVX = 0, avgVY = 0, sepX = 0, sepY = 0, count = 0;
+
+                    for (let j = 0; j < agents.length; j++) {
+                        if (i === j) continue;
+                        const dx = agents[j].x - agents[i].x;
+                        const dy = agents[j].y - agents[i].y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+
+                        if (dist < perceptionRadius) {
+                            avgX += agents[j].x;
+                            avgY += agents[j].y;
+                            avgVX += agents[j].vx;
+                            avgVY += agents[j].vy;
+                            count++;
+
+                            if (dist < separationDist) {
+                                sepX -= dx / dist;
+                                sepY -= dy / dist;
+                            }
+                        }
+                    }
+
+                    if (count > 0) {
+                        avgX /= count;
+                        avgY /= count;
+                        avgVX /= count;
+                        avgVY /= count;
+                        agents[i].vx += (avgX - agents[i].x) * 0.005 + (avgVX - agents[i].vx) * 0.05;
+                        agents[i].vy += (avgY - agents[i].y) * 0.005 + (avgVY - agents[i].vy) * 0.05;
+                    }
+                    agents[i].vx += sepX * 0.15;
+                    agents[i].vy += sepY * 0.15;
+
+                    // Boundary avoidance
+                    const margin = 50;
+                    if (agents[i].x < margin) agents[i].vx += 0.5;
+                    if (agents[i].x > width - margin) agents[i].vx -= 0.5;
+                    if (agents[i].y < margin) agents[i].vy += 0.5;
+                    if (agents[i].y > height - margin) agents[i].vy -= 0.5;
+
+                    // Speed limit
+                    const speed = Math.sqrt(agents[i].vx ** 2 + agents[i].vy ** 2);
+                    if (speed > 4) {
+                        agents[i].vx = (agents[i].vx / speed) * 4;
+                        agents[i].vy = (agents[i].vy / speed) * 4;
+                    }
+
+                    agents[i].x += agents[i].vx;
+                    agents[i].y += agents[i].vy;
+                }
+            }
+
+            function draw() {
+                ctx.fillStyle = '#fafaf9';
+                ctx.fillRect(0, 0, width, height);
+
+                for (const a of agents) {
+                    const angle = Math.atan2(a.vy, a.vx);
+                    ctx.save();
+                    ctx.translate(a.x, a.y);
+                    ctx.rotate(angle);
+                    ctx.beginPath();
+                    ctx.moveTo(8, 0);
+                    ctx.lineTo(-4, -4);
+                    ctx.lineTo(-4, 4);
+                    ctx.closePath();
+                    ctx.fillStyle = `hsl(${a.hue}, 60%, 35%)`;
+                    ctx.fill();
+                    ctx.restore();
+                }
+            }
+
+            let animId;
+            function animate() {
+                if (currentGame === 'flocking') { update(); draw(); }
+                animId = requestAnimationFrame(animate);
+            }
+
+            canvas.addEventListener('contextmenu', e => {
+                e.preventDefault();
+                const rect = canvas.getBoundingClientRect();
+                agents.push({
+                    x: e.clientX - rect.left,
+                    y: e.clientY - rect.top,
+                    vx: (Math.random() - 0.5) * 3,
+                    vy: (Math.random() - 0.5) * 3,
+                    hue: 180 + Math.random() * 40
+                });
+            });
+
+            resize();
+            initAgents();
+            animate();
+        })();
+
+        // Pursuit-Evasion Game
+        (function initPursuit() {
+            const canvas = document.getElementById('game-of-life');
+            const ctx = canvas.getContext('2d');
+            let pursuers = [], targets = [], width, height;
+
+            function resize() {
+                width = window.innerWidth;
+                height = window.innerHeight;
+                canvas.width = width;
+                canvas.height = height;
+            }
+
+            function init() {
+                pursuers = [{ x: width / 2, y: height / 2, vx: 0, vy: 0 }];
+                targets = [];
+                for (let i = 0; i < 5; i++) {
+                    targets.push({
+                        x: Math.random() * width,
+                        y: Math.random() * height,
+                        vx: (Math.random() - 0.5) * 2,
+                        vy: (Math.random() - 0.5) * 2
+                    });
+                }
+            }
+
+            function update() {
+                // Pursuer pursues closest target
+                let closest = 0, minDist = Infinity;
+                for (let i = 0; i < targets.length; i++) {
+                    const d = (targets[i].x - pursuers[0].x) ** 2 + (targets[i].y - pursuers[0].y) ** 2;
+                    if (d < minDist) { minDist = d; closest = i; }
+                }
+                const t = targets[closest];
+                pursuers[0].vx += (t.x - pursuers[0].x) * 0.02;
+                pursuers[0].vy += (t.y - pursuers[0].y) * 0.02;
+
+                // Targets flee from pursuer
+                for (const target of targets) {
+                    const dx = target.x - pursuers[0].x;
+                    const dy = target.y - pursuers[0].y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < 150) {
+                        target.vx += (dx / dist) * 0.3;
+                        target.vy += (dy / dist) * 0.3;
+                    }
+                    // Wander
+                    target.vx += (Math.random() - 0.5) * 0.5;
+                    target.vy += (Math.random() - 0.5) * 0.5;
+
+                    // Bounce off walls
+                    if (target.x < 0 || target.x > width) target.vx *= -1;
+                    if (target.y < 0 || target.y > height) target.vy *= -1;
+
+                    const speed = Math.sqrt(target.vx ** 2 + target.vy ** 2);
+                    if (speed > 3) {
+                        target.vx = (target.vx / speed) * 3;
+                        target.vy = (target.vy / speed) * 3;
+                    }
+                    target.x += target.vx;
+                    target.y += target.vy;
+                }
+
+                // Pursuer speed limit
+                const pSpeed = Math.sqrt(pursuers[0].vx ** 2 + pursuers[0].vy ** 2);
+                if (pSpeed > 4) {
+                    pursuers[0].vx = (pursuers[0].vx / pSpeed) * 4;
+                    pursuers[0].vy = (pursuers[0].vy / pSpeed) * 4;
+                }
+                pursuers[0].x += pursuers[0].vx;
+                pursuers[0].y += pursuers[0].vy;
+            }
+
+            function draw() {
+                ctx.fillStyle = '#fafaf9';
+                ctx.fillRect(0, 0, width, height);
+
+                // Draw targets
+                for (const t of targets) {
+                    ctx.beginPath();
+                    ctx.arc(t.x, t.y, 6, 0, Math.PI * 2);
+                    ctx.fillStyle = '#e74c3c';
+                    ctx.fill();
+                }
+
+                // Draw pursuer
+                const p = pursuers[0];
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, 10, 0, Math.PI * 2);
+                ctx.fillStyle = '#0f4c5c';
+                ctx.fill();
+            }
+
+            function animate() {
+                if (currentGame === 'pursuit') { update(); draw(); }
+                requestAnimationFrame(animate);
+            }
+
+            resize();
+            init();
+            animate();
+        })();
+
+        // Rock-Paper-Scissors
+        (function initRPS() {
+            const canvas = document.getElementById('game-of-life');
+            const ctx = canvas.getContext('2d');
+            let cells = [], width, height, cellSize = 12, cols, rows;
+
+            function resize() {
+                width = window.innerWidth;
+                height = window.innerHeight;
+                canvas.width = width;
+                canvas.height = height;
+                cols = Math.ceil(width / cellSize);
+                rows = Math.ceil(height / cellSize);
+            }
+
+            function init() {
+                cells = [];
+                for (let i = 0; i < cols * rows; i++) {
+                    cells.push(Math.floor(Math.random() * 3));
+                }
+            }
+
+            function update() {
+                const newCells = [...cells];
+
+                for (let y = 0; y < rows; y++) {
+                    for (let x = 0; x < cols; x++) {
+                        const idx = y * cols + x;
+
+                        for (let dy = -1; dy <= 1; dy++) {
+                            for (let dx = -1; dx <= 1; dx++) {
+                                if (dx === 0 && dy === 0) continue;
+                                const nx = (x + dx + cols) % cols;
+                                const ny = (y + dy + rows) % rows;
+                                const nidx = ny * cols + nx;
+                                const current = cells[idx];
+                                const neighbor = cells[nidx];
+                                // Rock(0) beats Scissors(2), Scissors(2) beats Paper(1), Paper(1) beats Rock(0)
+                                if ((current === 0 && neighbor === 2) ||
+                                    (current === 2 && neighbor === 1) ||
+                                    (current === 1 && neighbor === 0)) {
+                                    if (Math.random() < 0.05) newCells[nidx] = current;
+                                }
+                            }
+                        }
+                    }
+                }
+                cells = newCells;
+            }
+
+            function draw() {
+                ctx.fillStyle = '#fafaf9';
+                ctx.fillRect(0, 0, width, height);
+
+                for (let y = 0; y < rows; y++) {
+                    for (let x = 0; x < cols; x++) {
+                        const idx = y * cols + x;
+                        if (cells[idx] === 0) ctx.fillStyle = '#e74c3c';
+                        else if (cells[idx] === 1) ctx.fillStyle = '#3498db';
+                        else ctx.fillStyle = '#2ecc71';
+                        ctx.fillRect(x * cellSize, y * cellSize, cellSize - 1, cellSize - 1);
+                    }
+                }
+            }
+
+            function animate() {
+                if (currentGame === 'rps') { update(); draw(); }
+                requestAnimationFrame(animate);
+            }
+
+            resize();
+            init();
+            animate();
+        })();
+
+        // Particle Sweep
+        (function initSweep() {
+            const canvas = document.getElementById('game-of-life');
+            const ctx = canvas.getContext('2d');
+            let particles = [], width, height;
+
+            function resize() {
+                width = window.innerWidth;
+                height = window.innerHeight;
+                canvas.width = width;
+                canvas.height = height;
+            }
+
+            function init() {
+                particles = [];
+                for (let i = 0; i < 80; i++) {
+                    particles.push({
+                        x: Math.random() * width,
+                        y: Math.random() * height,
+                        vx: (Math.random() - 0.5) * 2,
+                        vy: (Math.random() - 0.5) * 2
+                    });
+                }
+            }
+
+            function update() {
+                for (const p of particles) {
+                    // Cohere with neighbors
+                    let avgX = 0, avgY = 0, count = 0;
+                    for (const other of particles) {
+                        if (p === other) continue;
+                        const dx = other.x - p.x;
+                        const dy = other.y - p.y;
+                        const d = Math.sqrt(dx * dx + dy * dy);
+                        if (d < 60) {
+                            avgX += other.x;
+                            avgY += other.y;
+                            count++;
+                        }
+                    }
+                    if (count > 0) {
+                        avgX /= count;
+                        avgY /= count;
+                        p.vx += (avgX - p.x) * 0.003;
+                        p.vy += (avgY - p.y) * 0.003;
+                    }
+
+                    // Spread apart if too close
+                    for (const other of particles) {
+                        if (p === other) continue;
+                        const dx = p.x - other.x;
+                        const dy = p.y - other.y;
+                        const d = Math.sqrt(dx * dx + dy * dy);
+                        if (d < 15) {
+                            p.vx += dx / d * 0.1;
+                            p.vy += dy / d * 0.1;
+                        }
+                    }
+
+                    // Move toward mouse
+                    if (mouseX > 0) {
+                        const dx = mouseX - p.x;
+                        const dy = mouseY - p.y;
+                        const d = Math.sqrt(dx * dx + dy * dy);
+                        if (d > 80) {
+                            p.vx += dx / d * 0.05;
+                            p.vy += dy / d * 0.05;
+                        }
+                    }
+
+                    const speed = Math.sqrt(p.vx ** 2 + p.vy ** 2);
+                    if (speed > 3) {
+                        p.vx = (p.vx / speed) * 3;
+                        p.vy = (p.vy / speed) * 3;
+                    }
+                    p.x += p.vx;
+                    p.y += p.vy;
+
+                    if (p.x < 0) p.x = width;
+                    if (p.x > width) p.x = 0;
+                    if (p.y < 0) p.y = height;
+                    if (p.y > height) p.y = 0;
+                }
+            }
+
+            function draw() {
+                ctx.fillStyle = '#fafaf9';
+                ctx.fillRect(0, 0, width, height);
+
+                for (const p of particles) {
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+                    ctx.fillStyle = 'rgba(15, 76, 92, 0.7)';
+                    ctx.fill();
+                }
+            }
+
+            let mouseX = 0, mouseY = 0;
+            canvas.addEventListener('mousemove', e => {
+                const rect = canvas.getBoundingClientRect();
+                mouseX = e.clientX - rect.left;
+                mouseY = e.clientY - rect.top;
+            });
+
+            function animate() {
+                if (currentGame === 'sweep') { update(); draw(); }
+                requestAnimationFrame(animate);
+            }
+
+            resize();
+            init();
+            animate();
+        })();
+
+        // Ant Colony
+        (function initAnt() {
+            const canvas = document.getElementById('game-of-life');
+            const ctx = canvas.getContext('2d');
+            let ants = [], food = [], trails = [], width, height;
+
+            function resize() {
+                width = window.innerWidth;
+                height = window.innerHeight;
+                canvas.width = width;
+                canvas.height = height;
+            }
+
+            function init() {
+                ants = [];
+                food = [];
+                trails = [];
+                const cols = Math.ceil(width / 10);
+                const rows = Math.ceil(height / 10);
+
+                for (let i = 0; i < 40; i++) {
+                    ants.push({
+                        x: width / 2,
+                        y: height / 2,
+                        angle: Math.random() * Math.PI * 2,
+                        hasFood: false
+                    });
+                }
+
+                for (let i = 0; i < 30; i++) {
+                    food.push({
+                        x: Math.random() * width,
+                        y: Math.random() * height
+                    });
+                }
+            }
+
+            function update() {
+                for (const ant of ants) {
+                    // Sense food
+                    let closestFood = null, minDist = 30;
+                    for (let f of food) {
+                        const d = Math.sqrt((ant.x - f.x) ** 2 + (ant.y - f.y) ** 2);
+                        if (d < minDist) { minDist = d; closestFood = f; }
+                    }
+
+                    if (closestFood && !ant.hasFood) {
+                        ant.angle = Math.atan2(closestFood.y - ant.y, closestFood.x - ant.x);
+                        if (minDist < 10) {
+                            ant.hasFood = true;
+                            const idx = food.indexOf(closestFood);
+                            if (idx > -1) food.splice(idx, 1);
+                        }
+                    } else if (ant.hasFood) {
+                        // Return to nest
+                        const dx = width / 2 - ant.x;
+                        const dy = height / 2 - ant.y;
+                        const d = Math.sqrt(dx * dx + dy * dy);
+                        ant.angle = Math.atan2(dy, dx);
+                        if (d < 15) ant.hasFood = false;
+                    } else {
+                        // Random wander with trail following
+                        ant.angle += (Math.random() - 0.5) * 0.5;
+                    }
+
+                    // Add trail
+                    const tx = Math.floor(ant.x / 10);
+                    const ty = Math.floor(ant.y / 10);
+                    if (tx >= 0 && tx < width / 10 && ty >= 0 && ty < height / 10) {
+                        trails.push({ x: tx, y: ty, strength: 1 });
+                    }
+
+                    ant.x += Math.cos(ant.angle) * 2;
+                    ant.y += Math.sin(ant.angle) * 2;
+
+                    // Bounce
+                    if (ant.x < 0 || ant.x > width) ant.angle = Math.PI - ant.angle;
+                    if (ant.y < 0 || ant.y > height) ant.angle = -ant.angle;
+                    ant.x = Math.max(0, Math.min(width, ant.x));
+                    ant.y = Math.max(0, Math.min(height, ant.y));
+                }
+
+                // Fade trails
+                for (const t of trails) t.strength -= 0.005;
+                trails = trails.filter(t => t.strength > 0);
+
+                // Respawn food
+                if (food.length < 30 && Math.random() < 0.1) {
+                    food.push({
+                        x: Math.random() * width,
+                        y: Math.random() * height
+                    });
+                }
+            }
+
+            function draw() {
+                ctx.fillStyle = '#fafaf9';
+                ctx.fillRect(0, 0, width, height);
+
+                // Draw trails
+                for (const t of trails) {
+                    ctx.fillStyle = `rgba(139, 195, 74, ${t.strength * 0.3})`;
+                    ctx.fillRect(t.x * 10, t.y * 10, 10, 10);
+                }
+
+                // Draw food
+                for (const f of food) {
+                    ctx.beginPath();
+                    ctx.arc(f.x, f.y, 4, 0, Math.PI * 2);
+                    ctx.fillStyle = '#27ae60';
+                    ctx.fill();
+                }
+
+                // Draw ants
+                for (const ant of ants) {
+                    ctx.beginPath();
+                    ctx.arc(ant.x, ant.y, 3, 0, Math.PI * 2);
+                    ctx.fillStyle = ant.hasFood ? '#e74c3c' : '#0f4c5c';
+                    ctx.fill();
+                }
+
+                // Draw nest
+                ctx.beginPath();
+                ctx.arc(width / 2, height / 2, 15, 0, Math.PI * 2);
+                ctx.strokeStyle = '#0f4c5c';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            }
+
+            function animate() {
+                if (currentGame === 'ant') { update(); draw(); }
+                requestAnimationFrame(animate);
+            }
+
+            resize();
+            init();
+            animate();
+        })();
+
+        // Game of Life (original)
         (function initGameOfLife() {
             const canvas = document.getElementById('game-of-life');
             const ctx = canvas.getContext('2d');
-            
+
             let width, height;
             let cells, nextCells;
             const cellSize = 8;
-            let animationId;
-            
+
             function resize() {
                 width = Math.ceil(window.innerWidth / cellSize);
                 height = Math.ceil(window.innerHeight / cellSize);
@@ -757,19 +1456,18 @@
                 canvas.height = height * cellSize;
                 initCells();
             }
-            
+
             function initCells() {
                 cells = [];
                 for (let y = 0; y < height; y++) {
                     cells[y] = [];
                     for (let x = 0; x < width; x++) {
-                        // Random initialization with lower density for elegance
                         cells[y][x] = Math.random() < 0.3 ? 1 : 0;
                     }
                 }
                 nextCells = [];
             }
-            
+
             function countNeighbors(x, y) {
                 let count = 0;
                 for (let dy = -1; dy <= 1; dy++) {
@@ -782,65 +1480,49 @@
                 }
                 return count;
             }
-            
+
             function update() {
                 for (let y = 0; y < height; y++) {
                     nextCells[y] = [];
                     for (let x = 0; x < width; x++) {
                         const neighbors = countNeighbors(x, y);
                         if (cells[y][x] === 1) {
-                            // Live cell survives with 2 or 3 neighbors
                             nextCells[y][x] = (neighbors === 2 || neighbors === 3) ? 1 : 0;
                         } else {
-                            // Dead cell becomes alive with exactly 3 neighbors
                             nextCells[y][x] = neighbors === 3 ? 1 : 0;
                         }
                     }
                 }
                 [cells, nextCells] = [nextCells, cells];
             }
-            
+
             function draw() {
                 ctx.fillStyle = '#fafaf9';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
-                
+
                 ctx.fillStyle = 'rgba(15, 76, 92, 0.55)';
                 for (let y = 0; y < height; y++) {
                     for (let x = 0; x < width; x++) {
                         if (cells[y][x] === 1) {
                             ctx.beginPath();
-                            ctx.arc(
-                                x * cellSize + cellSize / 2,
-                                y * cellSize + cellSize / 2,
-                                cellSize / 3,
-                                0,
-                                Math.PI * 2
-                            );
+                            ctx.arc(x * cellSize + cellSize / 2, y * cellSize + cellSize / 2, cellSize / 3, 0, Math.PI * 2);
                             ctx.fill();
                         }
                     }
                 }
             }
-            
+
             function animate() {
-                update();
-                draw();
-                animationId = setTimeout(() => requestAnimationFrame(animate), 100);
+                if (currentGame === 'life') { update(); draw(); }
+                requestAnimationFrame(animate);
             }
-            
-            // Throttle resize
-            let resizeTimeout;
-            window.addEventListener('resize', () => {
-                clearTimeout(resizeTimeout);
-                resizeTimeout = setTimeout(resize, 250);
-            });
-            
+
             resize();
             animate();
         })();
 
         // ==================== Keyboard Navigation ====================
-        document.addEventListener('keydown', function(e) {
+        document.addEventListener('keydown', function (e) {
             // Arrow keys for section navigation
             if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
                 const sections = Array.from(document.querySelectorAll('section, header'));
@@ -848,17 +1530,18 @@
                     const rect = section.getBoundingClientRect();
                     return rect.top <= 100 && rect.bottom > 100;
                 });
-                
+
                 if (currentSection) {
                     const currentIndex = sections.indexOf(currentSection);
-                    const nextIndex = e.key === 'ArrowDown' 
+                    const nextIndex = e.key === 'ArrowDown'
                         ? Math.min(currentIndex + 1, sections.length - 1)
                         : Math.max(currentIndex - 1, 0);
-                    
+
                     sections[nextIndex].scrollIntoView({ behavior: 'smooth' });
                 }
             }
         });
     </script>
 </body>
+
 </html>
