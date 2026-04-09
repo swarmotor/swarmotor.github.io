@@ -467,13 +467,30 @@
         </header>
 
         <section class="animate-on-scroll">
-            <h2><span class="section-title" data-lang="zh">研究兴趣</span><span class="section-title" data-lang="en">Research Interests</span></h2>
-            <p class="research-interests" data-lang="zh">
-                多智能体系统 (MAS)、分布式机器学习、群体智能、自主导航与机器人、拓扑感知
-            </p>
-            <p class="research-interests" data-lang="en">
-                Multi-Agent Systems (MAS), Distributed Machine Learning, Swarm Intelligence, Autonomous Navigation & Robotics, Topology-Aware Perception
-            </p>
+            <h2><span class="section-title" data-lang="zh">技术技能</span><span class="section-title" data-lang="en">Technical Skills</span></h2>
+            
+            <div class="skills-grid">
+                <div class="skill-category animate-on-scroll" style="--skill-index: 0;">
+                    <div class="skill-category-title" data-lang="zh">编程语言</div>
+                    <div class="skill-category-title" data-lang="en">Languages</div>
+                    <div class="skill-list">Python, C/C++, MATLAB, Java, etc.</div>
+                </div>
+                <div class="skill-category animate-on-scroll" style="--skill-index: 1;">
+                    <div class="skill-category-title" data-lang="zh">人工智能与机器人</div>
+                    <div class="skill-category-title" data-lang="en">AI & Robotics</div>
+                    <div class="skill-list">ROS2, PyTorch, TensorRT, OpenCV, Git, LaTeX</div>
+                </div>
+                <div class="skill-category animate-on-scroll" style="--skill-index: 2;">
+                    <div class="skill-category-title" data-lang="zh">仿真工具</div>
+                    <div class="skill-category-title" data-lang="en">Simulation</div>
+                    <div class="skill-list">Isaac Sim, Genesis, Gazebo</div>
+                </div>
+                <div class="skill-category animate-on-scroll" style="--skill-index: 3;">
+                    <div class="skill-category-title" data-lang="zh">理论基础</div>
+                    <div class="skill-category-title" data-lang="en">Theory</div>
+                    <div class="skill-list">Distributed Optimization, Graph Theory, Lyapunov Stability, MARL</div>
+                </div>
+            </div>
         </section>
 
         <section class="animate-on-scroll">
@@ -602,6 +619,30 @@
             </div>
 
             <div class="pub-item">
+                <div class="pub-title" data-lang="zh">基于Genesis的无人机端到端强化学习</div>
+                <div class="pub-title" data-lang="en">End-to-End RL for UAV Navigation via Genesis</div>
+                <div class="pub-meta">2024--Present | Isaac Sim | Genesis | PyTorch | CUDA</div>
+                <ul class="entry-details">
+                    <li data-lang="zh">基于物理的Isaac Sim + Genesis仿真环境，实现无人机从感知到决策的端到端训练</li>
+                    <li data-lang="zh">设计了在通信受限环境下基于注意力机制的策略网络</li>
+                    <li data-lang="en">Built physics-based Isaac Sim + Genesis simulation for end-to-end UAV training from perception to decision-making</li>
+                    <li data-lang="en">Designed attention-based policy network for communication-constrained navigation</li>
+                </ul>
+            </div>
+
+            <div class="pub-item">
+                <div class="pub-title" data-lang="zh">基于GNN的自组织无人机群拓扑强化学习框架</div>
+                <div class="pub-title" data-lang="en">GNN-Based Self-Organizing Swarm Topology Reinforcement Learning</div>
+                <div class="pub-meta">2024--Present | PyTorch | PyG | PettingZoo | MAPPO | CUDA</div>
+                <ul class="entry-details">
+                    <li data-lang="zh">提出基于图神经网络(GNN)的动态拓扑表示学习方法，实现通信拓扑的自适应优化</li>
+                    <li data-lang="zh">结合拓扑感知注意力机制，设计图强化学习框架，支持可扩展的群体协同</li>
+                    <li data-lang="en">Proposed GNN-based dynamic topology representation for adaptive communication topology optimization</li>
+                    <li data-lang="en">Designed graph reinforcement learning framework with topology-aware attention for scalable swarm coordination</li>
+                </ul>
+            </div>
+
+            <div class="pub-item">
                 <div class="pub-title" data-lang="zh">基于视觉的抗风无人机稳定控制</div>
                 <div class="pub-title" data-lang="en">Vision-Based Wind-Resistant UAV Stabilization</div>
                 <div class="pub-meta">2024--2025</div>
@@ -623,33 +664,6 @@
                     <li data-lang="en">Implemented real-time visual detection and LiDAR-based navigation system</li>
                     <li data-lang="en">Improved inference efficiency from 40 FPS to 90 FPS via TensorRT optimization</li>
                 </ul>
-            </div>
-        </section>
-
-        <section class="animate-on-scroll">
-            <h2><span class="section-title" data-lang="zh">技术技能</span><span class="section-title" data-lang="en">Technical Skills</span></h2>
-            
-            <div class="skills-grid">
-                <div class="skill-category animate-on-scroll" style="--skill-index: 0;">
-                    <div class="skill-category-title" data-lang="zh">编程语言</div>
-                    <div class="skill-category-title" data-lang="en">Languages</div>
-                    <div class="skill-list">Python, C/C++, MATLAB, Java, etc.</div>
-                </div>
-                <div class="skill-category animate-on-scroll" style="--skill-index: 1;">
-                    <div class="skill-category-title" data-lang="zh">人工智能与机器人</div>
-                    <div class="skill-category-title" data-lang="en">AI & Robotics</div>
-                    <div class="skill-list">ROS2, PyTorch, TensorRT, OpenCV, Git, LaTeX</div>
-                </div>
-                <div class="skill-category animate-on-scroll" style="--skill-index: 2;">
-                    <div class="skill-category-title" data-lang="zh">仿真工具</div>
-                    <div class="skill-category-title" data-lang="en">Simulation</div>
-                    <div class="skill-list">Isaac Sim, Genesis, Gazebo</div>
-                </div>
-                <div class="skill-category animate-on-scroll" style="--skill-index: 3;">
-                    <div class="skill-category-title" data-lang="zh">理论基础</div>
-                    <div class="skill-category-title" data-lang="en">Theory</div>
-                    <div class="skill-list">Distributed Optimization, Graph Theory, Lyapunov Stability, MARL</div>
-                </div>
             </div>
         </section>
 
