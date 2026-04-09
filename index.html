@@ -8,6 +8,18 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;500;600&family=Noto+Sans+SC:wght@300;400;500;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
+        /* Game of Life Background Canvas */
+        #game-of-life {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.12;
+            pointer-events: none;
+        }
+
         :root {
             --bg-primary: #fafaf9;
             --bg-secondary: #ffffff;
@@ -78,7 +90,7 @@
         }
 
         header {
-            text-align: center;
+            text-align: left;
             margin-bottom: 3rem;
             padding-bottom: 2rem;
             border-bottom: 1px solid var(--border);
@@ -430,6 +442,9 @@
         <div class="loader-spinner"></div>
     </div>
 
+    <!-- Game of Life Background -->
+    <canvas id="game-of-life"></canvas>
+
     <!-- Language Toggle -->
     <div class="lang-toggle">
         <button class="lang-btn active" onclick="setLang('zh')">中文</button>
@@ -446,8 +461,8 @@
                     <a href="mailto:jzhang1@supmicrotech.fr">jzhang1@supmicrotech.fr</a>
                 </span>
                 <span class="contact-item">+33 07 43 55 91 27</span>
-                <span class="contact-item" data-lang="zh">法国贝桑松 (ENSMM)</span>
-                <span class="contact-item" data-lang="en">Besançon, France (ENSMM)</span>
+                <span class="contact-item">+86 158 0095 2694</span>
+                <span class="contact-item">微信: Astrofutur</span>
             </div>
         </header>
 
@@ -470,8 +485,8 @@
                     <span class="entry-meta" data-lang="zh">2025 -- 2026</span>
                     <span class="entry-meta" data-lang="en">2025 -- 2026</span>
                 </div>
-                <div class="entry-subtitle" data-lang="zh">交换生项目 (L3)</div>
-                <div class="entry-subtitle" data-lang="en">Exchange Engineering Program (L3)</div>
+                <div class="entry-subtitle" data-lang="zh">交换生项目</div>
+                <div class="entry-subtitle" data-lang="en">Exchange Program</div>
                 <ul class="entry-details">
                     <li data-lang="zh">信号处理 (15/20)</li>
                     <li data-lang="zh">数学 (13/20)</li>
@@ -488,8 +503,8 @@
                     <span class="entry-meta" data-lang="zh">2023 -- 2025</span>
                     <span class="entry-meta" data-lang="en">2023 -- 2025</span>
                 </div>
-                <div class="entry-subtitle" data-lang="zh">智能科学与技术学士 (L1-L2)</div>
-                <div class="entry-subtitle" data-lang="en">B.S. in Intelligent Science and Technology (L1-L2)</div>
+                <div class="entry-subtitle" data-lang="zh">智能科学与技术学士</div>
+                <div class="entry-subtitle" data-lang="en">B.S. in Intelligent Science and Technology</div>
                 <ul class="entry-details">
                     <li data-lang="zh">高等数学: <strong>89/100</strong></li>
                     <li data-lang="zh">编程与实验: <strong>91/100</strong></li>
@@ -513,7 +528,11 @@
             </div>
 
             <div class="pub-item">
-                <div class="pub-title">Bio-inspired Neighbor Selection Mechanism and Performance Evaluation for UAV Swarms</div>
+                <div class="pub-title">
+                    <a href="https://www.sciencedirect.com/science/article/pii/S2405896325020579" target="_blank" style="color: inherit; text-decoration: none;">
+                        Bio-inspired Neighbor Selection Mechanism and Performance Evaluation for UAV Swarms ↗
+                    </a>
+                </div>
                 <div class="pub-meta">
                     <span data-lang="zh">第一作者</span><span data-lang="en">First Author</span> | 
                     <span class="venue">IFAC-ACA 2025</span> (Accepted)
@@ -523,7 +542,7 @@
             <div class="pub-item">
                 <div class="pub-title">Adaptive Encirclement Control Strategy for Swarm Robots Based on Multi-Sensor Dynamic Fusion</div>
                 <div class="pub-meta">
-                    <span data-lang="zh">共同作者</span><span data-lang="en">Co-author</span> | 
+                    <span data-lang="zh">本科生第一作者</span><span data-lang="en">Undergraduate First Author</span> | 
                     <span class="venue">Control Engineering of China</span> 2025 (Accepted)
                 </div>
             </div>
@@ -531,7 +550,7 @@
             <div class="pub-item">
                 <div class="pub-title">Multi-robot Capture Strategy for Observation-Limited Scenarios</div>
                 <div class="pub-meta">
-                    <span data-lang="zh">共同作者</span><span data-lang="en">Co-author</span> | 
+                    <span data-lang="zh">本科生第一作者</span><span data-lang="en">Undergraduate First Author</span> | 
                     <span class="venue">ROBOMECH</span> 2025 (Accepted)
                 </div>
             </div>
@@ -540,12 +559,10 @@
         <section class="animate-on-scroll">
             <h2><span class="section-title" data-lang="zh">科研与项目经验</span><span class="section-title" data-lang="en">Research & Project Experience</span></h2>
             
-            <div class="entry">
-                <div class="entry-header">
-                    <span class="entry-title" data-lang="zh">拓扑保持的群体感知研究</span>
-                    <span class="entry-title" data-lang="en">Spotlight: Topology-Preserving Swarm Perception</span>
-                </div>
-                <div class="entry-subtitle">SUPMICROTECH–ENSMM | FEMTO-ST Laboratory | 2025--Present</div>
+            <div class="pub-item">
+                <div class="pub-title" data-lang="zh">拓扑保持的群体感知研究</div>
+                <div class="pub-title" data-lang="en">Spotlight: Topology-Preserving Swarm Perception</div>
+                <div class="pub-meta">SUPMICROTECH–ENSMM | FEMTO-ST Laboratory | 2025--Present</div>
                 <ul class="entry-details">
                     <li data-lang="zh">提出了保证动态交互图中即时强连通性的拓扑保持感知范式</li>
                     <li data-lang="zh">建立了通信约束下结构信息传播的理论保证，防止网络分裂</li>
@@ -558,13 +575,11 @@
                 </ul>
             </div>
 
-            <div class="entry">
-                <div class="entry-header">
-                    <span class="entry-title" data-lang="zh">分布式无人机群体轨迹优化</span>
-                    <span class="entry-title" data-lang="en">Distributed UAV Swarm Trajectory Optimization</span>
-                </div>
-                <div class="entry-subtitle" data-lang="zh">项目负责人 | 导师: 张亮教授 | 2023--2025</div>
-                <div class="entry-subtitle" data-lang="en">Project Leader | Supervisor: Prof. Zhang Liang | 2023--2025</div>
+            <div class="pub-item">
+                <div class="pub-title" data-lang="zh">分布式无人机群体轨迹优化</div>
+                <div class="pub-title" data-lang="en">Distributed UAV Swarm Trajectory Optimization</div>
+                <div class="pub-meta" data-lang="zh">项目负责人 | 导师: 张良教授 | 2023--2025</div>
+                <div class="pub-meta" data-lang="en">Project Leader | Supervisor: Prof. Zhang Liang | 2023--2025</div>
                 <ul class="entry-details">
                     <li data-lang="zh">开发了基于CMA-ES的轨迹优化框架，实现去中心化多智能体协调</li>
                     <li data-lang="zh">设计了通信约束下的拓扑感知协调机制</li>
@@ -575,12 +590,10 @@
                 </ul>
             </div>
 
-            <div class="entry">
-                <div class="entry-header">
-                    <span class="entry-title" data-lang="zh">生成式强化学习用于去中心化群体协调</span>
-                    <span class="entry-title" data-lang="en">Generative Reinforcement Learning for Decentralized Swarm Coordination</span>
-                </div>
-                <div class="entry-subtitle" data-lang="zh">2024--Present</div>
+            <div class="pub-item">
+                <div class="pub-title" data-lang="zh">生成式强化学习用于去中心化群体协调</div>
+                <div class="pub-title" data-lang="en">Generative Reinforcement Learning for Decentralized Swarm Coordination</div>
+                <div class="pub-meta">2024--Present</div>
                 <ul class="entry-details">
                     <li data-lang="zh">开发了通信约束多智能体系统的去中心化强化学习框架</li>
                     <li data-lang="zh">在大规模仿真中评估了可扩展性和收敛稳定性</li>
@@ -589,12 +602,10 @@
                 </ul>
             </div>
 
-            <div class="entry">
-                <div class="entry-header">
-                    <span class="entry-title" data-lang="zh">基于视觉的抗风无人机稳定控制</span>
-                    <span class="entry-title" data-lang="en">Vision-Based Wind-Resistant UAV Stabilization</span>
-                </div>
-                <div class="entry-subtitle" data-lang="zh">2024--2025</div>
+            <div class="pub-item">
+                <div class="pub-title" data-lang="zh">基于视觉的抗风无人机稳定控制</div>
+                <div class="pub-title" data-lang="en">Vision-Based Wind-Resistant UAV Stabilization</div>
+                <div class="pub-meta">2024--2025</div>
                 <ul class="entry-details">
                     <li data-lang="zh">设计了抗扰动无人机的视觉状态估计算法</li>
                     <li data-lang="zh">量化了气动扰动下的稳定性性能</li>
@@ -603,12 +614,10 @@
                 </ul>
             </div>
 
-            <div class="entry">
-                <div class="entry-header">
-                    <span class="entry-title" data-lang="zh">自主感知与导航 (RoboMaster 2025)</span>
-                    <span class="entry-title" data-lang="en">Autonomous Perception & Navigation (RoboMaster 2025)</span>
-                </div>
-                <div class="entry-subtitle" data-lang="zh">2023--2025</div>
+            <div class="pub-item">
+                <div class="pub-title" data-lang="zh">自主感知与导航 (RoboMaster 2025)</div>
+                <div class="pub-title" data-lang="en">Autonomous Perception & Navigation (RoboMaster 2025)</div>
+                <div class="pub-meta">2023--2025</div>
                 <ul class="entry-details">
                     <li data-lang="zh">实现了实时视觉检测和基于LiDAR的导航系统</li>
                     <li data-lang="zh">通过TensorRT优化将推理效率从40 FPS提升至90 FPS</li>
@@ -725,6 +734,105 @@
                 }
             });
         });
+
+        // ==================== Game of Life Background ====================
+        (function initGameOfLife() {
+            const canvas = document.getElementById('game-of-life');
+            const ctx = canvas.getContext('2d');
+            
+            let width, height;
+            let cells, nextCells;
+            const cellSize = 8;
+            let animationId;
+            
+            function resize() {
+                width = Math.ceil(window.innerWidth / cellSize);
+                height = Math.ceil(window.innerHeight / cellSize);
+                canvas.width = width * cellSize;
+                canvas.height = height * cellSize;
+                initCells();
+            }
+            
+            function initCells() {
+                cells = [];
+                for (let y = 0; y < height; y++) {
+                    cells[y] = [];
+                    for (let x = 0; x < width; x++) {
+                        // Random initialization with lower density for elegance
+                        cells[y][x] = Math.random() < 0.3 ? 1 : 0;
+                    }
+                }
+                nextCells = [];
+            }
+            
+            function countNeighbors(x, y) {
+                let count = 0;
+                for (let dy = -1; dy <= 1; dy++) {
+                    for (let dx = -1; dx <= 1; dx++) {
+                        if (dx === 0 && dy === 0) continue;
+                        const nx = (x + dx + width) % width;
+                        const ny = (y + dy + height) % height;
+                        count += cells[ny][nx];
+                    }
+                }
+                return count;
+            }
+            
+            function update() {
+                for (let y = 0; y < height; y++) {
+                    nextCells[y] = [];
+                    for (let x = 0; x < width; x++) {
+                        const neighbors = countNeighbors(x, y);
+                        if (cells[y][x] === 1) {
+                            // Live cell survives with 2 or 3 neighbors
+                            nextCells[y][x] = (neighbors === 2 || neighbors === 3) ? 1 : 0;
+                        } else {
+                            // Dead cell becomes alive with exactly 3 neighbors
+                            nextCells[y][x] = neighbors === 3 ? 1 : 0;
+                        }
+                    }
+                }
+                [cells, nextCells] = [nextCells, cells];
+            }
+            
+            function draw() {
+                ctx.fillStyle = '#fafaf9';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                ctx.fillStyle = 'rgba(15, 76, 92, 0.55)';
+                for (let y = 0; y < height; y++) {
+                    for (let x = 0; x < width; x++) {
+                        if (cells[y][x] === 1) {
+                            ctx.beginPath();
+                            ctx.arc(
+                                x * cellSize + cellSize / 2,
+                                y * cellSize + cellSize / 2,
+                                cellSize / 3,
+                                0,
+                                Math.PI * 2
+                            );
+                            ctx.fill();
+                        }
+                    }
+                }
+            }
+            
+            function animate() {
+                update();
+                draw();
+                animationId = setTimeout(() => requestAnimationFrame(animate), 100);
+            }
+            
+            // Throttle resize
+            let resizeTimeout;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimeout);
+                resizeTimeout = setTimeout(resize, 250);
+            });
+            
+            resize();
+            animate();
+        })();
 
         // ==================== Keyboard Navigation ====================
         document.addEventListener('keydown', function(e) {
