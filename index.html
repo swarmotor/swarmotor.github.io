@@ -124,6 +124,38 @@
             background: var(--accent);
         }
 
+        .page-nav {
+            position: fixed;
+            top: 14rem;
+            right: 1.5rem;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .page-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border);
+            background: var(--bg-secondary);
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            border-radius: 0.5rem;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px var(--shadow);
+        }
+
+        .page-btn:hover {
+            background: var(--accent-light);
+        }
+
+        .page-btn.active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
         .container {
             max-width: 800px;
             margin: 0 auto;
@@ -563,20 +595,15 @@
         <button class="game-btn" onclick="setGame('life', this)" title="Game of Life">🎲</button>
     </div>
 
-    <div class="container">
-        <header class="animate-on-scroll">
-            <h1 data-lang="zh">张俊</h1>
-            <h1 data-lang="en">ZHANG Jun</h1>
+    <!-- Page Nav -->
+    <div class="page-nav">
+        <button class="page-btn active" onclick="location.href='index.html'">简历</button>
+        <button class="page-btn" onclick="location.href='share.html'">分享</button>
+        <button class="page-btn" onclick="location.href='posts.html'">帖子</button>
+    </div>
 
-            <div class="contact-info">
-                <span class="contact-item">
-                    <a href="mailto:jzhang1@supmicrotech.fr">jzhang1@supmicrotech.fr</a>
-                </span>
-                <span class="contact-item">+33 07 43 55 91 27</span>
-                <span class="contact-item">+86 158 0095 2694</span>
-                <span class="contact-item">WeChat: Astrofutur</span>
-            </div>
-        </header>
+    <div class="container page-content" id="page-resume">
+
 
         <section class="animate-on-scroll">
             <h2><span class="section-title" data-lang="zh">技术技能</span><span class="section-title"
@@ -606,43 +633,7 @@
             </div>
         </section>
 
-        <section class="animate-on-scroll">
-            <h2><span class="section-title" data-lang="zh">教育背景</span><span class="section-title"
-                    data-lang="en">Education</span></h2>
 
-            <div class="entry">
-                <div class="entry-header">
-                    <span class="entry-title">SUPMICROTECH--ENSMM</span>
-                    <span class="entry-meta" data-lang="zh">2025 -- 2026</span>
-                    <span class="entry-meta" data-lang="en">2025 -- 2026</span>
-                </div>
-
-                <ul class="entry-details">
-                    <li data-lang="zh">信号处理 (15/20)</li>
-                    <li data-lang="zh">数学 (13/20)</li>
-                    <li data-lang="zh">面向对象编程 (Java, 12.5/20)</li>
-                    <li data-lang="en">Signal Processing (15/20)</li>
-                    <li data-lang="en">Mathematics (13/20)</li>
-                    <li data-lang="en">Object-Oriented Programming (Java, 12.5/20)</li>
-                </ul>
-            </div>
-
-            <div class="entry">
-                <div class="entry-header">
-                    <span class="entry-title">安徽大学</span>
-                    <span class="entry-meta" data-lang="zh">2023 -- 2025</span>
-                    <span class="entry-meta" data-lang="en">2023 -- 2025</span>
-                </div>
-                <ul class="entry-details">
-                    <li data-lang="zh">高等数学: <strong>89/100</strong></li>
-                    <li data-lang="zh">编程与实验: <strong>91/100</strong></li>
-                    <li data-lang="zh">GPA: <strong>3.1/5.0</strong></li>
-                    <li data-lang="en">Advanced Mathematics: <strong>89/100</strong></li>
-                    <li data-lang="en">Programming & Experiments: <strong>91/100</strong></li>
-                    <li data-lang="en">GPA: <strong>3.1/5.0</strong></li>
-                </ul>
-            </div>
-        </section>
 
         <section class="animate-on-scroll">
             <h2><span class="section-title" data-lang="zh">发表论文</span><span class="section-title"
@@ -789,6 +780,22 @@
                     </li>
                 </ul>
             </div>
+
+        </section>
+        <section class="animate-on-scroll">
+            <h2><span class="section-title" data-lang="zh">教育背景</span><span class="section-title"
+                    data-lang="en">Education</span></h2>
+
+            <div class="entry">
+                <div class="entry-header">
+                    <span class="entry-title">SUPMICROTECH--ENSMM</span>
+                    <span class="entry-meta" data-lang="zh">2025 -- 2026</span>
+                    <span class="entry-meta" data-lang="en">2025 -- 2026</span>
+                    <span class="entry-title">安徽大学</span>
+                    <span class="entry-meta" data-lang="zh">2023 -- 2025</span>
+                    <span class="entry-meta" data-lang="en">2023 -- 2025</span>
+                </div>
+            </div>
         </section>
 
         <section class="animate-on-scroll">
@@ -807,6 +814,21 @@
                 <span class="award-year">2024.04</span>
             </div>
         </section>
+
+        <header class="animate-on-scroll">
+
+            <h2><span class="section-title" data-lang="zh">联系方式</span><span class="section-title"
+                    data-lang="en">Contact</span></h2>
+
+            <div class="contact-info">
+                <span class="contact-item">
+                    <a href="mailto:jzhang1@supmicrotech.fr">jzhang1@supmicrotech.fr</a>
+                </span>
+                <span class="contact-item">+33 07 43 55 91 27</span>
+                <span class="contact-item">+86 158 0095 2694</span>
+                <span class="contact-item">WeChat: Astrofutur</span>
+            </div>
+        </header>
     </div>
 
     <script>

@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SWARMOTOR - 分享</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;500;600&family=Noto+Sans+SC:wght@300;400;500;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        #game-of-life {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.15;
+            pointer-events: none;
+        }
+        :root {
+            --bg-primary: #fafaf9;
+            --bg-secondary: #ffffff;
+            --text-primary: #1a1a1a;
+            --text-secondary: #525252;
+            --text-muted: #737373;
+            --accent: #0f4c5c;
+            --accent-light: #e8f4f6;
+            --border: #e5e5e5;
+            --shadow: rgba(0, 0, 0, 0.04);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'DM Sans', 'Noto Sans SC', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.7;
+            font-size: 15px;
+            min-height: 100vh;
+        }
+        .lang-toggle {
+            position: fixed;
+            top: 1.5rem;
+            right: 1.5rem;
+            z-index: 1000;
+            display: flex;
+            gap: 0.25rem;
+            background: var(--bg-secondary);
+            padding: 0.25rem;
+            border-radius: 2rem;
+            box-shadow: 0 2px 12px var(--shadow);
+            border: 1px solid var(--border);
+        }
+        .lang-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            border-radius: 1.5rem;
+            transition: all 0.25s ease;
+            color: var(--text-muted);
+        }
+        .lang-btn.active {
+            background: var(--accent);
+            color: white;
+        }
+        .game-toggle {
+            position: fixed;
+            top: 4.5rem;
+            right: 1.5rem;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 0.15rem;
+            background: var(--bg-secondary);
+            padding: 0.25rem;
+            border-radius: 2rem;
+            box-shadow: 0 2px 12px var(--shadow);
+            border: 1px solid var(--border);
+        }
+        .game-btn {
+            width: 2rem;
+            height: 2rem;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 1rem;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .game-btn:hover {
+            background: var(--accent-light);
+            transform: scale(1.1);
+        }
+        .game-btn.active {
+            background: var(--accent);
+        }
+        .page-nav {
+            position: fixed;
+            top: 14rem;
+            right: 1.5rem;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+        .page-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border);
+            background: var(--bg-secondary);
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            border-radius: 0.5rem;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px var(--shadow);
+        }
+        .page-btn:hover {
+            background: var(--accent-light);
+        }
+        .page-btn.active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+        }
+        header {
+            text-align: left;
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+        }
+        h1 {
+            font-family: 'Crimson Pro', serif;
+            font-size: 2.75rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+        h2 {
+            font-family: 'Crimson Pro', serif;
+            font-size: 1.35rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        h2::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(to right, var(--border), transparent);
+        }
+        .section-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--accent);
+            font-weight: 600;
+        }
+        .share-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+        .share-item {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+        .share-item:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(15, 76, 92, 0.1);
+        }
+        .share-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+        .share-desc {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+        .share-tags {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        .tag {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.75rem;
+            background: var(--accent-light);
+            color: var(--accent);
+            border-radius: 1rem;
+        }
+        .share-link {
+            display: inline-block;
+            margin-top: 1rem;
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+        .share-link:hover {
+            opacity: 0.7;
+        }
+        [data-lang="en"] { display: none; }
+        body.lang-en [data-lang="zh"] { display: none; }
+        body.lang-en [data-lang="en"] { display: block; }
+    </style>
+</head>
+<body>
+    <canvas id="game-of-life"></canvas>
+    
+    <div class="lang-toggle">
+        <button class="lang-btn active" onclick="setLang('zh')">中文</button>
+        <button class="lang-btn" onclick="setLang('en')">EN</button>
+    </div>
+
+    <div class="game-toggle">
+        <button class="game-btn" onclick="location.href='index.html'" title="Resume">📄</button>
+    </div>
+
+    <div class="page-nav">
+        <button class="page-btn" onclick="location.href='index.html'">简历</button>
+        <button class="page-btn active">分享</button>
+        <button class="page-btn" onclick="location.href='posts.html'">帖子</button>
+    </div>
+
+    <div class="container">
+        <header>
+            <h1 data-lang="zh">分享</h1>
+            <h1 data-lang="en">Share</h1>
+        </header>
+
+        <section>
+            <h2><span class="section-title" data-lang="zh">项目展示</span><span class="section-title" data-lang="en">Projects</span></h2>
+            
+            <div class="share-grid">
+                <div class="share-item">
+                    <div class="share-title">Multi-Agent Flocking Demo</div>
+                    <div class="share-desc" data-lang="zh">基于Boids算法的群体涌现行为演示，包含对齐、聚合、分离规则</div>
+                    <div class="share-desc" data-lang="en">Swarm emergence behavior demo based on Boids algorithm</div>
+                    <div class="share-tags">
+                        <span class="tag">JavaScript</span>
+                        <span class="tag">Canvas</span>
+                        <span class="tag">MAS</span>
+                    </div>
+                </div>
+
+                <div class="share-item">
+                    <div class="share-title">UAV Trajectory Optimization</div>
+                    <div class="share-desc" data-lang="zh">基于CMA-ES的多无人机轨迹优化框架</div>
+                    <div class="share-desc" data-lang="en">CMA-ES based multi-UAV trajectory optimization</div>
+                    <div class="share-tags">
+                        <span class="tag">Python</span>
+                        <span class="tag">CMA-ES</span>
+                        <span class="tag">优化</span>
+                    </div>
+                </div>
+
+                <div class="share-item">
+                    <div class="share-title">Topology Visualization</div>
+                    <div class="share-desc" data-lang="zh">动态通信拓扑网络可视化工具</div>
+                    <div class="share-desc" data-lang="en">Dynamic communication topology visualization</div>
+                    <div class="share-tags">
+                        <span class="tag">D3.js</span>
+                        <span class="tag">图论</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        function setLang(lang) {
+            document.body.classList.remove('lang-en');
+            if (lang === 'en') {
+                document.body.classList.add('lang-en');
+            }
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if ((btn.textContent === 'EN' && lang === 'en') || 
+                    (btn.textContent === '中文' && lang === 'zh')) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+    </script>
+</body>
+</html>

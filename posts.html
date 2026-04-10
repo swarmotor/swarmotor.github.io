@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SWARMOTOR - 技术帖子</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;500;600&family=Noto+Sans+SC:wght@300;400;500;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        #game-of-life {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.12;
+            pointer-events: none;
+        }
+        :root {
+            --bg-primary: #fafaf9;
+            --bg-secondary: #ffffff;
+            --text-primary: #1a1a1a;
+            --text-secondary: #525252;
+            --text-muted: #737373;
+            --accent: #0f4c5c;
+            --accent-light: #e8f4f6;
+            --border: #e5e5e5;
+            --shadow: rgba(0, 0, 0, 0.04);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'DM Sans', 'Noto Sans SC', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.7;
+            font-size: 15px;
+            min-height: 100vh;
+        }
+        .lang-toggle {
+            position: fixed;
+            top: 1.5rem;
+            right: 1.5rem;
+            z-index: 1000;
+            display: flex;
+            gap: 0.25rem;
+            background: var(--bg-secondary);
+            padding: 0.25rem;
+            border-radius: 2rem;
+            box-shadow: 0 2px 12px var(--shadow);
+            border: 1px solid var(--border);
+        }
+        .lang-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            border-radius: 1.5rem;
+            transition: all 0.25s ease;
+            color: var(--text-muted);
+        }
+        .lang-btn.active {
+            background: var(--accent);
+            color: white;
+        }
+        .game-toggle {
+            position: fixed;
+            top: 4.5rem;
+            right: 1.5rem;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 0.15rem;
+            background: var(--bg-secondary);
+            padding: 0.25rem;
+            border-radius: 2rem;
+            box-shadow: 0 2px 12px var(--shadow);
+            border: 1px solid var(--border);
+        }
+        .game-btn {
+            width: 2rem;
+            height: 2rem;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 1rem;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .game-btn:hover {
+            background: var(--accent-light);
+            transform: scale(1.1);
+        }
+        .game-btn.active {
+            background: var(--accent);
+        }
+        .page-nav {
+            position: fixed;
+            top: 14rem;
+            right: 1.5rem;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+        .page-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border);
+            background: var(--bg-secondary);
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            border-radius: 0.5rem;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px var(--shadow);
+        }
+        .page-btn:hover {
+            background: var(--accent-light);
+        }
+        .page-btn.active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+        }
+        header {
+            text-align: left;
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+        }
+        h1 {
+            font-family: 'Crimson Pro', serif;
+            font-size: 2.75rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+        h2 {
+            font-family: 'Crimson Pro', serif;
+            font-size: 1.35rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        h2::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(to right, var(--border), transparent);
+        }
+        .section-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--accent);
+            font-weight: 600;
+        }
+        .post-item {
+            margin-bottom: 2rem;
+        }
+        .post-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+        .post-meta {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+        }
+        .post-content {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+        .post-list {
+            list-style: none;
+        }
+        .post-list li {
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .post-list li:last-child {
+            border-bottom: none;
+        }
+        [data-lang="en"] { display: none; }
+        body.lang-en [data-lang="zh"] { display: none; }
+        body.lang-en [data-lang="en"] { display: block; }
+    </style>
+</head>
+<body>
+    <canvas id="game-of-life"></canvas>
+    
+    <div class="lang-toggle">
+        <button class="lang-btn active" onclick="setLang('zh')">中文</button>
+        <button class="lang-btn" onclick="setLang('en')">EN</button>
+    </div>
+
+    <div class="game-toggle">
+        <button class="game-btn" onclick="location.href='index.html'" title="Resume">📄</button>
+    </div>
+
+    <div class="page-nav">
+        <button class="page-btn" onclick="location.href='index.html'">简历</button>
+        <button class="page-btn" onclick="location.href='share.html'">分享</button>
+        <button class="page-btn active">帖子</button>
+    </div>
+
+    <div class="container">
+        <header>
+            <h1 data-lang="zh">技术帖子</h1>
+            <h1 data-lang="en">Tech Posts</h1>
+        </header>
+
+        <section>
+            <h2><span class="section-title" data-lang="zh">学习笔记</span><span class="section-title" data-lang="en">Notes</span></h2>
+            
+            <ul class="post-list">
+                <li>
+                    <div class="post-title" data-lang="zh">多智能体强化学习 (MARL) 入门指南</div>
+                    <div class="post-title" data-lang="en">Multi-Agent Reinforcement Learning (MARL) Getting Started</div>
+                    <div class="post-meta">2024</div>
+                    <div class="post-content" data-lang="zh">
+                        介绍多智能体系统的基本概念、常见算法 (QMIX, MAPPO, MADDPG) 以及应用场景。
+                    </div>
+                    <div class="post-content" data-lang="en">
+                        Introduction to multi-agent systems, common algorithms (QMIX, MAPPO, MADDPG) and applications.
+                    </div>
+                </li>
+
+                <li>
+                    <div class="post-title" data-lang="zh">图神经网络 (GNN) 在机器人群体中的应用</div>
+                    <div class="post-title" data-lang="en">Graph Neural Networks for Robot Swarms</div>
+                    <div class="post-meta">2024</div>
+                    <div class="post-content" data-lang="zh">
+                        探讨如何用GNN表示通信拓扑，以及图强化学习框架的设计。
+                    </div>
+                    <div class="post-content" data-lang="en">
+                        Exploring how to represent communication topology with GNN and design of graph reinforcement learning frameworks.
+                    </div>
+                </li>
+
+                <li>
+                    <div class="post-title" data-lang="zh">分布式优化与群体协同</div>
+                    <div class="post-title" data-lang="en">Distributed Optimization & Swarm Coordination</div>
+                    <div class="post-meta">2024</div>
+                    <div class="post-content" data-lang="zh">
+                        经典分布式优化算法 (Consensus, ADMM) 与群体智能的结合。
+                    </div>
+                    <div class="post-content" data-lang="en">
+                        Classic distributed optimization algorithms (Consensus, ADMM) combined with swarm intelligence.
+                    </div>
+                </li>
+            </ul>
+        </section>
+    </div>
+
+    <script>
+        function setLang(lang) {
+            document.body.classList.remove('lang-en');
+            if (lang === 'en') {
+                document.body.classList.add('lang-en');
+            }
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if ((btn.textContent === 'EN' && lang === 'en') || 
+                    (btn.textContent === '中文' && lang === 'zh')) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
