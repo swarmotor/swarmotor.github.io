@@ -839,6 +839,7 @@
     <script>
         // ==================== Language Toggle ====================
         function setLang(lang) {
+            localStorage.setItem('swarmotor-lang', lang);
             document.body.classList.remove('lang-en');
             if (lang === 'en') {
                 document.body.classList.add('lang-en');
@@ -851,6 +852,12 @@
                 }
             });
         }
+
+        // 初始化语言状态
+        (function initLang() {
+            const saved = localStorage.getItem('swarmotor-lang');
+            if (saved) setLang(saved);
+        })();
 
         // ==================== Page Loader ====================
         window.addEventListener('load', function () {

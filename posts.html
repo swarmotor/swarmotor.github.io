@@ -233,19 +233,15 @@
     </div>
 
     <div class="container">
-        <header>
-            <h1 data-lang="zh">技术帖子</h1>
-            <h1 data-lang="en">Tech Posts</h1>
-        </header>
-
         <section>
             <h2><span class="section-title" data-lang="zh">学习笔记</span><span class="section-title" data-lang="en">Notes</span></h2>
             
             <ul class="post-list">
                 <li>
-                    <div class="post-title" data-lang="zh">多智能体强化学习 (MARL) 入门指南</div>
-                    <div class="post-title" data-lang="en">Multi-Agent Reinforcement Learning (MARL) Getting Started</div>
-                    <div class="post-meta">2024</div>
+                    <a href="https://qcn0sr22ysoh.feishu.cn/docx/ZqBdd0IUPo7CsKxyEXFcI5PInZc" target="_blank" style="text-decoration: none; color: inherit;">
+                        <div class="post-title" data-lang="zh">多智能体强化学习 (MARL) 入门指南</div>
+                        <div class="post-title" data-lang="en">Multi-Agent Reinforcement Learning (MARL) Getting Started</div>
+                    </a>
                     <div class="post-content" data-lang="zh">
                         介绍多智能体系统的基本概念、常见算法 (QMIX, MAPPO, MADDPG) 以及应用场景。
                     </div>
@@ -257,7 +253,6 @@
                 <li>
                     <div class="post-title" data-lang="zh">图神经网络 (GNN) 在机器人群体中的应用</div>
                     <div class="post-title" data-lang="en">Graph Neural Networks for Robot Swarms</div>
-                    <div class="post-meta">2024</div>
                     <div class="post-content" data-lang="zh">
                         探讨如何用GNN表示通信拓扑，以及图强化学习框架的设计。
                     </div>
@@ -269,7 +264,6 @@
                 <li>
                     <div class="post-title" data-lang="zh">分布式优化与群体协同</div>
                     <div class="post-title" data-lang="en">Distributed Optimization & Swarm Coordination</div>
-                    <div class="post-meta">2024</div>
                     <div class="post-content" data-lang="zh">
                         经典分布式优化算法 (Consensus, ADMM) 与群体智能的结合。
                     </div>
@@ -407,6 +401,7 @@
         // Can add more if needed
 
         function setLang(lang) {
+            localStorage.setItem('swarmotor-lang', lang);
             document.body.classList.remove('lang-en');
             if (lang === 'en') {
                 document.body.classList.add('lang-en');
@@ -419,6 +414,12 @@
                 }
             });
         }
+
+        // 初始化语言状态
+        (function initLang() {
+            const saved = localStorage.getItem('swarmotor-lang');
+            if (saved) setLang(saved);
+        })();
     </script>
 </body>
 </html>

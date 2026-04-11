@@ -253,11 +253,6 @@
     </div>
 
     <div class="container">
-        <header>
-            <h1 data-lang="zh">分享</h1>
-            <h1 data-lang="en">Share</h1>
-        </header>
-
         <section>
             <h2><span class="section-title" data-lang="zh">项目展示</span><span class="section-title" data-lang="en">Projects</span></h2>
             
@@ -891,6 +886,7 @@
         })();
 
         function setLang(lang) {
+            localStorage.setItem('swarmotor-lang', lang);
             document.body.classList.remove('lang-en');
             if (lang === 'en') {
                 document.body.classList.add('lang-en');
@@ -903,6 +899,12 @@
                 }
             });
         }
+
+        // 初始化语言状态
+        (function initLang() {
+            const saved = localStorage.getItem('swarmotor-lang');
+            if (saved) setLang(saved);
+        })();
     </script>
 </body>
 </html>
