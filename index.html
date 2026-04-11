@@ -88,8 +88,9 @@
 
         .game-toggle {
             position: fixed;
-            top: 4.5rem;
+            top: 50%;
             right: 1.5rem;
+            transform: translateY(-50%);
             z-index: 1000;
             display: flex;
             flex-direction: column;
@@ -126,7 +127,7 @@
 
         .page-nav {
             position: fixed;
-            top: 14rem;
+            bottom: 1.5rem;
             right: 1.5rem;
             z-index: 1000;
             display: flex;
@@ -135,15 +136,19 @@
         }
 
         .page-btn {
-            padding: 0.5rem 1rem;
+            padding: 0.5rem;
+            width: 2.5rem;
+            height: 2.5rem;
             border: 1px solid var(--border);
             background: var(--bg-secondary);
             cursor: pointer;
-            font-size: 0.85rem;
-            font-weight: 500;
-            border-radius: 0.5rem;
+            font-size: 1.2rem;
+            border-radius: 50%;
             transition: all 0.2s ease;
             box-shadow: 0 2px 8px var(--shadow);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .page-btn:hover {
@@ -597,9 +602,9 @@
 
     <!-- Page Nav -->
     <div class="page-nav">
-        <button class="page-btn active" onclick="location.href='index.html'">简历</button>
-        <button class="page-btn" onclick="location.href='share.html'">分享</button>
-        <button class="page-btn" onclick="location.href='posts.html'">帖子</button>
+        <button class="page-btn active" onclick="location.href='index.html'" title="简历">📄</button>
+        <button class="page-btn" onclick="location.href='share.html'" title="分享">📁</button>
+        <button class="page-btn" onclick="location.href='posts.html'" title="帖子">📝</button>
     </div>
 
     <div class="container page-content" id="page-resume">

@@ -68,8 +68,9 @@
         }
         .game-toggle {
             position: fixed;
-            top: 4.5rem;
+            top: 50%;
             right: 1.5rem;
+            transform: translateY(-50%);
             z-index: 1000;
             display: flex;
             flex-direction: column;
@@ -102,7 +103,7 @@
         }
         .page-nav {
             position: fixed;
-            top: 14rem;
+            bottom: 1.5rem;
             right: 1.5rem;
             z-index: 1000;
             display: flex;
@@ -110,15 +111,19 @@
             gap: 0.25rem;
         }
         .page-btn {
-            padding: 0.5rem 1rem;
+            padding: 0.5rem;
+            width: 2.5rem;
+            height: 2.5rem;
             border: 1px solid var(--border);
             background: var(--bg-secondary);
             cursor: pointer;
-            font-size: 0.85rem;
-            font-weight: 500;
-            border-radius: 0.5rem;
+            font-size: 1.2rem;
+            border-radius: 50%;
             transition: all 0.2s ease;
             box-shadow: 0 2px 8px var(--shadow);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .page-btn:hover {
             background: var(--accent-light);
@@ -233,13 +238,18 @@
     </div>
 
     <div class="game-toggle">
-        <button class="game-btn" onclick="location.href='index.html'" title="Resume">📄</button>
+        <button class="game-btn active" onclick="setGame('flocking', this)" title="Flocking">🦎</button>
+        <button class="game-btn" onclick="setGame('pursuit', this)" title="Pursuit-Evasion">🎯</button>
+        <button class="game-btn" onclick="setGame('rps', this)" title="Rock-Paper-Scissors">✊</button>
+        <button class="game-btn" onclick="setGame('sweep', this)" title="Particle Sweep">💨</button>
+        <button class="game-btn" onclick="setGame('ant', this)" title="Ant Colony">🐜</button>
+        <button class="game-btn" onclick="setGame('life', this)" title="Game of Life">🎲</button>
     </div>
 
     <div class="page-nav">
-        <button class="page-btn" onclick="location.href='index.html'">简历</button>
-        <button class="page-btn active">分享</button>
-        <button class="page-btn" onclick="location.href='posts.html'">帖子</button>
+        <button class="page-btn" onclick="location.href='index.html'" title="简历">📄</button>
+        <button class="page-btn active" title="分享">📁</button>
+        <button class="page-btn" onclick="location.href='posts.html'" title="帖子">📝</button>
     </div>
 
     <div class="container">
@@ -264,17 +274,6 @@
                 </div>
 
                 <div class="share-item">
-                    <div class="share-title">UAV Trajectory Optimization</div>
-                    <div class="share-desc" data-lang="zh">基于CMA-ES的多无人机轨迹优化框架</div>
-                    <div class="share-desc" data-lang="en">CMA-ES based multi-UAV trajectory optimization</div>
-                    <div class="share-tags">
-                        <span class="tag">Python</span>
-                        <span class="tag">CMA-ES</span>
-                        <span class="tag">优化</span>
-                    </div>
-                </div>
-
-                <div class="share-item">
                     <div class="share-title">Topology Visualization</div>
                     <div class="share-desc" data-lang="zh">动态通信拓扑网络可视化工具</div>
                     <div class="share-desc" data-lang="en">Dynamic communication topology visualization</div>
@@ -288,6 +287,609 @@
     </div>
 
     <script>
+        // ==================== Game System ====================
+        let currentGame = 'flocking';
+        
+        function setGame(game, btn) {
+            currentGame = game;
+            document.querySelectorAll('.game-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        }
+
+        // Flocking
+        (function initFlocking() {
+            const canvas = document.getElementById('game-of-life');
+            const ctx = canvas.getContext('2d');
+            let agents = [], width, height;
+            
+            function resize() {
+                width = window.innerWidth;
+                height = window.innerHeight;
+                canvas.width = width;
+                canvas.height = height;
+            }
+            
+            function initAgents(count = 60) {
+                agents = [];
+                for (let i = 0; i < count; i++) {
+                    agents.push({
+                        x: Math.random() * width,
+                        y: Math.random() * height,
+                        vx: (Math.random() - 0.5) * 3,
+                        vy: (Math.random() - 0.5) * 3,
+                        hue: 180 + Math.random() * 40
+                    });
+                }
+            }
+            
+            function update() {
+                const perceptionRadius = 80;
+                const separationDist = 25;
+                
+                for (let i = 0; i < agents.length; i++) {
+                    let avgX = 0, avgY = 0, avgVX = 0, avgVY = 0, sepX = 0, sepY = 0, count = 0;
+                    
+                    for (let j = 0; j < agents.length; j++) {
+                        if (i === j) continue;
+                        const dx = agents[j].x - agents[i].x;
+                        const dy = agents[j].y - agents[i].y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        
+                        if (dist < perceptionRadius) {
+                            avgX += agents[j].x;
+                            avgY += agents[j].y;
+                            avgVX += agents[j].vx;
+                            avgVY += agents[j].vy;
+                            count++;
+                            
+                            if (dist < separationDist) {
+                                sepX -= dx / dist;
+                                sepY -= dy / dist;
+                            }
+                        }
+                    }
+                    
+                    if (count > 0) {
+                        avgX /= count;
+                        avgY /= count;
+                        avgVX /= count;
+                        avgVY /= count;
+                        agents[i].vx += (avgX - agents[i].x) * 0.005 + (avgVX - agents[i].vx) * 0.05;
+                        agents[i].vy += (avgY - agents[i].y) * 0.005 + (avgVY - agents[i].vy) * 0.05;
+                    }
+                    agents[i].vx += sepX * 0.15;
+                    agents[i].vy += sepY * 0.15;
+                    
+                    const margin = 50;
+                    if (agents[i].x < margin) agents[i].vx += 0.5;
+                    if (agents[i].x > width - margin) agents[i].vx -= 0.5;
+                    if (agents[i].y < margin) agents[i].vy += 0.5;
+                    if (agents[i].y > height - margin) agents[i].vy -= 0.5;
+                    
+                    const speed = Math.sqrt(agents[i].vx ** 2 + agents[i].vy ** 2);
+                    if (speed > 4) {
+                        agents[i].vx = (agents[i].vx / speed) * 4;
+                        agents[i].vy = (agents[i].vy / speed) * 4;
+                    }
+                    
+                    agents[i].x += agents[i].vx;
+                    agents[i].y += agents[i].vy;
+                }
+            }
+            
+            function draw() {
+                ctx.fillStyle = '#fafaf9';
+                ctx.fillRect(0, 0, width, height);
+                
+                for (const a of agents) {
+                    const angle = Math.atan2(a.vy, a.vx);
+                    ctx.save();
+                    ctx.translate(a.x, a.y);
+                    ctx.rotate(angle);
+                    ctx.beginPath();
+                    ctx.moveTo(8, 0);
+                    ctx.lineTo(-4, -4);
+                    ctx.lineTo(-4, 4);
+                    ctx.closePath();
+                    ctx.fillStyle = `hsl(${a.hue}, 60%, 35%)`;
+                    ctx.fill();
+                    ctx.restore();
+                }
+            }
+            
+            function animate() {
+                if (currentGame === 'flocking') { update(); draw(); }
+                requestAnimationFrame(animate);
+            }
+            
+            resize();
+            initAgents();
+            animate();
+        })();
+
+        // Pursuit-Evasion
+        (function initPursuit() {
+            const canvas = document.getElementById('game-of-life');
+            const ctx = canvas.getContext('2d');
+            let pursuers = [], targets = [], width, height;
+            
+            function resize() {
+                width = window.innerWidth;
+                height = window.innerHeight;
+                canvas.width = width;
+                canvas.height = height;
+            }
+            
+            function init() {
+                pursuers = [{x: width/2, y: height/2, vx: 0, vy: 0}];
+                targets = [];
+                for (let i = 0; i < 5; i++) {
+                    targets.push({
+                        x: Math.random() * width,
+                        y: Math.random() * height,
+                        vx: (Math.random() - 0.5) * 2,
+                        vy: (Math.random() - 0.5) * 2
+                    });
+                }
+            }
+            
+            function update() {
+                let closest = 0, minDist = Infinity;
+                for (let i = 0; i < targets.length; i++) {
+                    const d = (targets[i].x - pursuers[0].x) ** 2 + (targets[i].y - pursuers[0].y) ** 2;
+                    if (d < minDist) { minDist = d; closest = i; }
+                }
+                const t = targets[closest];
+                pursuers[0].vx += (t.x - pursuers[0].x) * 0.02;
+                pursuers[0].vy += (t.y - pursuers[0].y) * 0.02;
+                
+                for (const target of targets) {
+                    const dx = target.x - pursuers[0].x;
+                    const dy = target.y - pursuers[0].y;
+                    const dist = Math.sqrt(dx*dx + dy*dy);
+                    if (dist < 150) {
+                        target.vx += (dx / dist) * 0.3;
+                        target.vy += (dy / dist) * 0.3;
+                    }
+                    target.vx += (Math.random() - 0.5) * 0.5;
+                    target.vy += (Math.random() - 0.5) * 0.5;
+                    
+                    if (target.x < 0 || target.x > width) target.vx *= -1;
+                    if (target.y < 0 || target.y > height) target.vy *= -1;
+                    
+                    const speed = Math.sqrt(target.vx ** 2 + target.vy ** 2);
+                    if (speed > 3) {
+                        target.vx = (target.vx / speed) * 3;
+                        target.vy = (target.vy / speed) * 3;
+                    }
+                    target.x += target.vx;
+                    target.y += target.vy;
+                }
+                
+                const pSpeed = Math.sqrt(pursuers[0].vx ** 2 + pursuers[0].vy ** 2);
+                if (pSpeed > 4) {
+                    pursuers[0].vx = (pursuers[0].vx / pSpeed) * 4;
+                    pursuers[0].vy = (pursuers[0].vy / pSpeed) * 4;
+                }
+                pursuers[0].x += pursuers[0].vx;
+                pursuers[0].y += pursuers[0].vy;
+            }
+            
+            function draw() {
+                ctx.fillStyle = '#fafaf9';
+                ctx.fillRect(0, 0, width, height);
+                
+                for (const t of targets) {
+                    ctx.beginPath();
+                    ctx.arc(t.x, t.y, 6, 0, Math.PI * 2);
+                    ctx.fillStyle = '#e74c3c';
+                    ctx.fill();
+                }
+                
+                const p = pursuers[0];
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, 10, 0, Math.PI * 2);
+                ctx.fillStyle = '#0f4c5c';
+                ctx.fill();
+            }
+            
+            function animate() {
+                if (currentGame === 'pursuit') { update(); draw(); }
+                requestAnimationFrame(animate);
+            }
+            
+            resize();
+            init();
+            animate();
+        })();
+
+        // RPS
+        (function initRPS() {
+            const canvas = document.getElementById('game-of-life');
+            const ctx = canvas.getContext('2d');
+            let cells = [], width, height, cellSize = 12, cols, rows;
+            
+            function resize() {
+                width = window.innerWidth;
+                height = window.innerHeight;
+                canvas.width = width;
+                canvas.height = height;
+                cols = Math.ceil(width / cellSize);
+                rows = Math.ceil(height / cellSize);
+            }
+            
+            function init() {
+                cells = [];
+                for (let i = 0; i < cols * rows; i++) {
+                    cells.push(Math.floor(Math.random() * 3));
+                }
+            }
+            
+            function update() {
+                const newCells = [...cells];
+                
+                for (let y = 0; y < rows; y++) {
+                    for (let x = 0; x < cols; x++) {
+                        const idx = y * cols + x;
+                        
+                        for (let dy = -1; dy <= 1; dy++) {
+                            for (let dx = -1; dx <= 1; dx++) {
+                                if (dx === 0 && dy === 0) continue;
+                                const nx = (x + dx + cols) % cols;
+                                const ny = (y + dy + rows) % rows;
+                                const nidx = ny * cols + nx;
+                                const current = cells[idx];
+                                const neighbor = cells[nidx];
+                                if ((current === 0 && neighbor === 2) ||
+                                    (current === 2 && neighbor === 1) ||
+                                    (current === 1 && neighbor === 0)) {
+                                    if (Math.random() < 0.05) newCells[nidx] = current;
+                                }
+                            }
+                        }
+                    }
+                }
+                cells = newCells;
+            }
+            
+            function draw() {
+                ctx.fillStyle = '#fafaf9';
+                ctx.fillRect(0, 0, width, height);
+                
+                for (let y = 0; y < rows; y++) {
+                    for (let x = 0; x < cols; x++) {
+                        const idx = y * cols + x;
+                        if (cells[idx] === 0) ctx.fillStyle = '#e74c3c'; 
+                        else if (cells[idx] === 1) ctx.fillStyle = '#3498db'; 
+                        else ctx.fillStyle = '#2ecc71'; 
+                        ctx.fillRect(x * cellSize, y * cellSize, cellSize - 1, cellSize - 1);
+                    }
+                }
+            }
+            
+            function animate() {
+                if (currentGame === 'rps') { update(); draw(); }
+                requestAnimationFrame(animate);
+            }
+            
+            resize();
+            init();
+            animate();
+        })();
+
+        // Particle Sweep
+        (function initSweep() {
+            const canvas = document.getElementById('game-of-life');
+            const ctx = canvas.getContext('2d');
+            let particles = [], width, height, mouseX = 0, mouseY = 0;
+            
+            function resize() {
+                width = window.innerWidth;
+                height = window.innerHeight;
+                canvas.width = width;
+                canvas.height = height;
+            }
+            
+            function init() {
+                particles = [];
+                for (let i = 0; i < 80; i++) {
+                    particles.push({
+                        x: Math.random() * width,
+                        y: Math.random() * height,
+                        vx: (Math.random() - 0.5) * 2,
+                        vy: (Math.random() - 0.5) * 2
+                    });
+                }
+            }
+            
+            function update() {
+                for (const p of particles) {
+                    let avgX = 0, avgY = 0, count = 0;
+                    for (const other of particles) {
+                        if (p === other) continue;
+                        const dx = other.x - p.x;
+                        const dy = other.y - p.y;
+                        const d = Math.sqrt(dx*dx + dy*dy);
+                        if (d < 60) {
+                            avgX += other.x;
+                            avgY += other.y;
+                            count++;
+                        }
+                    }
+                    if (count > 0) {
+                        avgX /= count;
+                        avgY /= count;
+                        p.vx += (avgX - p.x) * 0.003;
+                        p.vy += (avgY - p.y) * 0.003;
+                    }
+                    
+                    for (const other of particles) {
+                        if (p === other) continue;
+                        const dx = p.x - other.x;
+                        const dy = p.y - other.y;
+                        const d = Math.sqrt(dx*dx + dy*dy);
+                        if (d < 15) {
+                            p.vx += dx / d * 0.1;
+                            p.vy += dy / d * 0.1;
+                        }
+                    }
+                    
+                    if (mouseX > 0) {
+                        const dx = mouseX - p.x;
+                        const dy = mouseY - p.y;
+                        const d = Math.sqrt(dx*dx + dy*dy);
+                        if (d > 80) {
+                            p.vx += dx / d * 0.05;
+                            p.vy += dy / d * 0.05;
+                        }
+                    }
+                    
+                    const speed = Math.sqrt(p.vx ** 2 + p.vy ** 2);
+                    if (speed > 3) {
+                        p.vx = (p.vx / speed) * 3;
+                        p.vy = (p.vy / speed) * 3;
+                    }
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    
+                    if (p.x < 0) p.x = width;
+                    if (p.x > width) p.x = 0;
+                    if (p.y < 0) p.y = height;
+                    if (p.y > height) p.y = 0;
+                }
+            }
+            
+            function draw() {
+                ctx.fillStyle = '#fafaf9';
+                ctx.fillRect(0, 0, width, height);
+                
+                for (const p of particles) {
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+                    ctx.fillStyle = 'rgba(15, 76, 92, 0.7)';
+                    ctx.fill();
+                }
+            }
+            
+            canvas.addEventListener('mousemove', e => {
+                const rect = canvas.getBoundingClientRect();
+                mouseX = e.clientX - rect.left;
+                mouseY = e.clientY - rect.top;
+            });
+            
+            function animate() {
+                if (currentGame === 'sweep') { update(); draw(); }
+                requestAnimationFrame(animate);
+            }
+            
+            resize();
+            init();
+            animate();
+        })();
+
+        // Ant Colony
+        (function initAnt() {
+            const canvas = document.getElementById('game-of-life');
+            const ctx = canvas.getContext('2d');
+            let ants = [], food = [], trails = [], width, height;
+            
+            function resize() {
+                width = window.innerWidth;
+                height = window.innerHeight;
+                canvas.width = width;
+                canvas.height = height;
+            }
+            
+            function init() {
+                ants = [];
+                food = [];
+                trails = [];
+                
+                for (let i = 0; i < 40; i++) {
+                    ants.push({
+                        x: width / 2,
+                        y: height / 2,
+                        angle: Math.random() * Math.PI * 2,
+                        hasFood: false
+                    });
+                }
+                
+                for (let i = 0; i < 30; i++) {
+                    food.push({
+                        x: Math.random() * width,
+                        y: Math.random() * height
+                    });
+                }
+            }
+            
+            function update() {
+                for (const ant of ants) {
+                    let closestFood = null, minDist = 30;
+                    for (let f of food) {
+                        const d = Math.sqrt((ant.x - f.x) ** 2 + (ant.y - f.y) ** 2);
+                        if (d < minDist) { minDist = d; closestFood = f; }
+                    }
+                    
+                    if (closestFood && !ant.hasFood) {
+                        ant.angle = Math.atan2(closestFood.y - ant.y, closestFood.x - ant.x);
+                        if (minDist < 10) {
+                            ant.hasFood = true;
+                            const idx = food.indexOf(closestFood);
+                            if (idx > -1) food.splice(idx, 1);
+                        }
+                    } else if (ant.hasFood) {
+                        const dx = width/2 - ant.x;
+                        const dy = height/2 - ant.y;
+                        ant.angle = Math.atan2(dy, dx);
+                        if (Math.sqrt(dx*dx + dy*dy) < 15) ant.hasFood = false;
+                    } else {
+                        ant.angle += (Math.random() - 0.5) * 0.5;
+                    }
+                    
+                    const tx = Math.floor(ant.x / 10);
+                    const ty = Math.floor(ant.y / 10);
+                    if (tx >= 0 && tx < width/10 && ty >= 0 && ty < height/10) {
+                        trails.push({x: tx, y: ty, strength: 1});
+                    }
+                    
+                    ant.x += Math.cos(ant.angle) * 2;
+                    ant.y += Math.sin(ant.angle) * 2;
+                    
+                    if (ant.x < 0 || ant.x > width) ant.angle = Math.PI - ant.angle;
+                    if (ant.y < 0 || ant.y > height) ant.angle = -ant.angle;
+                    ant.x = Math.max(0, Math.min(width, ant.x));
+                    ant.y = Math.max(0, Math.min(height, ant.y));
+                }
+                
+                for (const t of trails) t.strength -= 0.005;
+                trails = trails.filter(t => t.strength > 0);
+                
+                if (food.length < 30 && Math.random() < 0.1) {
+                    food.push({
+                        x: Math.random() * width,
+                        y: Math.random() * height
+                    });
+                }
+            }
+            
+            function draw() {
+                ctx.fillStyle = '#fafaf9';
+                ctx.fillRect(0, 0, width, height);
+                
+                for (const t of trails) {
+                    ctx.fillStyle = `rgba(139, 195, 74, ${t.strength * 0.3})`;
+                    ctx.fillRect(t.x * 10, t.y * 10, 10, 10);
+                }
+                
+                for (const f of food) {
+                    ctx.beginPath();
+                    ctx.arc(f.x, f.y, 4, 0, Math.PI * 2);
+                    ctx.fillStyle = '#27ae60';
+                    ctx.fill();
+                }
+                
+                for (const ant of ants) {
+                    ctx.beginPath();
+                    ctx.arc(ant.x, ant.y, 3, 0, Math.PI * 2);
+                    ctx.fillStyle = ant.hasFood ? '#e74c3c' : '#0f4c5c';
+                    ctx.fill();
+                }
+                
+                ctx.beginPath();
+                ctx.arc(width/2, height/2, 15, 0, Math.PI * 2);
+                ctx.strokeStyle = '#0f4c5c';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            }
+            
+            function animate() {
+                if (currentGame === 'ant') { update(); draw(); }
+                requestAnimationFrame(animate);
+            }
+            
+            resize();
+            init();
+            animate();
+        })();
+
+        // Game of Life
+        (function initGameOfLife() {
+            const canvas = document.getElementById('game-of-life');
+            const ctx = canvas.getContext('2d');
+            let width, height, cells, nextCells, cellSize = 8;
+            
+            function resize() {
+                width = Math.ceil(window.innerWidth / cellSize);
+                height = Math.ceil(window.innerHeight / cellSize);
+                canvas.width = width * cellSize;
+                canvas.height = height * cellSize;
+                initCells();
+            }
+            
+            function initCells() {
+                cells = [];
+                for (let y = 0; y < height; y++) {
+                    cells[y] = [];
+                    for (let x = 0; x < width; x++) {
+                        cells[y][x] = Math.random() < 0.3 ? 1 : 0;
+                    }
+                }
+                nextCells = [];
+            }
+            
+            function countNeighbors(x, y) {
+                let count = 0;
+                for (let dy = -1; dy <= 1; dy++) {
+                    for (let dx = -1; dx <= 1; dx++) {
+                        if (dx === 0 && dy === 0) continue;
+                        const nx = (x + dx + width) % width;
+                        const ny = (y + dy + height) % height;
+                        count += cells[ny][nx];
+                    }
+                }
+                return count;
+            }
+            
+            function update() {
+                for (let y = 0; y < height; y++) {
+                    nextCells[y] = [];
+                    for (let x = 0; x < width; x++) {
+                        const neighbors = countNeighbors(x, y);
+                        if (cells[y][x] === 1) {
+                            nextCells[y][x] = (neighbors === 2 || neighbors === 3) ? 1 : 0;
+                        } else {
+                            nextCells[y][x] = neighbors === 3 ? 1 : 0;
+                        }
+                    }
+                }
+                [cells, nextCells] = [nextCells, cells];
+            }
+            
+            function draw() {
+                ctx.fillStyle = '#fafaf9';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                ctx.fillStyle = 'rgba(15, 76, 92, 0.55)';
+                for (let y = 0; y < height; y++) {
+                    for (let x = 0; x < width; x++) {
+                        if (cells[y][x] === 1) {
+                            ctx.beginPath();
+                            ctx.arc(x * cellSize + cellSize / 2, y * cellSize + cellSize / 2, cellSize / 3, 0, Math.PI * 2);
+                            ctx.fill();
+                        }
+                    }
+                }
+            }
+            
+            function animate() {
+                if (currentGame === 'life') { update(); draw(); }
+                requestAnimationFrame(animate);
+            }
+            
+            resize();
+            animate();
+        })();
+
         function setLang(lang) {
             document.body.classList.remove('lang-en');
             if (lang === 'en') {
