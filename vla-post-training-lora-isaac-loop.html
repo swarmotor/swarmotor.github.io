@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>从 LoRA 验证到 Isaac Sim 闭环评测：我怎么设计 VLA 后训练路线</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f5f8f8;
+  --paper: rgba(255,255,255,.94);
+  --ink: #18333b;
+  --muted: #465f68;
+  --subtle: #596f77;
+  --line: rgba(28,78,88,.18);
+  --cyan: #008c95;
+  --cyan-2: #3aa7b0;
+  --warm: #9a6a16;
+  --green: #0f766e;
+  --red: #a33a2b;
+  --shadow: 0 18px 48px rgba(23,74,83,.10);
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background:
+    radial-gradient(circle at 8% -10%, rgba(0,140,149,.15), transparent 34%),
+    radial-gradient(circle at 88% 2%, rgba(58,167,176,.13), transparent 30%),
+    linear-gradient(180deg, #f7faf9 0%, #eef5f5 52%, #f8faf9 100%);
+  color: var(--ink);
+  font-family: "Avenir Next", "Inter", "SF Pro Text", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  line-height: 1.76;
+  text-rendering: optimizeLegibility;
+}
+main { width: min(1040px, calc(100vw - 32px)); margin: 0 auto; padding: 48px 0 72px; }
+.hero, section, .card { background: var(--paper); border: 1px solid var(--line); border-radius: 24px; box-shadow: var(--shadow); }
+.hero { padding: clamp(28px, 5vw, 56px); background: linear-gradient(135deg, rgba(0,140,149,.12), rgba(255,255,255,.88) 52%, rgba(58,167,176,.10)); }
+.kicker { color: var(--cyan); font-size: 13px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+h1 { margin: 12px 0 14px; color: #102f38; font-family: "Iowan Old Style", "LXGW WenKai Screen", "霞鹜文楷", "Noto Serif SC", "Source Han Serif SC", "Songti SC", Georgia, serif; font-size: clamp(32px, 5vw, 56px); line-height: 1.12; letter-spacing: -.04em; }
+h2 { margin: 0 0 14px; color: #173943; font-family: "Optima", "Avenir Next", "Noto Serif SC", "Noto Sans SC", system-ui, sans-serif; font-size: clamp(22px, 3vw, 30px); line-height: 1.24; letter-spacing: -.02em; }
+h3 { margin: 22px 0 8px; color: #1c4049; font-size: 18px; }
+p { margin: 0 0 14px; color: var(--muted); }
+ul, ol { margin: 10px 0 0 22px; padding: 0; color: var(--muted); }
+li { margin: 7px 0; }
+section { margin-top: 22px; padding: clamp(22px, 4vw, 34px); }
+.lead { max-width: 860px; color: var(--muted); font-size: 18px; }
+.meta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+.pill { display: inline-flex; padding: 5px 11px; border: 1px solid rgba(0,140,149,.24); border-radius: 999px; background: rgba(0,140,149,.08); color: #31545d; font-size: 13px; font-weight: 700; }
+.grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-top: 18px; }
+.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.card { padding: 18px; box-shadow: none; }
+.card strong { display: block; margin-bottom: 6px; color: #173943; }
+.note { margin-top: 16px; padding: 16px 18px; border-left: 4px solid var(--cyan); border-radius: 16px; background: rgba(0,140,149,.08); color: var(--muted); }
+.warn { border-left-color: var(--warm); background: rgba(154,106,22,.08); }
+code { padding: 2px 6px; border: 1px solid rgba(0,140,149,.24); border-radius: 6px; background: rgba(0,140,149,.10); color: #005f68; font-family: "JetBrains Mono", "SFMono-Regular", Consolas, monospace; font-size: .92em; }
+.table-wrap { overflow-x: auto; margin-top: 14px; }
+table { width: 100%; border-collapse: collapse; overflow: hidden; border-radius: 16px; background: #fff; font-size: 15px; }
+th, td { padding: 12px 14px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; color: var(--muted); }
+th { background: rgba(0,140,149,.08); color: #173943; }
+.timeline { display: grid; gap: 14px; margin-top: 18px; }
+.step { padding: 18px; border: 1px solid var(--line); border-radius: 18px; background: rgba(255,255,255,.78); }
+.step span { display: inline-flex; margin-bottom: 8px; color: var(--cyan); font-size: 12px; font-weight: 850; letter-spacing: .10em; text-transform: uppercase; }
+footer { margin-top: 28px; color: var(--subtle); font-size: 14px; text-align: center; }
+@media (max-width: 760px) { main { width: min(100vw - 22px, 1040px); padding-top: 22px; } .grid, .two { grid-template-columns: 1fr; } .hero, section { border-radius: 18px; } }
+</style>
+</head>
+<body>
+<main>
+
+<header class="hero">
+  <div class="kicker">VLA Post-training Note</div>
+  <h1>从 LoRA 验证到 Isaac Sim 闭环评测：我怎么设计 VLA 后训练路线</h1>
+  <p class="lead">我把这条路线拆开看之后，发现 LoRA、Isaac Sim、VLM QA、DAgger 和 World Model 并不是几件并列的工具。它们更像一条后训练流水线里的不同闸门：先确认数据和接口是真的，再让策略进入自己制造的状态分布，最后把失败变成下一轮数据。</p>
+  <div class="meta"><span class="pill">LoRA FT</span><span class="pill">Isaac Sim</span><span class="pill">Rollout Feedback</span><span class="pill">DAgger</span><span class="pill">VLM / WM QA</span></div>
+</header>
+<section>
+  <h2>我为什么不直接做全参数微调</h2>
+  <p>如果一开始就跑全参数微调，训练成本会把很多基础错误掩盖掉。模型没提升，可能是数据太少，也可能是相机 key 错了、action 维度错了、norm stats 没对齐，甚至是 Isaac 端实际执行的控制语义和训练数据完全不是一回事。</p>
+  <p>LoRA 在这里不是最终方案，而是烟雾测试。它便宜、快、失败得早，适合帮我确认这条链路是否值得继续投入。只要 LoRA 阶段能稳定暴露和修正数据契约问题，后面的全参数训练才有意义。</p>
+  <div class="grid">
+    <div class="card"><strong>先看数据能否进入模型</strong>LeRobot 字段、observation schema、state/action 维度、单位和顺序必须先被确认。</div>
+    <div class="card"><strong>再看策略能否被调用</strong>policy server 要能用固定请求格式返回动作，而不是只在训练脚本里跑通。</div>
+    <div class="card"><strong>最后看动作是否可执行</strong>Isaac 端执行的是末端 delta、joint velocity 还是别的控制接口，这件事不能模糊。</div>
+  </div>
+</section>
+<section>
+  <h2>Isaac Sim 在这条路线里不是展示器</h2>
+  <p>我更愿意把 Isaac Sim 当成策略行为的测试台。真实场景重建出来的 mesh、3DGS、点云和相机位姿，只是资产入口；只有当这些资产变成可 reset、可交互、可记录 rollout 的世界，它才开始对 VLA 后训练有价值。</p>
+  <p>第一人称视角联通测试的价值也在这里。它不是为了证明画面好看，而是为了检查训练时看到的图像、仿真时拿到的 observation、policy server 返回的 action、Isaac 端执行的控制量是否处在同一个闭环里。</p>
+  <div class="note">我会把“能加载场景”和“能做 benchmark”分开验收。前者只说明资产可见，后者才说明它能参与训练反馈。</div>
+</section>
+<section>
+  <h2>我真正想捕捉的是 compounding error</h2>
+  <p>离线 imitation learning 学到的是专家轨迹附近的状态-动作映射。真实 rollout 里，策略会不断把环境推向自己造成的新状态。一个很小的早期偏差，可能让后续图像、物体姿态和接触状态都偏离训练分布，然后错误继续累积。</p>
+  <p>所以我不会把 benchmark 设计成只验证成功轨迹。它必须允许 policy 进入偏离状态，并且记录偏离之后发生了什么。只有这样，rollout feedback 才不是一句口号。</p>
+  <div class="table-wrap"><table><thead><tr><th>我观察的失败</th><th>它通常说明什么</th><th>下一轮补什么</th></tr></thead><tbody>
+    <tr><td>接近目标时轨迹逐渐偏掉</td><td>训练数据只覆盖专家附近状态</td><td>加入扰动初始位姿和恢复轨迹</td></tr>
+    <tr><td>目标识别对了，但接触后滑走</td><td>视觉语义成功不等于动力学成功</td><td>补充接触片段、摩擦扰动和失败标注</td></tr>
+    <tr><td>夹爪开合时机不稳定</td><td>长轨迹里的关键监督太稀疏</td><td>围绕子任务节点截短片段并加权</td></tr>
+    <tr><td>失败样本混入后性能反而下降</td><td>新数据没有质量过滤</td><td>引入 VLM/WM critic 或 advantage filtering</td></tr>
+  </tbody></table></div>
+</section>
+<section>
+  <h2>我会按三段推进</h2>
+  <div class="timeline">
+    <div class="step"><span>Phase 1</span><h3>LoRA FT + VLM QA + 人工校准</h3><p>目标是证明数据、policy server、Isaac client 和评测脚本能闭合。VLM 负责语义层面的初筛，比如目标是否被操作、任务是否接近完成；人工校准负责纠正 VLM 在遮挡、接触和边界状态上的误判。</p></div>
+    <div class="step"><span>Phase 2</span><h3>全参数 FT + rollout feedback + DAgger</h3><p>当输入输出契约稳定后，再进入全参数微调。这个阶段我会把 policy-induced distribution 放进训练：让策略自己 rollout，记录失败状态，再用人工、脚本或专家策略补上纠正动作。</p></div>
+    <div class="step"><span>Phase 3</span><h3>World Model / RECAP-style filtering</h3><p>数据越来越多以后，问题会从“有没有数据”变成“哪些数据值得学”。World Model 更适合判断动力学风险，RECAP-style value 或 advantage filtering 更适合把高价值片段从混合数据里挑出来。</p></div>
+  </div>
+</section>
+<section>
+  <h2>VLM 和 World Model 我不会混着用</h2>
+  <p>VLM 适合做语义判断：指令有没有完成，目标物体是不是对的，场景状态是否符合语言描述。World Model 更适合做动力学判断：动作是否可能导致碰撞，未来几步是否偏离目标，接触之后是不是会失败。</p>
+  <p>我更想要的是 hybrid critic。VLM 给任务语义分，World Model 给动作风险和未来状态误差，两者一起决定一条 rollout 是直接进训练、需要人工复核，还是只作为失败案例保留。</p>
+  <div class="grid two">
+    <div class="card"><strong>VLM QA</strong>看语义完成度、目标对象、阶段进度和明显失败。</div>
+    <div class="card"><strong>World Model QA</strong>看短期状态预测、碰撞风险、恢复可能性和动力学合理性。</div>
+  </div>
+</section>
+<section>
+  <h2>我会先冻结这些东西，再谈并行化</h2>
+  <p>成熟流程并行化之前，我会先冻结接口。否则每一轮训练和评测都不可比较：这次换了相机，下次换了 action space，再下一次换了 reset 条件，最后只剩一堆无法解释的 success rate。</p>
+  <div class="table-wrap"><table><thead><tr><th>冻结项</th><th>为什么必须先定</th></tr></thead><tbody>
+    <tr><td>observation schema</td><td>保证训练、推理、评测看到的是同一组输入。</td></tr>
+    <tr><td>action space</td><td>保证模型输出和 Isaac / 机器人控制接口语义一致。</td></tr>
+    <tr><td>camera layout</td><td>减少训练视角和 rollout 视角之间的人为 domain gap。</td></tr>
+    <tr><td>norm stats 与 policy config</td><td>避免同一个 checkpoint 在不同配置下被错误解释。</td></tr>
+    <tr><td>reset、扰动和评测指标</td><td>让不同训练轮次的 benchmark 可以比较。</td></tr>
+  </tbody></table></div>
+</section>
+<section>
+  <h2>这篇路线的核心判断</h2>
+  <p>我不把 LoRA、全参、DAgger、VLM QA、World Model 和 RECAP 看成互斥选项。它们分别处理不同阶段的瓶颈：LoRA 解决低成本验证，全参解决容量，rollout feedback 解决分布偏移，DAgger 解决恢复数据，VLM/WM critic 解决评测密度，RECAP-style filtering 解决数据利用效率。</p>
+  <p>真正要做的是把它们接成一条闭环：训练、评测、识别失败、生成针对性场景、补充数据、重新训练，再回到评测。</p>
+  <div class="note warn">我会刻意少写“最终方案”。这条路线更像研发 pipeline 的骨架，价值在于每一轮失败都能留下可复用的数据和判断标准。</div>
+</section>
+<footer>重新组织自 LoRA/LLORA 验证、Isaac Sim 联通测试、Benchmark 与 DAgger 可行性笔记；原始文档仍保留在上一级目录。</footer>
+
+</main>
+</body>
+</html>

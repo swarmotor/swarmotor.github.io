@@ -1,0 +1,535 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OpenPI / ALOHA 世界模型探索与评价器路线图</title>
+  <style>
+    :root { --bg:#f5f7fa; --panel:#fff; --text:#172033; --muted:#5d6879; --line:#d8dee8; --blue:#2158c8; --blue-soft:#edf3ff; --green:#08764b; --amber:#9a5900; --red:#ae3030; --code:#111827; --code-text:#e7edf5; }
+    * { box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body { margin:0; color:var(--text); background:var(--bg); font:15px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+    main { max-width:1160px; margin:0 auto; padding:28px 20px 64px; }
+    header, section { margin:0 0 18px; padding:24px; background:var(--panel); border:1px solid var(--line); border-radius:12px; box-shadow:0 4px 16px rgba(23,32,51,.05); }
+    h1,h2,h3 { line-height:1.25; margin:0 0 12px; }
+    h1 { font-size:30px; }
+    h2 { padding-left:10px; border-left:4px solid var(--blue); font-size:22px; }
+    h3 { margin-top:22px; font-size:17px; }
+    p { margin:10px 0; }
+    ul,ol { margin:10px 0 10px 24px; padding:0; }
+    li { margin:6px 0; }
+    a { color:var(--blue); }
+    code { padding:2px 5px; border-radius:5px; color:#173e92; background:var(--blue-soft); font:0.92em "SFMono-Regular",Consolas,monospace; }
+    pre { overflow:auto; margin:12px 0; padding:16px; border-radius:10px; color:var(--code-text); background:var(--code); font:13px/1.55 "SFMono-Regular",Consolas,monospace; white-space:pre; }
+    pre code { padding:0; color:inherit; background:transparent; }
+    table { width:100%; margin:12px 0; border-collapse:collapse; }
+    th,td { padding:9px 10px; vertical-align:top; text-align:left; border:1px solid var(--line); }
+    th { background:#f0f3f8; }
+    nav { display:flex; flex-wrap:wrap; gap:8px; margin-top:16px; }
+    nav a,.tag { display:inline-block; padding:4px 10px; border:1px solid #cbd8ff; border-radius:999px; color:var(--blue); background:var(--blue-soft); font-size:13px; font-weight:650; text-decoration:none; }
+    .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:12px; margin:14px 0; }
+    .card { padding:14px; border:1px solid var(--line); border-radius:10px; background:#fbfcff; }
+    .ok { color:var(--green); font-weight:700; }
+    .warn { color:var(--amber); font-weight:700; }
+    .stop { color:var(--red); font-weight:700; }
+    .muted { color:var(--muted); }
+    .callout { margin:14px 0; padding:12px 14px; border-left:4px solid var(--amber); background:#fff8eb; }
+    .diagram { overflow:auto; padding:14px; border:1px solid var(--line); border-radius:10px; background:#f8fafc; font-family:"SFMono-Regular",Consolas,monospace; white-space:pre; }
+    .checklist li { list-style:"□  "; padding-left:4px; }
+    .phase { margin-top:14px; padding:14px; border-left:4px solid var(--blue); background:#f8faff; }
+    @media (max-width:700px) { main { padding:16px 10px 40px; } header,section { padding:18px; } h1 { font-size:25px; } th,td { min-width:130px; } }
+  </style>
+
+
+
+<style id="blog-family-style">
+  :root {
+    --blog-bg: #f5f8f8;
+    --blog-bg-soft: #edf4f4;
+    --blog-surface: rgba(255, 255, 255, .92);
+    --blog-surface-strong: #ffffff;
+    --blog-border: rgba(28, 78, 88, .18);
+    --blog-text: #18333b;
+    --blog-muted: #465f68;
+    --blog-subtle: #596f77;
+    --blog-accent: #087f8c;
+    --blog-accent-2: #5aa6a6;
+    --blog-warm: #b7791f;
+    --blog-radius: 18px;
+    --blog-shadow: 0 18px 48px rgba(23, 74, 83, .10);
+  }
+  html { scroll-behavior: smooth; }
+  body {
+    background:
+      radial-gradient(circle at 8% -10%, color-mix(in srgb, var(--blog-accent) 16%, transparent), transparent 34%),
+      radial-gradient(circle at 88% 2%, color-mix(in srgb, var(--blog-accent-2) 13%, transparent), transparent 30%),
+      linear-gradient(180deg, #f7faf9 0%, #eef5f5 52%, #f8faf9 100%) !important;
+    color: var(--blog-text) !important;
+    font-family: "Avenir Next", "Inter", "SF Pro Text", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif !important;
+    letter-spacing: .005em;
+    text-rendering: optimizeLegibility;
+  }
+  h1 {
+    color: #102f38 !important;
+    font-family: "Iowan Old Style", "LXGW WenKai Screen", "霞鹜文楷", "Noto Serif SC", "Source Han Serif SC", "Songti SC", Georgia, serif !important;
+    letter-spacing: -.035em;
+    font-weight: 760;
+  }
+  h2, .section-header h2, .section-head h2 {
+    color: #173943 !important;
+    font-family: "Optima", "Avenir Next", "Noto Serif SC", "Noto Sans SC", system-ui, sans-serif !important;
+    letter-spacing: -.025em;
+    font-weight: 720;
+  }
+  h3, .title, .tl-title {
+    color: #1c4049 !important;
+    font-family: "Avenir Next", "Noto Sans SC", "PingFang SC", system-ui, sans-serif !important;
+    letter-spacing: -.01em;
+  }
+  .hero, .cover, header, .page-hero {
+    background:
+      linear-gradient(135deg, rgba(0, 140, 149, .12), rgba(255, 255, 255, .80) 44%, rgba(58, 167, 176, .10)),
+      linear-gradient(180deg, #fbfefe, #eef7f7) !important;
+    border-bottom: 1px solid var(--blog-border) !important;
+    color: var(--blog-text) !important;
+  }
+  .hero p, .cover .subtitle, header .subtitle, header .meta, .cover .meta {
+    color: var(--blog-muted) !important;
+  }
+  .wrap, .container, main {
+    max-width: min(1120px, calc(100vw - 32px));
+  }
+  .card, .panel, .callout, .note, .metric, .section, article, table, pre {
+    border-color: var(--blog-border) !important;
+  }
+  .card, .panel, .metric, .note {
+    background: var(--blog-surface) !important;
+    border-radius: var(--blog-radius) !important;
+    box-shadow: var(--blog-shadow);
+  }
+  .callout {
+    background: color-mix(in srgb, var(--blog-accent) 8%, #ffffff) !important;
+    border-left-color: var(--blog-accent) !important;
+    border-radius: 14px !important;
+    color: var(--blog-muted) !important;
+  }
+  a, .eyebrow, .accent { color: #006f78 !important; }
+  code {
+    color: #005f68 !important;
+    background: color-mix(in srgb, var(--blog-accent) 10%, #ffffff) !important;
+    border: 1px solid color-mix(in srgb, var(--blog-accent) 24%, #ffffff);
+    border-radius: 6px !important;
+    font-family: "JetBrains Mono", "SFMono-Regular", Consolas, "Liberation Mono", monospace !important;
+  }
+  pre {
+    background: #eef6f6 !important;
+    color: #25464e !important;
+    border-radius: 16px !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.72);
+  }
+  pre code { background: transparent !important; border: 0; color: inherit !important; }
+  table {
+    background: rgba(255, 255, 255, .86) !important;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  th {
+    background: color-mix(in srgb, var(--blog-accent) 11%, #f7fbfb) !important;
+    color: #173943 !important;
+  }
+  td, p, li { color: var(--blog-muted) !important; }
+  strong, b { color: #173943 !important; }
+  .tag, .badge, .step-count {
+    background: color-mix(in srgb, var(--blog-accent) 8%, #ffffff) !important;
+    border-color: color-mix(in srgb, var(--blog-accent) 24%, #ffffff) !important;
+    color: #31545d !important;
+  }
+  nav {
+    background: rgba(248, 252, 252, .86) !important;
+    border-bottom: 1px solid var(--blog-border) !important;
+    backdrop-filter: blur(18px);
+  }
+  nav a { color: #46616a !important; }
+  nav a:hover {
+    color: #12333c !important;
+    background: color-mix(in srgb, var(--blog-accent) 10%, #ffffff) !important;
+    border-color: color-mix(in srgb, var(--blog-accent) 32%, #ffffff) !important;
+  }
+  footer {
+    color: var(--blog-subtle) !important;
+    border-top-color: var(--blog-border) !important;
+  }
+  ::selection { background: color-mix(in srgb, var(--blog-accent) 24%, #ffffff); color: #0f2d35; }
+  @media (max-width: 720px) {
+    body { letter-spacing: 0; }
+    .hero, .cover, header { padding-left: 18px !important; padding-right: 18px !important; }
+  }
+</style>
+
+</head>
+<body>
+<main>
+  <header>
+    <h1>OpenPI / ALOHA 世界模型探索与评价器路线图</h1>
+    <p class="muted">面向当前 <code>pi0.5 + ALOHA Sim + MuJoCo</code> 工作目录。目标不是立即把世界模型放进控制回路，而是建立一条可证伪的离线评价链：定位 VLA 动作瑕疵、提出反事实修正、再由 MuJoCo 真值验证。</p>
+    <div class="grid">
+      <div class="card"><strong>当前 VLA 轨道</strong><br><span class="ok">ALOHA 数据、norm stats、500-step smoke 已跑通</span><br><span class="warn">500-step DROID 初始化结果不是任务质量结论</span></div>
+      <div class="card"><strong>正式 LoRA 轨道</strong><br><code>pi05_base -&gt; pi05_aloha_sim_lora</code><br>5,000 steps / warmup 500 / batch 32</div>
+      <div class="card"><strong>世界模型轨道</strong><br><span class="warn">当前仓库未实现 dynamics/world model</span><br>先做 ALOHA state-dynamics critic</div>
+      <div class="card"><strong>Ctrl-World 轨道</strong><br><span class="warn">先复现 DROID 原生 pipeline</span><br>不能直接作为 ALOHA evaluator</div>
+    </div>
+    <nav>
+      <a href="#concepts">概念与边界</a><a href="#status">当前状态</a><a href="#dreamer">DreamerV3</a><a href="#tdmpc">TD-MPC2</a><a href="#daydreamer">DayDreamer</a><a href="#aloha">OpenPI ALOHA</a><a href="#critic">离线 critic</a><a href="#ctrlworld">Ctrl-World</a><a href="#timeline">并行路线</a><a href="#evidence">证据清单</a>
+    </nav>
+  </header>
+
+  <section id="concepts">
+    <h2>1. 概念与证据边界</h2>
+    <table>
+      <tr><th>组件</th><th>输入 -&gt; 输出</th><th>在本项目中的角色</th></tr>
+      <tr><td>VLA policy</td><td><code>image + language + robot state -&gt; action</code></td><td>OpenPI pi0.5 产生 ALOHA 14D 外部动作。</td></tr>
+      <tr><td>State world model</td><td><code>state + action -&gt; future state/reward/contact</code></td><td>首个可验证 evaluator；不直接控制机器人。</td></tr>
+      <tr><td>Video world model</td><td><code>image/video + action -&gt; future image/video</code></td><td>第二阶段；解决视觉、物体遮挡和接触的可解释性。</td></tr>
+      <tr><td>World Action Model</td><td><code>observation + language -&gt; future observation + action</code></td><td>研究方向；不应混入第一版 ALOHA evaluator。</td></tr>
+      <tr><td>Critic / evaluator</td><td><code>trajectory -&gt; score + evidence + counterfactual</code></td><td>本路线的目标：找动作问题，而不是替代 policy。</td></tr>
+    </table>
+    <div class="diagram">ALOHA MuJoCo rollout
+  -&gt; simulator truth: state, cube pose, contacts, reward, action
+  -&gt; offline state world model: action-conditioned future prediction
+  -&gt; candidate perturbations: gripper delay, joint noise, hold action
+  -&gt; MuJoCo snapshot replay: verify ranking and causal hypothesis
+  -&gt; structured critic report
+  -&gt; optional VLM/LLM: turn verified evidence into natural language</div>
+    <div class="callout"><strong>硬边界：</strong>MuJoCo 是 ALOHA 任务事实的裁判。世界模型未通过 replay 验证前，只能输出预测或不确定性，不能声称“某个动作导致失败”。Ctrl-World 原生 DROID 复现成功，也不能证明它适用于 ALOHA 双臂 MuJoCo。</div>
+  </section>
+
+  <section id="status">
+    <h2>2. 当前项目状态与正确对照</h2>
+    <table>
+      <tr><th>项目资产</th><th>状态</th><th>解释</th></tr>
+      <tr><td><code>lerobot/aloha_sim_transfer_cube_human</code></td><td class="ok">本地已下载</td><td>50 episodes、20,000 frames、50 Hz、top camera、14D state/action。</td></tr>
+      <tr><td><code>pi05_aloha_sim_lora_smoke</code></td><td class="ok">已完成 500 steps</td><td>从 <code>pi05_droid</code> 初始化；它验证训练链路，不是正式效果实验。</td></tr>
+      <tr><td><code>pi05_base</code></td><td class="ok">本地已缓存</td><td>含 <code>assets/trossen/norm_stats.json</code>，可作为 ALOHA 直接基线和正式 LoRA 初始化。</td></tr>
+      <tr><td><code>pi05_aloha_sim_lora</code></td><td class="ok">已注册</td><td>正式配置：base 初始化、5,000 steps、warmup 500、batch 32、每 500 steps 保存。</td></tr>
+      <tr><td>ALOHA metrics JSONL</td><td class="ok">代码已准备</td><td>记录 seed、reward、success、steps、video path；仍需用户实际启动 rollout 生成结果。</td></tr>
+      <tr><td>ALOHA trajectory / world model</td><td class="warn">计划中</td><td>尚无 transition collector 或 dynamics implementation。</td></tr>
+    </table>
+    <h3>为什么 ALOHA 外部 14D、pi0.5 内部 32D 仍然正确</h3>
+    <p>ALOHA 的双臂接口是 14D：左臂 6 joint + 左 gripper + 右臂 6 joint + 右 gripper。pi0.5 checkpoint 的内部 action/state projection 是 32D。<code>AlohaInputs</code> 和 <code>AlohaOutputs</code> 负责 14D 与 32D 的 padding/truncation，必须保持该契约；不要为了“对齐维度”把 model <code>action_dim</code> 改成 14。</p>
+  </section>
+
+  <section id="dreamer">
+    <h2>3. Track A：DreamerV3 学习 sandbox</h2>
+    <p>DreamerV3 是理解世界模型闭环的最佳学习入口：encoder、RSSM、reward predictor、continue predictor、imagined rollout、actor-critic 都在一个系统中。它的 replay buffer 来自环境交互，而不是预先下载的机器人数据集。</p>
+    <div class="callout"><strong>隔离原则：</strong>在独立目录和独立环境运行。Dreamer 的奖励、reset、action space 和训练结果不能视为 OpenPI/ALOHA 结果。</div>
+    <h3>环境与最小 debug</h3>
+    <pre><code>git clone https://github.com/danijar/dreamerv3.git ~/third_party/dreamerv3
+cd ~/third_party/dreamerv3
+python -m pip install -U -r requirements.txt
+
+# 用户主动运行：最小调试
+python dreamerv3/main.py \
+  --logdir ~/logdir/dreamer/debug \
+  --configs crafter debug \
+  --run.train_ratio 32</code></pre>
+    <h3>正常 Crafter 训练与日志查看</h3>
+    <pre><code># 用户主动运行：正常训练
+python dreamerv3/main.py \
+  --logdir ~/logdir/dreamer/crafter \
+  --configs crafter \
+  --run.train_ratio 32
+
+python -m pip install -U scope
+python -m scope.viewer --basedir ~/logdir --port 8000</code></pre>
+    <h3>三个学习实验</h3>
+    <ol class="checklist">
+      <li>跑 <code>debug</code>，确认 replay、world model、imagined rollout、actor-critic 完整链路存在。</li>
+      <li>修改 <code>--jax.platform cpu</code> 或 batch size，记录 replay 吞吐、编译时间、显存/内存变化。</li>
+      <li>导出 imagined rollout 与真实 rollout，观察预测在哪个 horizon 开始漂移，并记录对应 reward/terminal 偏差。</li>
+    </ol>
+    <p><strong>完成标准：</strong>不是获得高分，而是能指出一条真实 trajectory 与 imagined trajectory 在何时、哪个 state/reward signal 上分叉。</p>
+  </section>
+
+  <section id="tdmpc">
+    <h2>4. Track B：TD-MPC2 连续控制 sandbox</h2>
+    <p>TD-MPC2 更贴近连续控制和模型预测控制：latent dynamics、reward/value prediction、短 horizon action-sequence scoring。它是理解“世界模型如何评价候选动作”的好对照，但不应直接复用到 ALOHA action/state space。</p>
+    <pre><code>git clone https://github.com/nicklashansen/tdmpc2.git ~/third_party/tdmpc2
+cd ~/third_party/tdmpc2
+conda env create -f docker/environment.yaml
+conda activate tdmpc2
+
+# 用户主动运行：先从 state observation 开始
+python train.py task=walker-walk steps=700000
+
+# 第二步：再比较像素输入
+python train.py task=walker-walk obs=rgb</code></pre>
+    <table>
+      <tr><th>从 TD-MPC2 学什么</th><th>不能直接搬什么</th></tr>
+      <tr><td>latent dynamics、candidate action scoring、uncertainty、短 horizon utility</td><td>checkpoint、action normalization、reward scale、environment wrapper、policy head</td></tr>
+      <tr><td>state vs RGB 的难度差、contact task 下预测漂移</td><td>把 walker/ManiSkill policy 直接用于 ALOHA/OpenPI</td></tr>
+    </table>
+    <p><strong>完成标准：</strong>能比较 state 与 RGB 训练时的预测/控制差异，并能解释为什么 ALOHA critic 第一版先用 privileged state 而不是先训视频生成模型。</p>
+  </section>
+
+  <section id="daydreamer">
+    <h2>5. Track C：DayDreamer 系统设计阅读</h2>
+    <p>DayDreamer 适合理解真实机器人 world-model 系统的 actor/learner/replay 并发结构。它不是本项目的第一天跑分任务；重点是读 reset、键盘接管、replay、异步学习和系统恢复如何设计。</p>
+    <pre><code># 仅作 DayDreamer README 架构参考；没有对应硬件时不要运行 xarm_real。
+# learner
+python embodied/agents/dreamerv2plus/train.py \
+  --configs xarm --run learning --task xarm_dummy --logdir ~/logdir/run1
+
+# actor: DO NOT RUN without a configured real XArm and safety protocol
+python embodied/agents/dreamerv2plus/train.py \
+  --configs xarm --run acting --task xarm_real --env.kbreset True --logdir ~/logdir/run1</code></pre>
+    <p>映射到本项目时：ALOHA MuJoCo rollout 是 actor；<code>transition_dataset</code> 是 replay artifact；state world model 是 learner；episode manifest/seed 是实验可复现边界。当前阶段不需要真实机器人 actor。</p>
+  </section>
+
+  <section id="aloha">
+    <h2>6. Track D：OpenPI ALOHA 正式 policy 实验</h2>
+    <h3>6.1 先完成 formal config 的 norm stats</h3>
+    <pre><code>cd ~/openpi
+export CUDA_VISIBLE_DEVICES=2
+export XLA_PYTHON_CLIENT_MEM_FRACTION=0.9
+
+# 用户主动运行：新 config 名需要自己的 assets 路径
+uv run scripts/compute_norm_stats.py \
+  --config-name pi05_aloha_sim_lora \
+  --max-frames 512</code></pre>
+    <h3>6.2 base 直接推理的兼容性检查</h3>
+    <p>注意：checkpoint 名 <code>pi05_base</code> 不是 config 名。ALOHA server 必须使用 <code>pi05_aloha</code> transform，并在 server 端提供 prompt。</p>
+    <pre><code># 终端 1，OpenPI 主环境。若 8000 已占用，改为 8001。
+cd ~/openpi
+deactivate 2&gt;/dev/null || true
+export CUDA_VISIBLE_DEVICES=2
+export XLA_PYTHON_CLIENT_MEM_FRACTION=0.9
+
+uv run scripts/serve_policy.py \
+  --port 8001 \
+  --default-prompt "Transfer cube" \
+  policy:checkpoint \
+  --policy.config=pi05_aloha \
+  --policy.dir=gs://openpi-assets/checkpoints/pi05_base</code></pre>
+    <pre><code># 终端 2，ALOHA Sim 独立环境。
+cd ~/openpi
+source examples/aloha_sim/.venv/bin/activate
+export MUJOCO_GL=egl
+export PYTHONPATH="$PWD:$PWD/src:$PWD/packages/openpi-client/src"
+
+python examples/aloha_sim/main.py \
+  --args.host 127.0.0.1 \
+  --args.port 8001 \
+  --args.policy-label pi05_aloha_base \
+  --args.num-episodes 1 \
+  --args.max-episode-steps 400 \
+  --args.out-dir data/aloha_sim/base_compatibility</code></pre>
+    <h3>6.3 5,000-step base-initialized LoRA</h3>
+    <pre><code>cd ~/openpi
+export CUDA_VISIBLE_DEVICES=2
+export XLA_PYTHON_CLIENT_MEM_FRACTION=0.9
+mkdir -p logs/aloha_sim_lora_base
+
+# 用户主动运行：先确保同一 GPU 上没有 policy server。
+uv run scripts/train.py pi05_aloha_sim_lora \
+  --exp-name=aloha_sim_lora_base \
+  --overwrite 2&gt;&amp;1 | tee logs/aloha_sim_lora_base/train.log
+
+# 中断后的继续方式。
+uv run scripts/train.py pi05_aloha_sim_lora \
+  --exp-name=aloha_sim_lora_base \
+  --resume 2&gt;&amp;1 | tee -a logs/aloha_sim_lora_base/train.log</code></pre>
+    <p class="warn">不要覆盖已有 <code>aloha_sim_lora_smoke</code>。它是 DROID 初始化的历史 smoke artifact，不是这轮 formal base 对照。</p>
+    <h3>6.4 评价必须是 paired rollout</h3>
+    <p>比较 base 和 LoRA 时，固定 task、prompt、action horizon、max steps、MuJoCo 版本、seed sequence。每个 policy 至少跑同一组 20 seeds，读取 <code>metrics.jsonl</code>，而不是根据训练 loss 或单条视频下结论。Transfer Cube 的 task-specific success 是 <code>max_reward == 4</code>。</p>
+  </section>
+
+  <section id="critic">
+    <h2>7. Track E：ALOHA 离线 state world-model critic</h2>
+    <p>这条轨道解决的是“动作有什么瑕疵、为什么可能失败”。第一版不训练像素世界模型，而是训练 <strong>action-conditioned privileged-state dynamics</strong>，因为它可以与 MuJoCo object/contact 真值直接比较。</p>
+    <h3>7.1 必须新增的 transition artifact</h3>
+    <pre><code>data/aloha_sim/offline_eval/&lt;run_id&gt;/
+  run_manifest.json
+  episodes/
+    episode_000000.npz
+    episode_000001.npz
+  metrics.jsonl
+  videos/</code></pre>
+    <p>每个 episode 至少保存下列时序对齐数组：</p>
+    <table>
+      <tr><th>字段</th><th>shape</th><th>用途</th></tr>
+      <tr><td><code>policy_state</code></td><td><code>[T, 14]</code></td><td>VLA 实际可见的 ALOHA state。</td></tr>
+      <tr><td><code>action_applied</code></td><td><code>[T, 14]</code></td><td>环境实际执行的 action，不是仅保存 policy chunk。</td></tr>
+      <tr><td><code>robot_qpos/qvel</code></td><td><code>[T+1, 14]</code></td><td>MuJoCo robot truth。</td></tr>
+      <tr><td><code>cube_pose</code></td><td><code>[T+1, 7]</code></td><td>red cube world pose。</td></tr>
+      <tr><td><code>contacts</code></td><td><code>[T+1, 3]</code></td><td>cube-left finger、cube-right finger、cube-table。</td></tr>
+      <tr><td><code>reward/terminated/truncated</code></td><td><code>[T]</code></td><td>task stage 与 episode boundary。</td></tr>
+    </table>
+    <p>运行时 callback 顺序是 <code>observation_t -&gt; action_t -&gt; env.step -&gt; subscriber</code>。因此环境必须缓存 post-step ground truth，subscriber 才能正确写出 <code>(s_t, a_t, s_t+1)</code>。</p>
+    <h3>7.2 最小 dynamics model</h3>
+    <pre><code>x_t = [robot_qpos_t, robot_qvel_t, cube_pose_t, contact_flags_t]
+a_t = applied ALOHA action_t
+model(x_t, a_t) -&gt; distribution(x_t+1 - x_t)
+
+auxiliary heads:
+  P(reward stage 0..4)
+  P(terminated / success within horizon)
+  ensemble disagreement</code></pre>
+    <p>第一版可以是小型 PyTorch residual MLP ensemble。不要放进 <code>src/openpi/training/config.py</code>，不要通过 <code>serve_policy.py</code>，不要让它改写 policy action。</p>
+    <h3>7.3 验证顺序与停止条件</h3>
+    <ol class="checklist">
+      <li>按完整 episode seed 切分 train/validation/test，禁止按 frame 随机切分。</li>
+      <li>先打败 persistence baseline：<code>x[t+1] = x[t]</code>；再比较 constant-velocity baseline。</li>
+      <li>报告 1/5/10/20-step robot/cube error、reward-stage precision/recall、NLL 与 calibration。</li>
+      <li>若 object/cube 预测不优于 baseline，不做 action-cause 解释；只保留 simulator rule critic。</li>
+      <li>若 ensemble uncertainty 与实际 error 不相关，不能用低不确定性作为可靠性判断。</li>
+    </ol>
+    <h3>7.4 反事实候选与 MuJoCo replay</h3>
+    <pre><code>behavior action
+right/left gripper delay: +/- 5, +/- 10 steps
+action scale: 0.8, 0.9, 1.1
+hold gripper open / closed
+single-joint +/- perturbation
+short temporal hold / time shift</code></pre>
+    <p>每个 candidate 都必须在同一 MuJoCo snapshot replay 中重放。world model 可以预测排序，但真实 replay 才能验证排序。初始目标：</p>
+    <ul>
+      <li>至少 100 个 held-out branch points。</li>
+      <li>candidate utility 预测与真实 replay utility 的 Spearman correlation <code>&gt;= 0.60</code>。</li>
+      <li>top-1 candidate 与真实最佳 candidate 的一致率至少 <code>60%</code>。</li>
+      <li>扰动变大时，uncertainty 不应自信下降；若自信错误，则禁止因果归因。</li>
+    </ul>
+    <h3>7.5 failure taxonomy</h3>
+    <div class="grid"><div class="card">no_approach_to_cube</div><div class="card">end_effector_missed_cube</div><div class="card">gripper_closed_before_contact</div><div class="card">gripper_closed_too_late</div><div class="card">grasp_failed_after_contact</div><div class="card">cube_dropped_after_lift</div><div class="card">left_arm_failed_to_receive</div><div class="card">joint_action_jump / saturation</div></div>
+    <pre><code>{
+  "type": "gripper_closed_before_contact",
+  "first_failure_step": 84,
+  "simulator_facts": {
+    "right_gripper_cube_contact": false,
+    "cube_table_contact": true,
+    "right_gripper_closed_at": 84
+  },
+  "counterfactual": {
+    "proposal": "delay right gripper close by 10 steps",
+    "world_model_prediction": "higher grasp-stage probability",
+    "replay_validated": true
+  },
+  "limitations": []
+}</code></pre>
+  </section>
+
+  <section id="ctrlworld">
+    <h2>8. Track F：Ctrl-World 外部复现</h2>
+    <p>Ctrl-World 是 action-conditioned generative video world model。公开 checkpoint 来自 DROID/Franka、真实多视角场景；当前 ALOHA 是双臂、top-only MuJoCo。两者在 embodiment、camera、action/state space、domain 上都不匹配。</p>
+    <div class="callout"><strong>正确结论语言：</strong>“Ctrl-World 官方 DROID pipeline 在指定 commit/checkpoint 下可运行。”<br>错误结论语言：“Ctrl-World 能评价 ALOHA。”后者需要独立 ALOHA adapter、transition metrics 和 MuJoCo replay 才能成立。</div>
+    <h3>8.1 原生复现环境</h3>
+    <pre><code># 独立环境；不要在 ~/openpi 或 examples/aloha_sim/.venv 中安装。
+conda create -n ctrl-world python=3.11 -y
+conda activate ctrl-world
+
+git clone https://github.com/Robert-gyj/Ctrl-World.git ~/third_party/Ctrl-World
+cd ~/third_party/Ctrl-World
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt</code></pre>
+    <p>优先用 HTTPS clone，避免默认要求 GitHub SSH key。先执行官方给出的 bundled DROID subset smoke / released checkpoint inference，保存 source commit、checkpoint hash、GPU、CUDA、PyTorch、命令、seed、日志和生成 artifact。</p>
+    <h3>8.2 仅在官方 pi0.5 policy-in-the-loop 脚本需要时安装独立 OpenPI clone</h3>
+    <pre><code>conda activate ctrl-world
+
+git clone --recurse-submodules \
+  https://github.com/Physical-Intelligence/openpi.git \
+  ~/third_party/openpi-ctrl-world
+cd ~/third_party/openpi-ctrl-world
+python -m pip install uv
+
+# 在 conda 环境中明确复用 active environment，避免项目 .venv 冲突。
+GIT_LFS_SKIP_SMUDGE=1 uv sync --active --all-extras --dev
+
+# 仅在 Ctrl-World README 或 import error 明确要求时再执行。
+# GIT_LFS_SKIP_SMUDGE=1 uv pip install -e .</code></pre>
+    <p class="warn">不要在当前 <code>~/openpi</code> checkout 里安装 Ctrl-World 依赖；当前仓库有 LoRA、ALOHA 和 Isaac Sim 未提交改动，PyTorch/CUDA/diffusers/JAX 版本也可能冲突。</p>
+    <h3>8.3 Ctrl-World 原生复现验收</h3>
+    <ol class="checklist">
+      <li>记录 official repo URL、commit SHA、license、checkpoint source、benchmark/domain、预处理和官方 metric。</li>
+      <li>运行官方 smoke test，再运行 released checkpoint inference/replay。</li>
+      <li>用预先声明的 seed 数和官方 metric 对比，标注 reproduced / partial / failed。</li>
+      <li>所有输出保存在 <code>data/external_ctrl_world/&lt;commit&gt;/&lt;experiment&gt;/</code>，不写入 <code>data/aloha_sim</code>。</li>
+    </ol>
+    <h3>8.4 ALOHA feasibility gate</h3>
+    <p>原生 DROID 复现成功后，才能研究 ALOHA 视频/action 是否可进入 Ctrl-World。需要独立验证：</p>
+    <ul>
+      <li>14D 双臂 action/state encoding 是否有明确、可测试的映射。</li>
+      <li>top-only camera 是否需要补充 wrist/multi-view，或是否有实验支持去除 multi-view。</li>
+      <li>不同 action chunks 是否导致可区分的 future prediction。</li>
+      <li>Ctrl-World uncertainty/predicted progress 是否与 MuJoCo reward/cube pose 相关。</li>
+      <li>所有动作 attribution 是否通过 snapshot replay。</li>
+    </ul>
+  </section>
+
+  <section id="timeline">
+    <h2>9. 并行路线、依赖与预算</h2>
+    <table>
+      <tr><th>Lane</th><th>目标</th><th>输入</th><th>输出</th><th>依赖</th></tr>
+      <tr><td>A</td><td>DreamerV3 学习</td><td>Crafter replay</td><td>真实/想象 rollout 对照</td><td>独立 sandbox</td></tr>
+      <tr><td>B</td><td>TD-MPC2 学习</td><td>continuous-control environment</td><td>latent dynamics / planning 实验</td><td>独立 sandbox</td></tr>
+      <tr><td>C</td><td>OpenPI ALOHA</td><td>pi05_base + ALOHA dataset</td><td>LoRA checkpoints + paired metrics</td><td>GPU、MuJoCo env</td></tr>
+      <tr><td>D</td><td>ALOHA state critic</td><td>固定 seed rollout transitions</td><td>prediction + counterfactual report</td><td>C 的 rollout artifact</td></tr>
+      <tr><td>E</td><td>Ctrl-World 原生复现</td><td>DROID-format repo/checkpoint</td><td>external reproduction manifest</td><td>独立 conda env</td></tr>
+    </table>
+    <div class="diagram">DreamerV3 / TD-MPC2 --------------&gt; 概念与实验直觉
+                                      |
+OpenPI base -&gt; ALOHA LoRA -&gt; paired rollout corpus
+                                      |
+                                      v
+                         transition collector -&gt; state critic
+                                      |
+                                      v
+                        replay-validated counterfactual report
+
+Ctrl-World DROID native reproduction -- separate evidence track --&gt; ALOHA feasibility gate</div>
+    <p><strong>资源建议：</strong>同一 GPU 上不要同时运行 policy server、OpenPI JAX 训练、Ctrl-World 推理或 TD-MPC2 训练。先释放 server，再训练；外部 sandbox 需要单独环境和日志目录。</p>
+  </section>
+
+  <section id="evidence">
+    <h2>10. 证据清单与实验报告模板</h2>
+    <h3>每次实验必须保存</h3>
+    <ul class="checklist">
+      <li>git revision、配置名、checkpoint 路径/hash、norm stats path。</li>
+      <li>环境版本：Python、PyTorch/JAX、CUDA、MuJoCo/gym-aloha、GPU。</li>
+      <li>task、prompt、action horizon、max episode steps、固定 seed list。</li>
+      <li>train/validation/test split manifest；禁止 frame-level leakage。</li>
+      <li>videos、metrics.jsonl、transition NPZ、world-model prediction、replay outcome。</li>
+      <li>通过/失败的验收项与明确限制。</li>
+    </ul>
+    <h3>最终 report 的最小结构</h3>
+    <pre><code>{
+  "policy": "pi05_aloha_sim_lora:checkpoint_999",
+  "task": "gym_aloha/AlohaTransferCube-v0",
+  "seed": 3100531970,
+  "success": false,
+  "max_reward": 2,
+  "first_failure_step": 84,
+  "simulator_facts": [],
+  "rule_diagnoses": [],
+  "counterfactual_predictions": [],
+  "mujo_replay_validation": [],
+  "world_model_uncertainty": 0.31,
+  "limitations": ["Candidate B was not replay-validated"]
+}</code></pre>
+    <p class="stop">不能用的结论：单条视频成功、训练 loss 下降、checkpoint 保存成功、world model 画面看起来合理、Ctrl-World 原生 demo 成功。</p>
+    <p class="ok">可以成立的结论：固定 seed 的 MuJoCo paired evaluation 显示 success/reward 提升；或 held-out replay 验证了明确的 action counterfactual 排序。</p>
+  </section>
+
+  <section>
+    <h2>11. 参考与本地入口</h2>
+    <ul>
+      <li><a href="https://github.com/danijar/dreamerv3">DreamerV3</a>：RSSM、imagined rollout、actor-critic。</li>
+      <li><a href="https://github.com/nicklashansen/tdmpc2">TD-MPC2</a>：latent dynamics、continuous control、MPC-style planning。</li>
+      <li><a href="https://github.com/danijar/daydreamer">DayDreamer</a>：actor/learner/replay 的真实机器人系统设计。</li>
+      <li><a href="https://github.com/openvla/openvla">OpenVLA</a>：VLA baseline 对照，不是 world model。</li>
+      <li><a href="https://github.com/Robert-gyj/Ctrl-World">Ctrl-World</a>、<a href="https://ctrl-world.github.io/">project page</a>、<a href="https://huggingface.co/yjguo/Ctrl-World">checkpoint</a>。</li>
+      <li><a href="https://droid-dataset.github.io/">DROID dataset</a>：Ctrl-World 公开 checkpoint 的域背景。</li>
+      <li>本地：<code>src/openpi/training/config.py</code>、<code>examples/aloha_sim/</code>、<code>docs/pi05_lora_smoke_experiment.md</code>。</li>
+    </ul>
+    <p class="muted">本文是探索/工程路线图。命令块中的训练、下载、server、MuJoCo rollout 都需要用户主动执行；出现于本文不代表已经在本机执行或已经得到结果。</p>
+  </section>
+</main>
+</body>
+</html>

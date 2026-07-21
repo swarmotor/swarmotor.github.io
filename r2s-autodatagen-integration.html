@@ -1,0 +1,1254 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>R2S 与 AutoDataGen 融合：3DGS→URDF→IsaacLab→RL/IL→机器人训练</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --secondary: #8b5cf6;
+            --accent: #ec4899;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --dark: #0f172a;
+            --darker: #020617;
+            --light: #f8fafc;
+            --gray-400: #94a3b8;
+            --gray-500: #64748b;
+            --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-blue: linear-gradient(135deg, #4facfe 0%, #00f2c3 100%);
+            --gradient-pink: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient-orange: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            --gradient-purple: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.4);
+            --shadow-xl: 0 30px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        body {
+            background: var(--darker);
+            color: var(--light);
+            line-height: 1.6;
+            overflow-x: hidden;
+            padding: 0;
+            margin: 0;
+        }
+
+        /* 背景动画 */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+                        radial-gradient(circle at 90% 80%, rgba(236, 72, 153, 0.15) 0%, transparent 50%),
+                        radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.1) 0%, transparent 60%);
+            z-index: -1;
+            animation: backgroundPulse 30s ease-in-out infinite;
+        }
+
+        @keyframes backgroundPulse {
+            0%, 100% { opacity: 0.5; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.1); }
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+        }
+
+        /* 头部 */
+        .hero {
+            text-align: center;
+            padding: 80px 20px;
+            margin-bottom: 60px;
+            background: rgba(17, 24, 39, 0.6);
+            backdrop-filter: blur(20px);
+            border-radius: 32px;
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            right: -50%;
+            bottom: -50%;
+            background: conic-gradient(from 0deg at 50% 50%, transparent, rgba(99, 102, 241, 0.1), transparent, rgba(236, 72, 153, 0.1), transparent);
+            animation: rotate 60s linear infinite;
+            z-index: -1;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 15px;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 50px rgba(99, 102, 241, 0.4);
+        }
+
+        .hero .subtitle {
+            font-size: 1.4rem;
+            color: var(--gray-400);
+            margin-bottom: 25px;
+            font-weight: 300;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* 管道图容器 */
+        .pipeline-container {
+            position: relative;
+            margin: 80px 0;
+            padding: 40px 0;
+            background: rgba(17, 24, 39, 0.4);
+            backdrop-filter: blur(20px);
+            border-radius: 32px;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            overflow: hidden;
+        }
+
+        .pipeline-header {
+            text-align: center;
+            padding: 30px 0;
+            background: rgba(17, 24, 39, 0.8);
+            border-bottom: 2px solid rgba(99, 102, 241, 0.3);
+        }
+
+        .pipeline-header h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--primary);
+        }
+
+        .pipeline-header p {
+            color: var(--gray-400);
+            font-size: 1.1rem;
+        }
+
+        /* 水平管道图 */
+        .horizontal-pipeline {
+            position: relative;
+            padding: 40px 20px;
+            height: 400px;
+            overflow-x: auto;
+            overflow-y: hidden;
+        }
+
+        .pipeline-track {
+            position: relative;
+            width: 2000px; /* 扩展宽度以容纳所有节点 */
+            height: 200px;
+            margin: 40px 0;
+        }
+
+        .track-line {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(to right, var(--primary), var(--secondary), var(--accent), var(--success));
+            border-radius: 2px;
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
+        }
+
+        /* 节点容器 */
+        .node-container {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 600px;
+            padding: 30px;
+            background: rgba(17, 24, 39, 0.8);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 2px solid var(--primary);
+            box-shadow: var(--shadow-lg);
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .node-container:hover {
+            transform: translateY(-50%) scale(1.05);
+            box-shadow: var(--shadow-xl);
+            border-color: var(--accent);
+            z-index: 20;
+        }
+
+        /* 特定节点的特殊样式 */
+        .node-1 { left: 5%; }
+        .node-2 { left: 30%; }
+        .node-3 { left: 55%; }
+        .node-4 { left: 80%; }
+
+        /* 节点标题 */
+        .node-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(99, 102, 241, 0.3);
+        }
+
+        .node-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            background: var(--gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3);
+        }
+
+        .node-2 .node-icon {
+            background: var(--gradient-pink);
+        }
+
+        .node-3 .node-icon {
+            background: var(--gradient-green);
+        }
+
+        .node-4 .node-icon {
+            background: var(--gradient-orange);
+        }
+
+        .node-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--light);
+        }
+
+        .node-subtitle {
+            font-size: 0.9rem;
+            color: var(--success);
+            margin-top: 5px;
+            font-weight: 600;
+        }
+
+        /* 节点内容 */
+        .node-content {
+            color: var(--gray-300);
+        }
+
+        .node-list {
+            list-style: none;
+            padding: 0;
+            margin: 15px 0;
+        }
+
+        .node-list li {
+            padding: 8px 0;
+            padding-left: 30px;
+            position: relative;
+            border-bottom: 1px solid rgba(99, 102, 241, 0.2);
+        }
+
+        .node-list li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--success);
+            font-weight: bold;
+        }
+
+        /* 箭头指示 */
+        .flow-arrows {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 100%;
+            height: 4px;
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        .flow-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            color: white;
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.5);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: translateY(-50%) scale(1); opacity: 1; }
+            50% { transform: translateY(-50%) scale(1.2); opacity: 0.8; }
+        }
+
+        .arrow-1 { left: 15%; }
+        .arrow-2 { left: 45%; }
+        .arrow-3 { left: 75%; }
+
+        /* 数据流指示 */
+        .data-flow {
+            background: rgba(17, 24, 39, 0.6);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 40px 0;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+
+        .data-flow-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 25px;
+            text-align: center;
+            color: var(--accent);
+        }
+
+        .flow-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .flow-step {
+            background: rgba(17, 24, 39, 0.8);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .flow-step:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow);
+            border-color: var(--success);
+        }
+
+        .flow-step-number {
+            width: 40px;
+            height: 40px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            margin: 0 auto 15px;
+            font-size: 1.2rem;
+        }
+
+        .flow-step-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .flow-step-desc {
+            font-size: 0.9rem;
+            color: var(--gray-400);
+        }
+
+        /* 技术模块 */
+        .tech-sections {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 30px;
+            margin: 60px 0;
+        }
+
+        .tech-section {
+            background: rgba(17, 24, 39, 0.6);
+            border-radius: 24px;
+            padding: 40px;
+            border: 11px solid rgba(99, 102, 241, 0.2);
+        }
+
+        .tech-section-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .tech-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--gradient);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+            font-weight: bold;
+        }
+
+        .tech-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .tech-list li {
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(99, 102, 241, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .tech-list li::before {
+            content: '🚀';
+            font-size: 1.2rem;
+        }
+
+        /* 挑战与机会 */
+        .challenges-opportunities {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin: 60px 0;
+        }
+
+        .challenges, .opportunities {
+            background: rgba(17, 24, 39, 0.6);
+            border-radius: 24px;
+            padding: 40px;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+
+        .challenges {
+            border-left: 4px solid var(--error);
+        }
+
+        .opportunities {
+            border-left: 4px solid var(--success);
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 25px;
+        }
+
+        .threats-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .threats-list li {
+            padding: 12px 0;
+            padding-left: 35px;
+            position: relative;
+            border-bottom: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .threats-list li::before {
+            content: '⚠️';
+            position: absolute;
+            left: 0;
+            font-size: 1.2rem;
+        }
+
+        .benefits-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .benefits-list li {
+            padding: 12px 0;
+            padding-left: 35px;
+            position: relative;
+            border-bottom: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .benefits-list li::before {
+            content: '✨';
+            position: absolute;
+            left: 0;
+            font-size: 1.2rem;
+        }
+
+        /* 底部 */
+        .footer {
+            text-align: center;
+            padding: 60px 20px;
+            margin-top: 80px;
+            background: rgba(17, 24, 39, 0.8);
+            border-radius: 32px;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+
+        .footer h3 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+
+        .footer p {
+            color: var(--gray-400);
+            margin: 10px 0;
+            font-size: 1.1rem;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 968px) {
+            .node-container {
+                width: 90%;
+                padding: 20px;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .data-showcase {
+                grid-template-columns: 1fr;
+            }
+
+            .challenges-opportunities {
+                grid-template-columns: 1fr;
+            }
+
+            .horizontal-pipeline {
+                height: auto;
+                overflow-x: hidden;
+                overflow-y: auto;
+                padding-bottom: 40px;
+            }
+
+            .pipeline-track {
+                width: 100%;
+                height: 200px;
+            }
+
+            .node-container {
+                position: relative;
+                left: auto !important;
+                transform: none !important;
+                margin: 20px 0;
+            }
+
+            .flow-arrows {
+                display: none;
+            }
+        }
+
+        /* 动画 */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeIn 0.6s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+        .delay-4 { animation-delay: 0.4s; }
+
+        /* 滚动效果 */
+        .scroll-reveal {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.8s ease-out;
+        }
+
+        .scroll-reveal.revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* 美化滚动条 */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--darker);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--gradient-blue);
+            border-radius: 4px;
+        }
+
+        /* 光标效果 */
+        .node-container {
+            cursor: pointer;
+        }
+
+        /* 箭头指示 */
+        .flow-arrows {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 100%;
+            height: 4px;
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        .flow-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            color: white;
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.5);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: translateY(-50%) scale(1); opacity: 1; }
+            50% { transform: translateY(-50%) scale(1.2); opacity: 0.8; }
+        }
+
+        /* 特殊样式修复 */
+        .tech-section {
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+    </style>
+
+
+
+<style id="blog-family-style">
+  :root {
+    --blog-bg: #f5f8f8;
+    --blog-bg-soft: #edf4f4;
+    --blog-surface: rgba(255, 255, 255, .92);
+    --blog-surface-strong: #ffffff;
+    --blog-border: rgba(28, 78, 88, .18);
+    --blog-text: #18333b;
+    --blog-muted: #465f68;
+    --blog-subtle: #596f77;
+    --blog-accent: #168a8f;
+    --blog-accent-2: #8fb8c8;
+    --blog-warm: #b7791f;
+    --blog-radius: 18px;
+    --blog-shadow: 0 18px 48px rgba(23, 74, 83, .10);
+  }
+  html { scroll-behavior: smooth; }
+  body {
+    background:
+      radial-gradient(circle at 8% -10%, color-mix(in srgb, var(--blog-accent) 16%, transparent), transparent 34%),
+      radial-gradient(circle at 88% 2%, color-mix(in srgb, var(--blog-accent-2) 13%, transparent), transparent 30%),
+      linear-gradient(180deg, #f7faf9 0%, #eef5f5 52%, #f8faf9 100%) !important;
+    color: var(--blog-text) !important;
+    font-family: "Avenir Next", "Inter", "SF Pro Text", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif !important;
+    letter-spacing: .005em;
+    text-rendering: optimizeLegibility;
+  }
+  h1 {
+    color: #102f38 !important;
+    font-family: "Iowan Old Style", "LXGW WenKai Screen", "霞鹜文楷", "Noto Serif SC", "Source Han Serif SC", "Songti SC", Georgia, serif !important;
+    letter-spacing: -.035em;
+    font-weight: 760;
+  }
+  h2, .section-header h2, .section-head h2 {
+    color: #173943 !important;
+    font-family: "Optima", "Avenir Next", "Noto Serif SC", "Noto Sans SC", system-ui, sans-serif !important;
+    letter-spacing: -.025em;
+    font-weight: 720;
+  }
+  h3, .title, .tl-title {
+    color: #1c4049 !important;
+    font-family: "Avenir Next", "Noto Sans SC", "PingFang SC", system-ui, sans-serif !important;
+    letter-spacing: -.01em;
+  }
+  .hero, .cover, header, .page-hero {
+    background:
+      linear-gradient(135deg, rgba(0, 140, 149, .12), rgba(255, 255, 255, .80) 44%, rgba(58, 167, 176, .10)),
+      linear-gradient(180deg, #fbfefe, #eef7f7) !important;
+    border-bottom: 1px solid var(--blog-border) !important;
+    color: var(--blog-text) !important;
+  }
+  .hero p, .cover .subtitle, header .subtitle, header .meta, .cover .meta {
+    color: var(--blog-muted) !important;
+  }
+  .wrap, .container, main {
+    max-width: min(1120px, calc(100vw - 32px));
+  }
+  .card, .panel, .callout, .note, .metric, .section, article, table, pre {
+    border-color: var(--blog-border) !important;
+  }
+  .card, .panel, .metric, .note {
+    background: var(--blog-surface) !important;
+    border-radius: var(--blog-radius) !important;
+    box-shadow: var(--blog-shadow);
+  }
+  .callout {
+    background: color-mix(in srgb, var(--blog-accent) 8%, #ffffff) !important;
+    border-left-color: var(--blog-accent) !important;
+    border-radius: 14px !important;
+    color: var(--blog-muted) !important;
+  }
+  a, .eyebrow, .accent { color: #006f78 !important; }
+  code {
+    color: #005f68 !important;
+    background: color-mix(in srgb, var(--blog-accent) 10%, #ffffff) !important;
+    border: 1px solid color-mix(in srgb, var(--blog-accent) 24%, #ffffff);
+    border-radius: 6px !important;
+    font-family: "JetBrains Mono", "SFMono-Regular", Consolas, "Liberation Mono", monospace !important;
+  }
+  pre {
+    background: #eef6f6 !important;
+    color: #25464e !important;
+    border-radius: 16px !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.72);
+  }
+  pre code { background: transparent !important; border: 0; color: inherit !important; }
+  table {
+    background: rgba(255, 255, 255, .86) !important;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  th {
+    background: color-mix(in srgb, var(--blog-accent) 11%, #f7fbfb) !important;
+    color: #173943 !important;
+  }
+  td, p, li { color: var(--blog-muted) !important; }
+  strong, b { color: #173943 !important; }
+  .tag, .badge, .step-count {
+    background: color-mix(in srgb, var(--blog-accent) 8%, #ffffff) !important;
+    border-color: color-mix(in srgb, var(--blog-accent) 24%, #ffffff) !important;
+    color: #31545d !important;
+  }
+  nav {
+    background: rgba(248, 252, 252, .86) !important;
+    border-bottom: 1px solid var(--blog-border) !important;
+    backdrop-filter: blur(18px);
+  }
+  nav a { color: #46616a !important; }
+  nav a:hover {
+    color: #12333c !important;
+    background: color-mix(in srgb, var(--blog-accent) 10%, #ffffff) !important;
+    border-color: color-mix(in srgb, var(--blog-accent) 32%, #ffffff) !important;
+  }
+  footer {
+    color: var(--blog-subtle) !important;
+    border-top-color: var(--blog-border) !important;
+  }
+  ::selection { background: color-mix(in srgb, var(--blog-accent) 24%, #ffffff); color: #0f2d35; }
+  @media (max-width: 720px) {
+    body { letter-spacing: 0; }
+    .hero, .cover, header { padding-left: 18px !important; padding-right: 18px !important; }
+  }
+</style>
+
+</head>
+<body>
+    <div class="container">
+        <!-- 头部 -->
+        <section class="hero fade-in">
+            <div class="tag" style="display: inline-block; background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.3); color: var(--primary); padding: 8px 24px; border-radius: 50px; font-size: 0.9rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 20px;">
+                R2S 集成方案</div>
+            <h1>R2S 与 AutoDataGen 融合：<br>3DGS→URDF→IsaacLab→RL/IL→机器人训练</h1>
+            <p class="subtitle">融合前沿R2S技术与自动化训练系统的完整闭环管道</p>
+        </section>
+
+        <!-- 管道图 -->
+        <section class="pipeline-container scroll-reveal">
+            <div class="pipeline-header">
+                <h2>🔗 完整技术集成管道</h2>
+                <p>从3DGS重建到部署的完整闭环工作流程</p>
+            </div>
+
+            <div class="horizontal-pipeline">
+                <div class="pipeline-track">
+                    <div class="track-line"></div>
+
+                    <!-- 节点1：3DGS -->
+                    <div class="node-container node-1 fade-in delay-1">
+                        <div class="node-header">
+                            <div class="node-icon">📸</div>
+                            <div>
+                                <div class="node-title">3DGS</div>
+                                <div class="node-subtitle">点云重建器</div>
+                            </div>
+                        </div>
+                        <div class="node-content">
+                            <ul class="node-list">
+                                <li>用高斯体的显式表示捕捉真实场景</li>
+                                <li>支持毫秒级渲染和真实动态光照</li>
+                                <li>可直接导出高品质3D几何和纹理</li>
+                                <li>支持物体分割和语义 labeling</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- 箭头1 -->
+                    <div class="flow-arrows">
+                        <div class="flow-arrow arrow-1">→</div>
+                    </div>
+
+                    <!-- 节点2：URDF -->
+                    <div class="node-container node-2 fade-in delay-2">
+                        <div class="node-header">
+                            <div class="node-icon">⚙️</div>
+                            <div>
+                                <div class="node-title">URDF → 物理模型</div>
+                                <div class="node-subtitle">动力学推理</div>
+                            </div>
+                        </div>
+                        <div class="node-content">
+                            <ul class="node-list">
+                                <li>基于RL的物理属性推理（质量、摩擦、刚度）</li>
+                                <li>自动发现铰接关节和运动学结构</li>
+                                <li>生成IsaacLab可直接导入的URDF</li>
+                                <li>支持软材质绑定和碰撞模型</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- 箭头2 -->
+                    <div class="flow-arrows">
+                        <div class="flow-arrow arrow-2">→</div>
+                    </div>
+
+                    <!-- 节点3：IsaacLab -->
+                    <div class="node-container node-3 fade-in delay-3">
+                        <div class="node-header">
+                            <div class="node-icon">🎮</div>
+                            <div>
+                                <div class="node-title">IsaacLab资产导入</div>
+                                <div class="node-subtitle">模拟环境配置</div>
+                            </div>
+                        </div>
+                        <div class="node-content">
+                            <ul class="node-list">
+                                <li>导入3DGS → URDF转换的场景和物体</li>
+                                <li>配置IsaacLab物理仿真参数和贴图</li>
+                                <li>建立机器人姿态控制和感知基准</li>
+                                <li>提供真实世界-仿真转换接口</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- 箭头3 -->
+                    <div class="flow-arrows">
+                        <div class="flow-arrow arrow-3">→</div>
+                    </div>
+
+                    <!-- 节点4：RL/IL训练 -->
+                    <div class="node-container node-4 fade-in delay-4">
+                        <div class="node-header">
+                            <div class="node-icon">🧠</div>
+                            <div>
+                                <div class="node-title">RL/IL 世界模型</div>
+                                <div class="node-subtitle">闭环训练</div>
+                            </div>
+                        </div>
+                        <div class="node-content">
+                            <ul class="node-list">
+                                <li>在IsaacLab环境中训练强化学习策略</li>
+                                <li>训练基于世界模型的因果推理和规划</li>
+                                <li>通过自我监督学习提取多模态表示</li>
+                                <li>支持单向和双向仿真-真实世界循环</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 数据流示意图 -->
+        <section class="data-flow scroll-reveal">
+            <h3 class="data-flow-title">🔄 数据流与关键转化点</h3>
+
+            <div class="flow-grid">
+                <div class="flow-step">
+                    <div class="flow-step-number">1</div>
+                    <div class="flow-step-title">3DGS重构</div>
+                    <div class="flow-step-desc">多视角图像 → 高斯体网格</div>
+                </div>
+
+                <div class="flow-step">
+                    <div class="flow-step-number">2</div>
+                    <div class="flow-step-title">物理推理</div>
+                    <div class="flow-step-desc">基于ML的URDF生成与关节发现</div>
+                </div>
+
+                <div class="flow-step">
+                    <div class="flow-step-number">3</div>
+                    <div class="flow-step-title">资产导入</div>
+                    <div class="flow-step-desc">IsaacLab Scene + Physics 设置</div>
+                </div>
+
+                <div class="flow-step">
+                    <div class="flow-step-number">4</div>
+                    <div class="flow-step-title">策略训练</div>
+                    <div class="flow-step-desc">基于Sim2Real的强化学习</div>
+                </div>
+
+                <div class="flow-step">
+                    <div class="flow-step-number">5</div>
+                    <div class="flow-step-title">部署验证</div>
+                    <div class="flow-step-desc">真实世界测试与反馈循环</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 技术模块 -->
+        <section class="tech-sections">
+            <!-- 3DGS模块 -->
+            <div class="tech-section scroll-reveal">
+                <div class="tech-section-title">
+                    <div class="tech-icon">📸</div>
+                    <span>3DGS 模块</span>
+                </div>
+                <ul class="tech-list">
+                    <li>显式高斯体表示，渲染速度毫秒级</li>
+                    <li>支持接触光照、反射和透明材质</li>
+                    <li>支持大规模动态物体贴图和纹理</li>
+                    <li>提供相机姿态和运动光流</li>
+                    <li>支持混合现实XR配套</li>
+                    <li>与AI LLM结合自动生成三维场景</li>
+                </ul>
+            </div>
+
+            <!-- URDF/物理模块 -->
+            <div class="tech-section scroll-reveal">
+                <div class="tech-section-title">
+                    <div class="tech-icon">⚙️</div>
+                    <span>URDF/物理推理模块</span>
+                </div>
+                <ul class="tech-list">
+                    <li>基于3DGS的高质量物理属性推理</li>
+                    <li>自动检测连杆结构和铰接关节</li>
+                    <li>生成符合IsaacLab标准的URDF格式</li>
+                    <li>支持软材质绑定和碰撞检测</li>
+                    <li>物理参数优化（质量、惯性、张力）</li>
+                    <li>支持多机器人平台标准</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- 挑战与机会 -->
+        <section class="challenges-opportunities">
+            <div class="challenges scroll-reveal">
+                <h3 class="section-title">⚠️ 主要挑战</h3>
+                <ul class="threats-list">
+                    <li>3DGS和物理仿真的跨领域集成</li>
+                    <li>URDF生成精度与仿真真实性的权衡</li>
+                    <li>大规模闭环训练的数据流管理</li>
+                    <li>多传感器融合与鲁棒性</li>
+                    <li>真实世界-仿真世界认知 gap</li>
+                    <li>复杂机器人系统的端到端验证</li>
+                </ul>
+            </div>
+
+            <div class="opportunities scroll-reveal">
+                <h3 class="section-title">✨ 关键机会</h3>
+                <ul class="benefits-list">
+                    <li>突破传统mesh重建的视觉质量瓶颈</li>
+                    <li>实现一站式从现实到模拟的完整pipeline</li>
+                    <li>支持低成本大规模真实世界训练</li>
+                    <li>提高机器人策略的泛化与鲁棒性</li>
+                    <li>降低机器人开发的进入门槛</li>
+                    <li>加速强化学习与世界模型的融合</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- 底部 -->
+        <footer class="footer scroll-reveal">
+            <h3>🚀 下一代机器人训练范式</h3>
+            <p>集成3DGS、URDF、IsaacLab和AI训练的完整闭环 pipeline</p>
+            <p>可实时捕捉真实世界，自动生成仿真策略，实现高速真实世界部署</p>
+            <p><strong>推动机器人从实验室走向实际应用！</strong></p>
+        </footer>
+    </div>
+
+    <script>
+        // 初始化平滑滚动效果
+        function revealOnScroll() {
+            const reveals = document.querySelectorAll('.scroll-reveal');
+
+            reveals.forEach(element => {
+                const windowHeight = window.innerHeight;
+                const elementTop = element.getBoundingClientRect().top;
+                const elementVisible = 150;
+
+                if (elementTop < windowHeight - elementVisible) {
+                    element.classList.add('revealed');
+                }
+            });
+        }
+
+        // 添加节点交互效果
+        document.querySelectorAll('.node-container').forEach(node => {
+            node.addEventListener('click', function() {
+                // 节点点击时的微妙动画
+                this.style.transform = 'translateY(-50%) scale(1.05)';
+                setTimeout(() => {
+                    this.style.transform = 'translateY(-50%) scale(1.1)';
+                }, 200);
+            });
+
+            node.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(-50%) scale(1)';
+            });
+        });
+
+        // 初始化滚动显示
+        window.addEventListener('scroll', revealOnScroll);
+        window.addEventListener('load', revealOnScroll);
+
+        // 为所有按钮添加波纹效果
+        document.querySelectorAll('.btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                const ripple = document.createElement('span');
+                ripple.style.position = 'absolute';
+                ripple.style.width = '20px';
+                ripple.style.height = '20px';
+                ripple.style.background = 'rgba(255, 255, 255, 0.6)';
+                ripple.style.borderRadius = '50%';
+                ripple.style.transform = 'translate(-50%, -50%)';
+                ripple.style.pointerEvents = 'none';
+                ripple.style.animation = 'rippleEffect 0.6s ease-out';
+
+                const rect = btn.getBoundingClientRect();
+                ripple.style.left = `${e.clientX - rect.left}px`;
+                ripple.style.top = `${e.clientY - rect.top}px`;
+
+                btn.style.position = 'relative';
+                btn.style.overflow = 'hidden';
+                btn.appendChild(ripple);
+
+                setTimeout(() => ripple.remove(), 600);
+            });
+        });
+
+        // 添加ripple效果动画
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes rippleEffect {
+                to {
+                    width: 2000px;
+                    height: 2000px;
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // 鼠标跟随光效
+        document.addEventListener('mousemove', (e) => {
+            const mouseX = e.clientX;
+            const mouseY = e.clientY;
+
+            // 创建光效
+            if (!document.querySelector('.mouse-light')) {
+                const light = document.createElement('div');
+                light.className = 'mouse-light';
+                light.style.position = 'fixed';
+                light.style.width = '300px';
+                light.style.height = '300px';
+                light.style.background = 'radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%)';
+                light.style.borderRadius = '50%';
+                light.style.pointerEvents = 'none';
+                light.style.zIndex = '9999';
+                light.style.transition = 'all 0.3s ease';
+                document.body.appendChild(light);
+            }
+
+            const light = document.querySelector('.mouse-light');
+            light.style.left = mouseX - 150 + 'px';
+            light.style.top = mouseY - 150 + 'px';
+            light.style.opacity = '0.3';
+            setTimeout(() => light.style.opacity = '0', 5000);
+        });
+
+        // 动态粒子背景
+        function createParticle() {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.animationDelay = Math.random() * 20 + 's';
+            particle.style.animationDuration = (20 + Math.random() * 20) + 's';
+            particle.style.background = Math.random() > 0.5 ? 'rgba(99, 102, 241, 0.3)' : 'rgba(236, 72, 153, 0.3)';
+            document.querySelector('.particles').appendChild(particle);
+            setTimeout(() => particle.remove(), 40000);
+        }
+
+        // 为每个粒子添加不同的动画延迟
+        for (let i = 0; i < 10; i++) {
+            setTimeout(() => createParticle(), i * 3000);
+        }
+
+        // 持续添加粒子
+        setInterval(() => {
+            if (Math.random() > 0.3) createParticle();
+        }, 5000);
+
+        // 初始粒子
+        for (let i = 0; i < 5; i++) {
+            createParticle();
+        }
+
+        // 优化性能 - 防抖处理
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                // 重置所有动画
+                document.querySelectorAll('.node-container').forEach(node => {
+                    node.style.animation = 'none';
+                    node.offsetHeight; // 触发重绘
+                    node.style.animation = '';
+                });
+            }, 250);
+        });
+
+        // 添加触控支持
+        let touchStartY = 0;
+        document.addEventListener('touchstart', (e) => {
+            touchStartY = e.touches[0].clientY;
+        });
+
+        document.addEventListener('touchend', (e) => {
+            const touchEndY = e.changedTouches[0].clientY;
+            if (Math.abs(touchEndY - touchStartY) > 50) {
+                // 忽略垂直滚动事件，以免影响页面导航
+            }
+        });
+
+        // 初始化完成提示
+        setTimeout(() => {
+            console.log('🎉 3DGS->URDF->IsaacLab->RL/IL机器人训练集成页面已完全加载！');
+            console.log('💡 提示：尝试点击不同的管道节点，查看详细信息');
+            console.log('🚀 您现在可以开始构建从3DGS到机器人的完整pipeline！');
+        }, 2000);
+    </script>
+
+    <style>
+        /* 额外的样式 */
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            animation: float 20s infinite linear;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-10vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .mouse-light {
+            transition: opacity 2s ease-out;
+        }
+
+        @media (max-width: 968px) {
+            .node-container {
+                position: relative;
+                left: auto !important;
+                transform: none !important;
+                margin: 20px 0;
+                width: 90%;
+            }
+
+            .horizontal-pipeline {
+                height: auto;
+                overflow-x: hidden;
+                overflow-y: auto;
+                padding-bottom: 40px;
+            }
+
+            .pipeline-track {
+                width: 100%;
+                height: auto;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .track-line {
+                display: none;
+            }
+
+            .flow-arrows {
+                display: none;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .tech-sections {
+                grid-template-columns: 1fr;
+            }
+
+            .challenges-opportunities {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</body>
+</html>

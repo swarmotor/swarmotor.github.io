@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GASE / SimFoundry / VLK：拿到数据之后，VLA 训练-评测 Pipeline 的创新点对比</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #1c2128;
+    --surface3: #222832;
+    --border: #30363d;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --subtle: #6e7681;
+    --blue: #58a6ff;
+    --green: #3fb950;
+    --yellow: #d29922;
+    --red: #f85149;
+    --purple: #bc8cff;
+    --orange: #f0883e;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC", Helvetica, Arial, sans-serif;
+    line-height: 1.72;
+    overflow-x: hidden;
+  }
+  .hero {
+    padding: 66px 24px 46px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+    background:
+      radial-gradient(circle at 16% 0%, rgba(88, 166, 255, .22), transparent 36%),
+      radial-gradient(circle at 82% 8%, rgba(188, 140, 255, .16), transparent 34%),
+      linear-gradient(135deg, #0d1117 0%, #111722 50%, #0d1117 100%);
+  }
+  .eyebrow {
+    display: inline-flex;
+    padding: 5px 12px;
+    border: 1px solid rgba(88, 166, 255, .35);
+    border-radius: 999px;
+    background: rgba(88, 166, 255, .08);
+    color: var(--blue);
+    font-size: .78rem;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+  }
+  h1 {
+    max-width: 1040px;
+    margin: 18px auto 12px;
+    font-size: clamp(2rem, 5vw, 3.15rem);
+    line-height: 1.1;
+    letter-spacing: -.04em;
+  }
+  .hero p { max-width: 900px; margin: 0 auto; color: var(--muted); }
+  .tags { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--muted);
+    font-size: .8rem;
+    white-space: nowrap;
+  }
+  .tag.ok { color: var(--green); border-color: rgba(63, 185, 80, .38); background: rgba(63, 185, 80, .09); }
+  .tag.info { color: var(--blue); border-color: rgba(88, 166, 255, .38); background: rgba(88, 166, 255, .09); }
+  .tag.warn { color: var(--yellow); border-color: rgba(210, 153, 34, .38); background: rgba(210, 153, 34, .09); }
+  .tag.risk { color: var(--red); border-color: rgba(248, 81, 73, .36); background: rgba(248, 81, 73, .08); }
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: rgba(13, 17, 23, .92);
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: blur(12px);
+    overflow-x: hidden;
+  }
+  nav .nav-inner { max-width: 1120px; width: 100%; margin: 0 auto; padding: 10px 24px; display: flex; gap: 8px; overflow-x: auto; }
+  nav a { color: var(--muted); text-decoration: none; font-size: .82rem; border: 1px solid transparent; border-radius: 999px; padding: 4px 10px; white-space: nowrap; }
+  nav a:hover { color: var(--text); border-color: var(--border); background: var(--surface); }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 30px 24px 60px; }
+  section { margin: 38px 0; }
+  .section-head { display: flex; align-items: end; gap: 14px; margin-bottom: 16px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+  .section-head h2 { font-size: 1.35rem; letter-spacing: -.02em; }
+  .section-head span { color: var(--subtle); font-size: .84rem; margin-left: auto; }
+  .grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 14px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px; overflow-x: auto; }
+  .span-3 { grid-column: span 3; }
+  .span-4 { grid-column: span 4; }
+  .span-5 { grid-column: span 5; }
+  .span-6 { grid-column: span 6; }
+  .span-7 { grid-column: span 7; }
+  .span-8 { grid-column: span 8; }
+  .span-12 { grid-column: span 12; }
+  .metric .label { color: var(--muted); font-size: .78rem; text-transform: uppercase; letter-spacing: .04em; }
+  .metric .value { margin-top: 5px; font-size: 1.34rem; font-weight: 750; color: var(--green); }
+  .metric .note { margin-top: 4px; color: var(--subtle); font-size: .84rem; }
+  h3 { font-size: 1rem; margin-bottom: 8px; }
+  p, li { color: var(--muted); font-size: .93rem; }
+  ul { padding-left: 18px; }
+  .callout { border-left: 3px solid var(--blue); background: rgba(88, 166, 255, .08); border-radius: 0 10px 10px 0; padding: 15px 17px; color: var(--muted); }
+  .callout strong { display: block; color: var(--text); margin-bottom: 3px; }
+  .callout.ok { border-color: var(--green); background: rgba(63, 185, 80, .08); }
+  .callout.warn { border-color: var(--yellow); background: rgba(210, 153, 34, .08); }
+  .callout.risk { border-color: var(--red); background: rgba(248, 81, 73, .08); }
+  table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+  th, td { text-align: left; padding: 11px 12px; border-bottom: 1px solid rgba(48, 54, 61, .68); vertical-align: top; }
+  th { background: var(--surface2); color: var(--muted); font-weight: 650; }
+  tr:hover td { background: rgba(88, 166, 255, .035); }
+  code { background: rgba(88, 166, 255, .10); color: var(--blue); border-radius: 4px; padding: 2px 6px; font-family: "JetBrains Mono", Consolas, monospace; font-size: .86em; word-break: break-word; }
+  pre { margin-top: 12px; padding: 14px 16px; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; color: var(--muted); overflow-x: auto; white-space: pre-wrap; word-break: break-all; font-family: "JetBrains Mono", Consolas, monospace; font-size: .82rem; line-height: 1.6; }
+  .timeline { border-left: 2px solid var(--border); padding-left: 20px; }
+  .event { position: relative; margin-bottom: 18px; }
+  .event:last-child { margin-bottom: 0; }
+  .event::before { content: ""; position: absolute; left: -27px; top: 7px; width: 11px; height: 11px; border-radius: 50%; background: var(--surface3); border: 2px solid var(--blue); }
+  .event.ok::before { border-color: var(--green); background: var(--green); }
+  .event.warn::before { border-color: var(--yellow); }
+  .event.risk::before { border-color: var(--red); }
+  .event .title { font-weight: 700; }
+  .event .body { color: var(--muted); font-size: .92rem; margin-top: 2px; }
+  .source-list { counter-reset: source; display: grid; gap: 10px; }
+  .source { counter-increment: source; display: grid; grid-template-columns: 34px 1fr; gap: 10px; align-items: start; }
+  .source::before { content: counter(source); width: 26px; height: 26px; display: grid; place-items: center; border: 1px solid var(--border); border-radius: 50%; color: var(--muted); background: var(--surface2); font-size: .8rem; }
+  .source a { color: var(--blue); text-decoration: none; }
+  .source a:hover { text-decoration: underline; }
+  .source p { color: var(--muted); font-size: .88rem; }
+  footer { color: var(--subtle); text-align: center; border-top: 1px solid var(--border); margin-top: 44px; padding-top: 18px; font-size: .82rem; }
+  @media (max-width: 860px) {
+    .span-3, .span-4, .span-5, .span-6, .span-7, .span-8 { grid-column: span 12; }
+    .section-head { align-items: start; flex-direction: column; gap: 4px; }
+    .section-head span { margin-left: 0; }
+    table { min-width: 760px; }
+  }
+</style>
+
+
+
+<style id="blog-family-style">
+  :root {
+    --blog-bg: #f5f8f8;
+    --blog-bg-soft: #edf4f4;
+    --blog-surface: rgba(255, 255, 255, .92);
+    --blog-surface-strong: #ffffff;
+    --blog-border: rgba(28, 78, 88, .18);
+    --blog-text: #18333b;
+    --blog-muted: #465f68;
+    --blog-subtle: #596f77;
+    --blog-accent: #168a8f;
+    --blog-accent-2: #8fb8c8;
+    --blog-warm: #b7791f;
+    --blog-radius: 18px;
+    --blog-shadow: 0 18px 48px rgba(23, 74, 83, .10);
+  }
+  html { scroll-behavior: smooth; }
+  body {
+    background:
+      radial-gradient(circle at 8% -10%, color-mix(in srgb, var(--blog-accent) 16%, transparent), transparent 34%),
+      radial-gradient(circle at 88% 2%, color-mix(in srgb, var(--blog-accent-2) 13%, transparent), transparent 30%),
+      linear-gradient(180deg, #f7faf9 0%, #eef5f5 52%, #f8faf9 100%) !important;
+    color: var(--blog-text) !important;
+    font-family: "Avenir Next", "Inter", "SF Pro Text", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif !important;
+    letter-spacing: .005em;
+    text-rendering: optimizeLegibility;
+  }
+  h1 {
+    color: #102f38 !important;
+    font-family: "Iowan Old Style", "LXGW WenKai Screen", "霞鹜文楷", "Noto Serif SC", "Source Han Serif SC", "Songti SC", Georgia, serif !important;
+    letter-spacing: -.035em;
+    font-weight: 760;
+  }
+  h2, .section-header h2, .section-head h2 {
+    color: #173943 !important;
+    font-family: "Optima", "Avenir Next", "Noto Serif SC", "Noto Sans SC", system-ui, sans-serif !important;
+    letter-spacing: -.025em;
+    font-weight: 720;
+  }
+  h3, .title, .tl-title {
+    color: #1c4049 !important;
+    font-family: "Avenir Next", "Noto Sans SC", "PingFang SC", system-ui, sans-serif !important;
+    letter-spacing: -.01em;
+  }
+  .hero, .cover, header, .page-hero {
+    background:
+      linear-gradient(135deg, rgba(0, 140, 149, .12), rgba(255, 255, 255, .80) 44%, rgba(58, 167, 176, .10)),
+      linear-gradient(180deg, #fbfefe, #eef7f7) !important;
+    border-bottom: 1px solid var(--blog-border) !important;
+    color: var(--blog-text) !important;
+  }
+  .hero p, .cover .subtitle, header .subtitle, header .meta, .cover .meta {
+    color: var(--blog-muted) !important;
+  }
+  .wrap, .container, main {
+    max-width: min(1120px, calc(100vw - 32px));
+  }
+  .card, .panel, .callout, .note, .metric, .section, article, table, pre {
+    border-color: var(--blog-border) !important;
+  }
+  .card, .panel, .metric, .note {
+    background: var(--blog-surface) !important;
+    border-radius: var(--blog-radius) !important;
+    box-shadow: var(--blog-shadow);
+  }
+  .callout {
+    background: color-mix(in srgb, var(--blog-accent) 8%, #ffffff) !important;
+    border-left-color: var(--blog-accent) !important;
+    border-radius: 14px !important;
+    color: var(--blog-muted) !important;
+  }
+  a, .eyebrow, .accent { color: #006f78 !important; }
+  code {
+    color: #005f68 !important;
+    background: color-mix(in srgb, var(--blog-accent) 10%, #ffffff) !important;
+    border: 1px solid color-mix(in srgb, var(--blog-accent) 24%, #ffffff);
+    border-radius: 6px !important;
+    font-family: "JetBrains Mono", "SFMono-Regular", Consolas, "Liberation Mono", monospace !important;
+  }
+  pre {
+    background: #eef6f6 !important;
+    color: #25464e !important;
+    border-radius: 16px !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.72);
+  }
+  pre code { background: transparent !important; border: 0; color: inherit !important; }
+  table {
+    background: rgba(255, 255, 255, .86) !important;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  th {
+    background: color-mix(in srgb, var(--blog-accent) 11%, #f7fbfb) !important;
+    color: #173943 !important;
+  }
+  td, p, li { color: var(--blog-muted) !important; }
+  strong, b { color: #173943 !important; }
+  .tag, .badge, .step-count {
+    background: color-mix(in srgb, var(--blog-accent) 8%, #ffffff) !important;
+    border-color: color-mix(in srgb, var(--blog-accent) 24%, #ffffff) !important;
+    color: #31545d !important;
+  }
+  nav {
+    background: rgba(248, 252, 252, .86) !important;
+    border-bottom: 1px solid var(--blog-border) !important;
+    backdrop-filter: blur(18px);
+  }
+  nav a { color: #46616a !important; }
+  nav a:hover {
+    color: #12333c !important;
+    background: color-mix(in srgb, var(--blog-accent) 10%, #ffffff) !important;
+    border-color: color-mix(in srgb, var(--blog-accent) 32%, #ffffff) !important;
+  }
+  footer {
+    color: var(--blog-subtle) !important;
+    border-top-color: var(--blog-border) !important;
+  }
+  ::selection { background: color-mix(in srgb, var(--blog-accent) 24%, #ffffff); color: #0f2d35; }
+  @media (max-width: 720px) {
+    body { letter-spacing: 0; }
+    .hero, .cover, header { padding-left: 18px !important; padding-right: 18px !important; }
+  }
+</style>
+
+</head>
+<body>
+<header class="hero">
+  <div class="eyebrow">Post-data FT / Evaluation Pipeline</div>
+  <h1>GASE / SimFoundry / VLK：拿到数据之后，VLA 训练-评测 Pipeline 的创新点对比</h1>
+  <p>这篇记录刻意不展开前期重建、分割、资产生成细节，只分析这些系统把数据交给策略学习以后，如何组织 fine-tuning、仿真评测、真实部署和闭环验证。</p>
+  <div class="tags">
+    <span class="tag info">GASE: R2S2R 小样本对齐</span>
+    <span class="tag ok">SimFoundry: 训练 + 评测统一平台</span>
+    <span class="tag warn">VLK: 合成 VLK 数据直接 FT pi0.5</span>
+    <span class="tag risk">重点: 后数据阶段</span>
+  </div>
+</header>
+
+<nav>
+  <div class="nav-inner">
+    <a href="#verdict">总判断</a>
+    <a href="#common">共同 pipeline</a>
+    <a href="#compare">三工作对比</a>
+    <a href="#innovations">创新点</a>
+    <a href="#recipes">落地配方</a>
+    <a href="#metrics">评测设计</a>
+    <a href="#risks">风险</a>
+    <a href="#sources">来源</a>
+  </div>
+</nav>
+
+<main class="wrap">
+  <section id="verdict">
+    <div class="section-head"><h2>1. 总判断</h2><span>谁真正回答了 FT VLA pipeline 问题</span></div>
+    <div class="grid">
+      <div class="card span-8 callout ok">
+        <strong>最接近“拿到数据后怎么 FT VLA”的是 VLK，其次是 SimFoundry，GASE 更像验证 sim-to-real gap 的场景供给系统。</strong>
+        <p>VLK 明确把合成数据组织为 <code>egocentric image + language + robot state -> future kinematic trajectory</code> 的监督数据，并从预训练 <code>pi0.5</code> 全模型 fine-tune。SimFoundry 的创新是把同一批 sim-ready scenes 同时用于 policy training 和 real-to-sim evaluation，证明仿真评测能预测真实排名。GASE 的后数据阶段更窄：用重建场景收集 sim 训练样本，对比 sim-to-real 与 real-to-real 的成功率差距。</p>
+      </div>
+      <div class="card span-4 metric">
+        <div class="label">对 OpenPI/pi0.5 借鉴优先级</div>
+        <div class="value">VLK > SimFoundry > GASE</div>
+        <div class="note">如果目标是训练-评测 pipeline，而不是场景重建质量。</div>
+      </div>
+      <div class="card span-4 metric"><div class="label">GASE 的关键词</div><div class="value">Gap audit</div><div class="note">50 sim/real episodes，对比 sim2real 与 real2real。</div></div>
+      <div class="card span-4 metric"><div class="label">SimFoundry 的关键词</div><div class="value">Predictive eval</div><div class="note">仿真评测与真实表现相关，训练和筛选共用环境。</div></div>
+      <div class="card span-4 metric"><div class="label">VLK 的关键词</div><div class="value">Data-to-policy</div><div class="note">48k 合成轨迹直接 FT pi0.5，闭环 sim/real 评测。</div></div>
+    </div>
+  </section>
+
+  <section id="common">
+    <div class="section-head"><h2>2. 三者共同的后数据 Pipeline</h2><span>把前期全部压缩成“数据已到手”</span></div>
+    <div class="card">
+      <div class="timeline">
+        <div class="event ok"><div class="title">Step 1 · 合成/仿真数据变成可训练 episode</div><div class="body">关键不是图像好不好看，而是每条 episode 是否有同步的 observation、语言/任务、动作或未来轨迹、成功标签、初始状态、场景版本。</div></div>
+        <div class="event ok"><div class="title">Step 2 · 选择策略学习目标</div><div class="body">GASE 走常规 policy training / pi0.5 manipulation；SimFoundry 面向多 policy architecture 的 sim data training/co-training；VLK 明确改 action space 为 G1 kinematic trajectory 并 fine-tune pi0.5。</div></div>
+        <div class="event warn"><div class="title">Step 3 · 仿真内闭环评测</div><div class="body">评测不再只看离线 loss。三者都强调在重建/生成环境中闭环 rollout，观察任务成功率、阶段失败和 sim-to-real gap。</div></div>
+        <div class="event warn"><div class="title">Step 4 · 真实部署验证</div><div class="body">真实机器人验证是最终证据：GASE 用 Piper/导航机器人，SimFoundry 用 DROID/YAM 等 manipulation tasks，VLK 用 Unitree G1。</div></div>
+        <div class="event risk"><div class="title">Step 5 · 用评测结果反推数据设计</div><div class="body">真正的创新点在这里：SimFoundry 用 object/scene/task cousins 定位泛化轴；VLK 用数据量和视觉随机化消融指导数据生成；GASE 用 sim2real-real2real gap 检验场景保真度是否足够。</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="compare">
+    <div class="section-head"><h2>3. 三篇工作的训练-评测对比</h2><span>只比较得到数据后的部分</span></div>
+    <div class="card">
+      <table>
+        <thead><tr><th>维度</th><th>GASE</th><th>SimFoundry</th><th>VLK</th></tr></thead>
+        <tbody>
+          <tr><td>数据到手后的形式</td><td>可导入 Isaac Sim 的重建场景 + 可采集 sim episodes。</td><td>interactive digital twin + object/scene/task digital cousins，可生成训练轨迹和评测场景。</td><td>同步的 egocentric RGB、语言指令、G1 当前状态、未来全身 kinematic trajectory、contact labels。</td></tr>
+          <tr><td>训练对象</td><td>Pi0.5 manipulation policy；导航实验用 Uni-NaVid。</td><td>多种 policy architectures；项目页明确展示 pi0.5-DROID、pi0.5-base fine-tuning。</td><td>从预训练 pi0.5 初始化，full fine-tune 为 VLK policy。</td></tr>
+          <tr><td>核心训练目标</td><td>用 sim 数据训练后做 sim2real，对比 real2real。</td><td>sim-only、real-only、sim+real co-training、多任务 sim data，检验泛化。</td><td>flow-matching x0 prediction：预测 1 秒未来 G1 运动轨迹，并加 contact/root/FK/foot-sliding 辅助损失。</td></tr>
+          <tr><td>评测闭环</td><td>sim2sim、sim2real、real2real 三范式。</td><td>real-to-sim policy evaluation + sim-to-real policy training；用 Pearson 和 MMRV 衡量仿真评测是否预测真实表现。</td><td>held-out synthetic validation、1000 sim rollouts per mode、120 real-world Unitree G1 trials。</td></tr>
+          <tr><td>创新点重心</td><td>证明高保真重建场景可把 sim2real gap 压到接近 real2real。</td><td>把场景生成变成 policy training 与 policy ranking 的统一实验平台。</td><td>把合成交互直接组织为 VLA 可监督的 kinematic action space，并验证数据量/视觉随机化对真实部署的影响。</td></tr>
+          <tr><td>对 OpenPI 的启发</td><td>适合做“这个重建场景能不能替代真实采集”的 gap audit。</td><td>适合做“用仿真评测筛 checkpoint/数据增强策略”的 benchmark foundry。</td><td>适合直接设计 pi0.5 后数据 FT recipe：数据 schema、loss、chunked evaluation、真实部署链路。</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="innovations">
+    <div class="section-head"><h2>4. “训练-评测 Pipeline” 的多重创新点</h2><span>不是单一算法创新</span></div>
+    <div class="grid">
+      <div class="card span-6">
+        <h3>创新 1：评测从“最终真实成功率”前移到仿真预测</h3>
+        <p>SimFoundry 的关键不是只生成更多数据，而是让 simulation evaluation 能预测 real-world policy performance。它报告 mean Pearson correlation 0.911 和 MMRV 0.018，使仿真成为 checkpoint 排序、policy 选择和数据增强策略选择的前置筛选器。</p>
+      </div>
+      <div class="card span-6">
+        <h3>创新 2：数据增强轴变成可解释实验变量</h3>
+        <p>SimFoundry 将 object cousins、scene cousins、task cousins 分开，使“泛化提升来自哪里”可以被消融。项目页报告 object/scene/task cousins 对 sim-trained policies 分别带来 17%、21%、40% 平均真实成功率提升。</p>
+      </div>
+      <div class="card span-6">
+        <h3>创新 3：VLA action space 被重定义为可执行运动接口</h3>
+        <p>VLK 不让 pi0.5 直接输出低层 joint command，而是输出 1 秒未来 whole-body kinematic trajectory，再由 whole-body tracker 转成真实机器人动作。这让 VLA 负责视觉语言到运动意图，tracker 负责稳定执行。</p>
+      </div>
+      <div class="card span-6">
+        <h3>创新 4：训练 loss 不只拟合动作，还拟合物理可执行性</h3>
+        <p>VLK 在 flow-matching 轨迹重建损失外加入 wrist contact、root trajectory consistency、forward kinematics、foot-sliding regularization。这里的重点是把真实部署会失败的物理约束提前写入训练目标。</p>
+      </div>
+      <div class="card span-6">
+        <h3>创新 5：数据规模消融直接指导下一轮生成</h3>
+        <p>VLK 用不同训练数据比例评测闭环成功率，发现导航较少数据即可学会，而接触丰富的 Pick (Surface) 从 10% 数据的 0% 提升到 full dataset 的 46%。这说明数据预算应优先给接触/操作阶段。</p>
+      </div>
+      <div class="card span-6">
+        <h3>创新 6：视觉随机化不再是装饰，而是部署 gate</h3>
+        <p>VLK 报告移除视觉 domain randomization 会让 walking success 从 90% 降到 41%。这把 lighting/camera randomization 从“可选增强”变成真实部署必要条件。</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="recipes">
+    <div class="section-head"><h2>5. 如果要迁移到 OpenPI/pi0.5，具体怎么做</h2><span>可执行配方</span></div>
+    <div class="grid">
+      <div class="card span-4">
+        <h3>GASE-style gap audit</h3>
+        <ul>
+          <li>同一任务收集 <code>N=50</code> sim episodes 与 <code>N=50</code> real episodes。</li>
+          <li>训练三组：sim-only、real-only、sim+real。</li>
+          <li>评测三组：sim2sim、sim2real、real2real。</li>
+          <li>如果 sim2real 与 real2real gap 小于 10%，再扩大 synthetic 数据。</li>
+        </ul>
+      </div>
+      <div class="card span-4">
+        <h3>SimFoundry-style foundry</h3>
+        <ul>
+          <li>每个真实场景生成 digital twin，再生成 object/scene/task cousins。</li>
+          <li>每个 checkpoint 先跑 sim eval，记录 end-to-end success 和 subtask success。</li>
+          <li>用少量真实 trials 校准 sim-real Pearson/MMRV。</li>
+          <li>只把仿真排序稳定的 checkpoint 推到真实机器人。</li>
+        </ul>
+      </div>
+      <div class="card span-4">
+        <h3>VLK-style direct FT</h3>
+        <ul>
+          <li>把数据 schema 固定为 <code>image, language, robot_state, future_trajectory, contact</code>。</li>
+          <li>从 <code>pi0.5</code> 初始化，替换/适配 action head 到目标机器人轨迹表示。</li>
+          <li>使用 flow matching x0 trajectory loss，加物理辅助损失。</li>
+          <li>10% held-out synthetic + 真实部署 trials 双重评测。</li>
+        </ul>
+      </div>
+      <div class="card span-12 callout warn">
+        <strong>对当前 OpenPI/pi0.5 最推荐的实现顺序</strong>
+        <p>先做 GASE-style gap audit 确认合成数据是否可信；再做 SimFoundry-style sim eval foundry 筛选 checkpoint 和数据增强轴；最后才做 VLK-style action-space 改造，因为它需要修改模型输出、loss、tracker/执行接口，工程量最大但创新性也最高。</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="metrics">
+    <div class="section-head"><h2>6. 评测协议应该怎么设计</h2><span>把三篇工作的优点合并</span></div>
+    <div class="card">
+      <table>
+        <thead><tr><th>评测层</th><th>二元通过条件</th><th>借鉴来源</th><th>为什么必要</th></tr></thead>
+        <tbody>
+          <tr><td>离线数据检查</td><td>每条 episode 都有同步 observation、instruction、action/trajectory、success/stage label。</td><td>VLK</td><td>没有完整 tuple，VLA FT loss 和评测都不可解释。</td></tr>
+          <tr><td>仿真 held-out</td><td>保留 10% 合成轨迹做闭环 rollout，不只看 validation loss。</td><td>VLK</td><td>检测模型是否能在自己动作诱导的状态分布下完成任务。</td></tr>
+          <tr><td>sim-real 相关性</td><td>在少量真实 trials 上计算 sim ranking 是否预测 real ranking。</td><td>SimFoundry</td><td>如果仿真不能排序，仿真评测不能指导训练。</td></tr>
+          <tr><td>gap audit</td><td>sim2real 与 real2real 的成功率差距低于任务设定阈值，例如 10%。</td><td>GASE</td><td>判断 synthetic data 能否替代真实采集。</td></tr>
+          <tr><td>泛化轴消融</td><td>分别加入 object、scene、task variation，并报告每个轴的增益。</td><td>SimFoundry</td><td>把“多样性有用”拆成可执行的数据生成策略。</td></tr>
+          <tr><td>部署鲁棒性</td><td>光照、相机、布局扰动下成功率不能断崖式下降。</td><td>VLK</td><td>VLK 的视觉随机化消融显示这是 sim-to-real 转移关键 gate。</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="risks">
+    <div class="section-head"><h2>7. 风险和误读</h2><span>避免把场景生成贡献误读成训练贡献</span></div>
+    <div class="grid">
+      <div class="card span-6 callout risk"><strong>误读 1：GASE 证明了通用 VLA FT pipeline</strong><p>不准确。GASE 后数据阶段主要证明高质量重建环境可降低 sim-to-real gap。它的 policy training/eval 设置较窄，不能直接推出大规模泛化训练 recipe。</p></div>
+      <div class="card span-6 callout warn"><strong>误读 2：SimFoundry 只是在做数据增强</strong><p>不准确。它的重要创新是把数据增强和 policy evaluation 放进同一个 foundry，用仿真相关性决定哪些 policy/数据策略值得上真实机器人。</p></div>
+      <div class="card span-6 callout warn"><strong>误读 3：VLK 可以直接复用 OpenPI train.py</strong><p>不准确。VLK 改了 action space、训练目标和部署执行接口。它借用 pi0.5 backbone，但不是简单把合成 LeRobot 数据喂给原始 action head。</p></div>
+      <div class="card span-6 callout ok"><strong>正确理解：三者是三个层级</strong><p>GASE 是场景可信度验证，SimFoundry 是训练-评测平台化，VLK 是面向 humanoid 的端到端后数据 FT 方案。真正写自己的 pipeline 时，应按这三个层级逐步加复杂度。</p></div>
+    </div>
+  </section>
+
+  <section id="sources">
+    <div class="section-head"><h2>8. 来源</h2><span>所有关键数字来自公开页面或论文 HTML</span></div>
+    <div class="grid">
+      <div class="card span-6">
+        <h3>论文与项目页</h3>
+        <div class="source-list">
+          <div class="source"><div><a href="https://arxiv.org/html/2606.17520">GASE arXiv 2606.17520</a><p>Pi0.5/Piper manipulation, sim2sim/sim2real/real2real, 50 samples, sim-to-real gap within 10% claims.</p></div></div>
+          <div class="source"><div><a href="https://jar7visz.github.io/gase-page/">GASE project page</a><p>System summary and R2S2R framing.</p></div></div>
+          <div class="source"><div><a href="https://arxiv.org/html/2606.28276">SimFoundry arXiv 2606.28276</a><p>Training/evaluation unified pipeline, Pearson 0.911, MMRV 0.018, object/scene/task cousins.</p></div></div>
+          <div class="source"><div><a href="https://research.nvidia.com/labs/gear/simfoundry/">SimFoundry project page</a><p>Real-to-sim eval examples, pi0.5-DROID and pi0.5-base fine-tuning result highlights.</p></div></div>
+          <div class="source"><div><a href="https://arxiv.org/html/2606.30645">VLK arXiv 2606.30645</a><p>VLK policy, pi0.5 initialization, flow-matching trajectory objective, sim/real evaluation details.</p></div></div>
+          <div class="source"><div><a href="https://vision-language-kinematics.github.io/">VLK project page</a><p>48k paired trajectories, synthetic-only FT, 0 real-world fine-tuning, Unitree G1 deployment overview.</p></div></div>
+        </div>
+      </div>
+      <div class="card span-6">
+        <h3>报告边界</h3>
+        <p>本 HTML 没有评判三篇工作前半段的重建质量、分割算法或资产生成方法优劣。所有比较都围绕“数据/场景已经生成后，如何训练、筛选、评测和部署 VLA 或策略”。如果要写第二份报告，才应单独比较 3DGS、object extraction、digital cousins、motion synthesis 的前端生成能力。</p>
+        <pre>建议用于 OpenPI/pi0.5 的最小实验：
+1. GASE-style: 50 sim vs 50 real gap audit
+2. SimFoundry-style: sim eval ranking vs real ranking calibration
+3. VLK-style: action-space/loss 改造小规模 proof-of-concept</pre>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    Focused comparison report: post-data FT and evaluation pipelines for VLA / embodied policies.
+  </footer>
+</main>
+</body>
+</html>

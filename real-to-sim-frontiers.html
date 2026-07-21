@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-to-Sim 前沿</title>
+    <style>
+        :root {
+            --blue: #1a73e8;
+            --blue-dark: #1557b0;
+            --green: #34a853;
+            --red: #ea4335;
+            --orange: #f9ab00;
+            --purple: #9c27b0;
+            --bg: #ffffff;
+            --bg-alt: #f8f9fa;
+            --text: #202124;
+            --text2: #5f6368;
+            --border: #dadce0;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans SC", sans-serif;
+            line-height: 1.8;
+            color: var(--text);
+            background: var(--bg);
+        }
+
+        .container { max-width: 1000px; margin: 0 auto; padding: 0 24px; }
+
+        /* Hero */
+        header {
+            background: linear-gradient(135deg, #0d47a1 0%, #1565c0 40%, #1e88e5 100%);
+            color: white;
+            padding: 72px 0 56px;
+            text-align: center;
+        }
+        header h1 { font-size: 2.2em; font-weight: 700; margin-bottom: 12px; }
+        header .sub { font-size: 1.1em; opacity: 0.9; max-width: 720px; margin: 0 auto; }
+        header .meta { margin-top: 20px; font-size: 0.88em; opacity: 0.75; }
+
+        /* TOC */
+        .toc {
+            background: var(--bg-alt);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 28px 32px;
+            margin: 40px 0;
+        }
+        .toc h2 { font-size: 1.2em; margin-bottom: 12px; color: var(--blue); border: none; padding: 0; }
+        .toc ol { padding-left: 20px; }
+        .toc li { margin-bottom: 5px; }
+        .toc a { color: var(--text); text-decoration: none; }
+        .toc a:hover { color: var(--blue); }
+
+        /* Headings */
+        h2 {
+            font-size: 1.6em;
+            font-weight: 700;
+            border-bottom: 3px solid var(--blue);
+            padding-bottom: 10px;
+            margin: 48px 0 20px;
+        }
+        h3 { font-size: 1.25em; font-weight: 600; margin: 28px 0 12px; }
+        h4 { font-size: 1.05em; font-weight: 600; color: var(--text2); margin: 20px 0 10px; }
+
+        p { margin-bottom: 14px; }
+
+        /* Tables */
+        .tw { overflow-x: auto; margin: 18px 0; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,.1); }
+        table { width: 100%; border-collapse: collapse; font-size: 0.9em; }
+        thead { background: var(--blue); color: #fff; }
+        th { padding: 11px 14px; text-align: left; font-weight: 600; white-space: nowrap; }
+        td { padding: 9px 14px; border-bottom: 1px solid var(--border); }
+        tbody tr:nth-child(even) { background: var(--bg-alt); }
+        tbody tr:hover { background: #e8f0fe; }
+
+        /* Cards */
+        .cg { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 18px; margin: 20px 0; }
+        .card {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 22px;
+            box-shadow: 0 1px 3px rgba(0,0,0,.08);
+            transition: box-shadow .2s;
+        }
+        .card:hover { box-shadow: 0 4px 8px rgba(0,0,0,.12); }
+        .card .tag {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 0.78em;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .tag-blue { background: #e8f0fe; color: var(--blue-dark); }
+        .tag-green { background: #e6f4ea; color: #1e7e34; }
+        .tag-red { background: #fce8e6; color: #c5221f; }
+        .tag-orange { background: #fef7e0; color: #b06000; }
+        .tag-purple { background: #f3e8fd; color: #7627bb; }
+        .card h4 { margin: 0 0 6px; color: var(--text); font-size: 1.05em; }
+        .card p { font-size: 0.9em; color: var(--text2); margin: 0; line-height: 1.6; }
+
+        /* Flow */
+        .flow {
+            background: var(--bg-alt);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 22px;
+            margin: 20px 0;
+            text-align: center;
+            font-family: "SF Mono", "Fira Code", monospace;
+            font-size: 0.88em;
+            line-height: 2.2;
+            overflow-x: auto;
+        }
+        .flow .step {
+            display: inline-block;
+            padding: 5px 14px;
+            border-radius: 6px;
+            margin: 3px;
+            font-weight: 500;
+            color: #fff;
+        }
+        .flow .arr { display: inline-block; color: var(--text2); margin: 0 3px; font-weight: bold; }
+
+        /* Callout */
+        .callout {
+            border-left: 4px solid var(--blue);
+            border-radius: 0 8px 8px 0;
+            padding: 18px 22px;
+            margin: 20px 0;
+            background: linear-gradient(135deg, #e8f0fe 0%, #f0f6ff 100%);
+        }
+        .callout.warn { border-left-color: var(--red); background: linear-gradient(135deg, #fce8e6 0%, #fff5f5 100%); }
+        .callout.ok { border-left-color: var(--green); background: linear-gradient(135deg, #e6f4ea 0%, #f0faf2 100%); }
+        .callout p { margin: 0; }
+
+        /* Timeline */
+        .tl { position: relative; padding-left: 30px; margin: 22px 0; }
+        .tl::before {
+            content: '';
+            position: absolute;
+            left: 10px; top: 0; bottom: 0;
+            width: 3px;
+            background: var(--blue);
+            border-radius: 2px;
+        }
+        .tl-item { position: relative; margin-bottom: 24px; }
+        .tl-item::before {
+            content: '';
+            position: absolute;
+            left: -24px; top: 5px;
+            width: 12px; height: 12px;
+            background: var(--blue);
+            border: 3px solid #fff;
+            border-radius: 50%;
+            box-shadow: 0 0 0 2px var(--blue);
+        }
+        .tl-item .year { font-size: 0.82em; font-weight: 600; color: var(--blue); margin-bottom: 2px; }
+        .tl-item h4 { margin: 2px 0 6px; color: var(--text); }
+        .tl-item p { font-size: 0.9em; color: var(--text2); margin: 0; }
+
+        /* Lists */
+        ul, ol { padding-left: 22px; margin-bottom: 14px; }
+        li { margin-bottom: 6px; }
+
+        /* Footer */
+        footer {
+            background: var(--bg-alt);
+            border-top: 1px solid var(--border);
+            padding: 36px 0;
+            margin-top: 56px;
+            text-align: center;
+            color: var(--text2);
+            font-size: 0.88em;
+        }
+
+        /* Back to top */
+        .btt {
+            position: fixed; bottom: 22px; right: 22px;
+            width: 42px; height: 42px;
+            background: var(--blue); color: #fff; border: none;
+            border-radius: 50%; cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,.2);
+            font-size: 1.1em;
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; transform: translateY(16px);
+            transition: opacity .3s, transform .3s;
+        }
+        .btt.on { opacity: 1; transform: translateY(0); }
+
+        @media (max-width: 768px) {
+            header h1 { font-size: 1.6em; }
+            header { padding: 56px 0 36px; }
+            .cg { grid-template-columns: 1fr; }
+            table { font-size: 0.8em; }
+            th, td { padding: 7px 9px; }
+        }
+    </style>
+
+
+
+<style id="blog-family-style">
+  :root {
+    --blog-bg: #f5f8f8;
+    --blog-bg-soft: #edf4f4;
+    --blog-surface: rgba(255, 255, 255, .92);
+    --blog-surface-strong: #ffffff;
+    --blog-border: rgba(28, 78, 88, .18);
+    --blog-text: #18333b;
+    --blog-muted: #465f68;
+    --blog-subtle: #596f77;
+    --blog-accent: #008c95;
+    --blog-accent-2: #3aa7b0;
+    --blog-warm: #b7791f;
+    --blog-radius: 18px;
+    --blog-shadow: 0 18px 48px rgba(23, 74, 83, .10);
+  }
+  html { scroll-behavior: smooth; }
+  body {
+    background:
+      radial-gradient(circle at 8% -10%, color-mix(in srgb, var(--blog-accent) 16%, transparent), transparent 34%),
+      radial-gradient(circle at 88% 2%, color-mix(in srgb, var(--blog-accent-2) 13%, transparent), transparent 30%),
+      linear-gradient(180deg, #f7faf9 0%, #eef5f5 52%, #f8faf9 100%) !important;
+    color: var(--blog-text) !important;
+    font-family: "Avenir Next", "Inter", "SF Pro Text", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif !important;
+    letter-spacing: .005em;
+    text-rendering: optimizeLegibility;
+  }
+  h1 {
+    color: #102f38 !important;
+    font-family: "Iowan Old Style", "LXGW WenKai Screen", "霞鹜文楷", "Noto Serif SC", "Source Han Serif SC", "Songti SC", Georgia, serif !important;
+    letter-spacing: -.035em;
+    font-weight: 760;
+  }
+  h2, .section-header h2, .section-head h2 {
+    color: #173943 !important;
+    font-family: "Optima", "Avenir Next", "Noto Serif SC", "Noto Sans SC", system-ui, sans-serif !important;
+    letter-spacing: -.025em;
+    font-weight: 720;
+  }
+  h3, .title, .tl-title {
+    color: #1c4049 !important;
+    font-family: "Avenir Next", "Noto Sans SC", "PingFang SC", system-ui, sans-serif !important;
+    letter-spacing: -.01em;
+  }
+  .hero, .cover, header, .page-hero {
+    background:
+      linear-gradient(135deg, rgba(0, 140, 149, .12), rgba(255, 255, 255, .80) 44%, rgba(58, 167, 176, .10)),
+      linear-gradient(180deg, #fbfefe, #eef7f7) !important;
+    border-bottom: 1px solid var(--blog-border) !important;
+    color: var(--blog-text) !important;
+  }
+  .hero p, .cover .subtitle, header .subtitle, header .meta, .cover .meta {
+    color: var(--blog-muted) !important;
+  }
+  .wrap, .container, main {
+    max-width: min(1120px, calc(100vw - 32px));
+  }
+  .card, .panel, .callout, .note, .metric, .section, article, table, pre {
+    border-color: var(--blog-border) !important;
+  }
+  .card, .panel, .metric, .note {
+    background: var(--blog-surface) !important;
+    border-radius: var(--blog-radius) !important;
+    box-shadow: var(--blog-shadow);
+  }
+  .callout {
+    background: color-mix(in srgb, var(--blog-accent) 8%, #ffffff) !important;
+    border-left-color: var(--blog-accent) !important;
+    border-radius: 14px !important;
+    color: var(--blog-muted) !important;
+  }
+  a, .eyebrow, .accent { color: #006f78 !important; }
+  code {
+    color: #005f68 !important;
+    background: color-mix(in srgb, var(--blog-accent) 10%, #ffffff) !important;
+    border: 1px solid color-mix(in srgb, var(--blog-accent) 24%, #ffffff);
+    border-radius: 6px !important;
+    font-family: "JetBrains Mono", "SFMono-Regular", Consolas, "Liberation Mono", monospace !important;
+  }
+  pre {
+    background: #eef6f6 !important;
+    color: #25464e !important;
+    border-radius: 16px !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.72);
+  }
+  pre code { background: transparent !important; border: 0; color: inherit !important; }
+  table {
+    background: rgba(255, 255, 255, .86) !important;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  th {
+    background: color-mix(in srgb, var(--blog-accent) 11%, #f7fbfb) !important;
+    color: #173943 !important;
+  }
+  td, p, li { color: var(--blog-muted) !important; }
+  strong, b { color: #173943 !important; }
+  .tag, .badge, .step-count {
+    background: color-mix(in srgb, var(--blog-accent) 8%, #ffffff) !important;
+    border-color: color-mix(in srgb, var(--blog-accent) 24%, #ffffff) !important;
+    color: #31545d !important;
+  }
+  nav {
+    background: rgba(248, 252, 252, .86) !important;
+    border-bottom: 1px solid var(--blog-border) !important;
+    backdrop-filter: blur(18px);
+  }
+  nav a { color: #46616a !important; }
+  nav a:hover {
+    color: #12333c !important;
+    background: color-mix(in srgb, var(--blog-accent) 10%, #ffffff) !important;
+    border-color: color-mix(in srgb, var(--blog-accent) 32%, #ffffff) !important;
+  }
+  footer {
+    color: var(--blog-subtle) !important;
+    border-top-color: var(--blog-border) !important;
+  }
+  ::selection { background: color-mix(in srgb, var(--blog-accent) 24%, #ffffff); color: #0f2d35; }
+  @media (max-width: 720px) {
+    body { letter-spacing: 0; }
+    .hero, .cover, header { padding-left: 18px !important; padding-right: 18px !important; }
+  }
+</style>
+
+</head>
+<body>
+
+<header>
+    <div class="container">
+        <h1>Real-to-Sim 前沿</h1>
+        <p class="sub">从真实世界构建可交互数字孪生 —— 当前 R2S 技术全景与 AutoDataGen 的演进方向</p>
+        <p class="meta">AutoDataGen 技术调研 · 2026 年 6 月</p>
+    </div>
+</header>
+
+<main class="container">
+
+<nav class="toc" id="toc">
+    <h2>目录</h2>
+    <ol>
+        <li><a href="#ch1">R2S 的本质：为什么需要"回到仿真"</a></li>
+        <li><a href="#ch2">第一层：3DGS + 物理引擎（主流路线）</a></li>
+        <li><a href="#ch3">第二层：3DGS + 物理属性推断（可交互性）</a></li>
+        <li><a href="#ch4">第三层：生成式 Real2Sim（跳过重建）</a></li>
+        <li><a href="#ch5">第四层：动态数字孪生（实时同步）</a></li>
+        <li><a href="#ch6">核心发现：光保真不够</a></li>
+        <li><a href="#ch7">R2S 方法全景对比</a></li>
+        <li><a href="#ch8">与 AutoDataGen 的融合路径</a></li>
+        <li><a href="#ch9">参考文献</a></li>
+    </ol>
+</nav>
+
+<!-- Ch1 -->
+<section id="ch1">
+    <h2>R2S 的本质：为什么需要"回到仿真"</h2>
+
+    <p>传统 Sim-to-Real 的核心痛点是<strong>域差距（domain gap）</strong>——仿真中训练的策略在真实世界中表现不佳。R2S2R 的核心洞察是：<strong>与其让策略适应仿真，不如让仿真适应真实世界</strong>。</p>
+
+    <div class="flow">
+        <span class="step" style="background:var(--red);">Real<br><small>真实场景</small></span>
+        <span class="arr">→</span>
+        <span class="step" style="background:var(--blue);">Sim<br><small>数字孪生构建</small></span>
+        <span class="arr">→</span>
+        <span class="step" style="background:var(--green);">Train<br><small>仿真中训练/生成数据</small></span>
+        <span class="arr">→</span>
+        <span class="step" style="background:var(--orange);">Real<br><small>部署到真实世界</small></span>
+    </div>
+
+    <div class="callout">
+        <p><strong>R2S 的价值：</strong>真实世界数据采集成本 $100+/小时，而 R2S 允许从几分钟的扫描/照片构建数字孪生，然后在仿真中无限生成训练数据。这不是"替代"真实数据，而是"放大"少量真实数据的价值。</p>
+    </div>
+
+    <h3>R2S vs 传统数据采集</h3>
+    <div class="tw">
+        <table>
+            <thead><tr><th>维度</th><th>传统遥操作采集</th><th>程序化仿真（无 R2S）</th><th>R2S2R</th></tr></thead>
+            <tbody>
+                <tr><td><strong>场景来源</strong></td><td>真实物理环境</td><td>人工搭建仿真场景</td><td>从真实场景自动重建</td></tr>
+                <tr><td><strong>视觉保真</strong></td><td>真实</td><td>低（程序化渲染）</td><td>高（神经渲染）</td></tr>
+                <tr><td><strong>物理一致性</strong></td><td>真实</td><td>依赖引擎精度</td><td>对齐真实动力学</td></tr>
+                <tr><td><strong>多样性</strong></td><td>受限于物理环境</td><td>高（域随机化）</td><td>高（在真实场景上随机化）</td></tr>
+                <tr><td><strong>成本</strong></td><td>$100+/小时</td><td>GPU 算力</td><td>少量扫描 + GPU 算力</td></tr>
+                <tr><td><strong>泛化性</strong></td><td>受限于采集场景</td><td>受限于仿真场景保真度</td><td>高（真实场景 + 仿真多样性）</td></tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<!-- Ch2 -->
+<section id="ch2">
+    <h2>第一层：3DGS + 物理引擎（主流路线）</h2>
+
+    <p>用 <strong>3D Gaussian Splatting</strong> 从真实场景的多视角照片/视频重建高保真 3D 场景，再对接物理仿真引擎（Isaac Sim、MuJoCo 等）。这是当前 R2S 的主流技术路线。</p>
+
+    <div class="tl">
+        <div class="tl-item">
+            <div class="year">2024 · CoRL</div>
+            <h4>SplatSim</h4>
+            <p><strong>核心：</strong>用 3DGS 替代传统 mesh 作为渲染原语，保留仿真器的物理引擎。零样本 sim2real 成功率 86.25%（vs 真实数据训练 97.5%）。</p>
+            <p><strong>输入：</strong>多视角 RGB 图像 → 3DGS 重建 → 替换仿真器中的 mesh 渲染</p>
+        </div>
+        <div class="tl-item">
+            <div class="year">2024</div>
+            <h4>RoboGSim</h4>
+            <p><strong>核心：</strong>3DGS 重建 + Isaac Sim 数字孪生构建 + 布局对齐模块。支持演示合成和闭环策略评估。</p>
+            <p><strong>输入：</strong>多视角 RGB + 机械臂 MDH 参数 → Isaac Sim 可交互场景</p>
+        </div>
+        <div class="tl-item">
+            <div class="year">2024</div>
+            <h4>RL-GSBridge</h4>
+            <p><strong>核心：</strong>Mesh-based 3DGS + 软绑定约束，减少非结构化物体的渲染伪影。</p>
+            <p><strong>成果：</strong>抓取和放置任务的零样本 sim2real 迁移</p>
+        </div>
+        <div class="tl-item">
+            <div class="year">2025</div>
+            <h4>Re3Sim</h4>
+            <p><strong>核心：</strong>MVS 多视图立体几何重建 + 高斯渲染 + PhysX 物理后端。零样本平均成功率 58%。</p>
+            <p><strong>特点：</strong>同时解决几何 gap 和视觉 gap，生成大规模仿真数据集</p>
+        </div>
+        <div class="tl-item">
+            <div class="year">2025</div>
+            <h4>VR-Robo</h4>
+            <p><strong>核心：</strong>3DGS + 基础模型先验 → 四足机器人导航的数字孪生。</p>
+            <p><strong>特点：</strong>GS-mesh 混合表示 + 坐标对齐 + 智能体-物体随机化 + 遮挡感知场景组合</p>
+        </div>
+    </div>
+
+    <div class="callout ok">
+        <p><strong>第一层特征：</strong>解决"视觉对齐"——让仿真渲染看起来像真实世界。但物体通常是静态的，缺乏物理交互能力（不能推、拉、抓）。</p>
+    </div>
+</section>
+
+<!-- Ch3 -->
+<section id="ch3">
+    <h2>第二层：3DGS + 物理属性推断（可交互性）</h2>
+
+    <p>第一层的 3DGS 重建只能渲染静态场景。前沿工作用<strong>多模态大模型（MLLM）自动推断物体的物理属性和运动学结构</strong>，将静态场景变为可交互的"游乐场"。</p>
+
+    <div class="cg">
+        <div class="card">
+            <span class="tag tag-blue">2025</span>
+            <h4>RoboSimGS</h4>
+            <p><strong>架构：</strong>3DGS（静态背景）+ Mesh（可交互物体）+ <strong>MLLM 自动推断密度、刚度、铰接结构</strong>（铰链、抽屉滑轨）</p>
+            <p><strong>突破：</strong>从多视角图片直接推断物体物理属性 → 零样本 sim2real</p>
+        </div>
+        <div class="card">
+            <span class="tag tag-green">2026</span>
+            <h4>ArtiTwinSplat</h4>
+            <p><strong>架构：</strong>从 RGB-D 视频<strong>无监督发现铰接结构</strong> → SAM2 部件跟踪 → 关节估计 → 高斯优化</p>
+            <p><strong>突破：</strong>直接导出 URDF → Isaac Sim 可用，无需 CAD 模型或人工标注</p>
+        </div>
+        <div class="card">
+            <span class="tag tag-purple">2025</span>
+            <h4>TwinAligner</h4>
+            <p><strong>架构：</strong>SDF 重建 + 3DGS 可编辑渲染 + <strong>物理对齐模块</strong>（同时优化视觉和动力学）</p>
+            <p><strong>突破：</strong>闭环同步——从真实机器人交互数据推断刚体物理参数</p>
+        </div>
+        <div class="card">
+            <span class="tag tag-orange">2025</span>
+            <h4>Splatting Physical Scenes</h4>
+            <p><strong>架构：</strong>SplatMesh（3DGS + mesh 混合）+ 可微物理（MuJoCo MJX）→ 端到端优化</p>
+            <p><strong>突破：</strong>视觉差异梯度直接传播到几何、机器人姿态、相机参数</p>
+        </div>
+    </div>
+
+    <div class="callout">
+        <p><strong>第二层特征：</strong>解决"物理对齐"——不仅看起来像真实世界，还要<strong>动起来像真实世界</strong>。MLLM/基础模型成为推断物理属性的关键桥梁。</p>
+    </div>
+</section>
+
+<!-- Ch4 -->
+<section id="ch4">
+    <h2>第三层：生成式 Real2Sim（跳过重建）</h2>
+
+    <p>不再从真实场景"重建"，而是用<strong>生成模型直接从图片/文本生成仿真环境</strong>。这是最具扩展性的路线——一张互联网图片就能变为可训练的仿真场景。</p>
+
+    <div class="cg">
+        <div class="card">
+            <span class="tag tag-blue">2024</span>
+            <h4>URDFormer</h4>
+            <p><strong>流程：</strong>单张 RGB 图 → Transformer 预测 URDF → 加载到仿真器</p>
+            <p><strong>规模：</strong>支持 5 类物体（橱柜、烤箱、洗碗机、冰箱、洗衣机），从互联网图片直接生成仿真环境</p>
+            <p><strong>成果：</strong>零样本 real2sim2real，开/关柜门成功率 78%</p>
+        </div>
+        <div class="card">
+            <span class="tag tag-green">2026</span>
+            <h4>WorldComposer</h4>
+            <p><strong>流程：</strong>全景图 → 生成式 3DGS → 高保真仿真场景 + 语义/几何编辑</p>
+            <p><strong>创新：</strong>"数字表亲"（Digital Cousins）—— 在真实场景基础上生成多样化变体，而非精确复制</p>
+            <p><strong>规模：</strong>多房间拼接 → 大规模一致环境 → 长时域导航</p>
+        </div>
+        <div class="card">
+            <span class="tag tag-purple">2026</span>
+            <h4>ComSim</h4>
+            <p><strong>流程：</strong>经典仿真（动作精确）+ 神经仿真（DiT 视频生成，视觉逼真）→ 组合生成伪真实数据</p>
+            <p><strong>创新：</strong>仅 10 条真实演示即可 bootstrap 大规模训练数据</p>
+            <p><strong>成果：</strong>显著缩小 sim2real 域差距，提升策略成功率</p>
+        </div>
+    </div>
+
+    <div class="callout ok">
+        <p><strong>第三层特征：</strong>解决"规模"——不再受限于真实场景扫描，可以从互联网图片/文本无限生成仿真训练环境。这是通向"无限数据"的关键路径。</p>
+    </div>
+</section>
+
+<!-- Ch5 -->
+<section id="ch5">
+    <h2>第四层：动态数字孪生（实时同步）</h2>
+
+    <p>最激进的 R2S 路线：仿真器与真实世界<strong>持续同步</strong>，策略始终在仿真中执行，真实机器人仅作为仿真状态的"物理执行器"。</p>
+
+    <div class="cg">
+        <div class="card">
+            <span class="tag tag-red">2025</span>
+            <h4>real-is-sim</h4>
+            <p><strong>范式转换：</strong>策略永远在仿真中运行，真实机器人跟随仿真关节状态。将 sim2real 的责任从策略转移到数字孪生的同步机制。</p>
+            <p><strong>同步频率：</strong>60Hz 实时同步</p>
+            <p><strong>核心：</strong>Embodied Gaussian 模拟器 + 真实世界持续校正</p>
+        </div>
+        <div class="card">
+            <span class="tag tag-orange">2026</span>
+            <h4>ExoGS</h4>
+            <p><strong>创新：</strong>低成本外骨骼（~$400）+ 3DGS 数字化 → <strong>无需真实机器人即可采集训练数据</strong></p>
+            <p><strong>流程：</strong>人类佩戴外骨骼操作 → 3DGS 重建场景 → 几何感知数据增强 → 策略训练</p>
+            <p><strong>成果：</strong>数据采集成本大幅降低，策略性能超过传统遥操作</p>
+        </div>
+    </div>
+
+    <div class="callout warn">
+        <p><strong>第四层特征：</strong>解决"部署"——不再区分"仿真训练"和"真实部署"，仿真器成为策略的永久运行环境。这是 R2S 的终极形态，但对同步精度要求极高。</p>
+    </div>
+</section>
+
+<!-- Ch6 -->
+<section id="ch6">
+    <h2>核心发现：光保真不够</h2>
+
+    <div class="callout warn">
+        <p><strong>关键结论（2026, OpenReview）：</strong>仅靠光保真重建不足以支撑 VLA 策略的闭环部署。在接触丰富操作中，微小感知误差会随时间累积，导致轨迹发散。</p>
+    </div>
+
+    <p>一项系统性评估发现，即使数字孪生在视觉上高度逼真，VLA 策略在闭环执行中仍会逐渐偏离真实世界行为。这揭示了 R2S 的核心挑战：</p>
+
+    <div class="cg">
+        <div class="card">
+            <span class="tag tag-red">视觉 Gap</span>
+            <h4>外观对齐</h4>
+            <p>3DGS 已能生成照片级渲染。但光照变化、反射、透明材质仍是挑战。Cosmos Transfer 等工具正在弥补。</p>
+        </div>
+        <div class="card">
+            <span class="tag tag-orange">物理 Gap</span>
+            <h4>动力学对齐</h4>
+            <p>物体质量、摩擦、刚度、接触力等物理参数难以从视觉推断。TwinAligner 和 RoboSimGS 正在突破。</p>
+        </div>
+        <div class="card">
+            <span class="tag tag-purple">动态 Gap</span>
+            <h4>可变形物体</h4>
+            <p>绳子、布料、液体的仿真极其困难。SoftMimicGen 和 Real2Sim-Eval 正在探索。</p>
+        </div>
+    </div>
+
+    <h3>前沿解决方案</h3>
+    <div class="tw">
+        <table>
+            <thead><tr><th>Gap 类型</th><th>代表工作</th><th>方法</th><th>效果</th></tr></thead>
+            <tbody>
+                <tr><td><strong>视觉</strong></td><td>HyperSim</td><td>3DGS 背景 + 约束感知前景生成 + 域随机化</td><td>零样本 75%，少样本 95%</td></tr>
+                <tr><td><strong>视觉</strong></td><td>CRAFT</td><td>视频扩散模型 + 7 轴视觉变化</td><td>双臂操作成功率显著提升</td></tr>
+                <tr><td><strong>物理</strong></td><td>TwinAligner</td><td>SDF 重建 + 物理参数联合优化</td><td>零样本泛化，样本效率接近真实数据</td></tr>
+                <tr><td><strong>物理</strong></td><td>RoboSimGS</td><td>MLLM 推断密度/刚度/铰接结构</td><td>从静态场景生成可交互环境</td></tr>
+                <tr><td><strong>动态</strong></td><td>Real2Sim-Eval</td><td>高斯溅射 + 软体数字孪生</td><td>仿真与真实性能强相关</td></tr>
+                <tr><td><strong>综合</strong></td><td>HyperSim</td><td>高保真合成 + 对抗轨迹 + 仿真-真实联合训练</td><td>抗物理扰动能力提升 35%</td></tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<!-- Ch7 -->
+<section id="ch7">
+    <h2>R2S 方法全景对比</h2>
+
+    <div class="tw">
+        <table>
+            <thead>
+                <tr>
+                    <th>系统</th>
+                    <th>年份</th>
+                    <th>输入</th>
+                    <th>渲染</th>
+                    <th>物理</th>
+                    <th>可交互</th>
+                    <th>零样本成功率</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>SplatSim</strong></td>
+                    <td>2024</td>
+                    <td>多视角 RGB</td>
+                    <td>3DGS</td>
+                    <td>物理引擎</td>
+                    <td>刚体</td>
+                    <td>86.25%</td>
+                </tr>
+                <tr>
+                    <td><strong>RoboGSim</strong></td>
+                    <td>2024</td>
+                    <td>多视角 RGB + MDH</td>
+                    <td>3DGS</td>
+                    <td>Isaac Sim</td>
+                    <td>刚体</td>
+                    <td>—</td>
+                </tr>
+                <tr>
+                    <td><strong>RL-GSBridge</strong></td>
+                    <td>2024</td>
+                    <td>多视角 RGB</td>
+                    <td>Mesh-3DGS</td>
+                    <td>物理引擎</td>
+                    <td>刚体</td>
+                    <td>—</td>
+                </tr>
+                <tr>
+                    <td><strong>Re3Sim</strong></td>
+                    <td>2025</td>
+                    <td>多视角 RGB</td>
+                    <td>MVS + 3DGS</td>
+                    <td>PhysX</td>
+                    <td>刚体</td>
+                    <td>58%</td>
+                </tr>
+                <tr>
+                    <td><strong>VR-Robo</strong></td>
+                    <td>2025</td>
+                    <td>多视角 RGB + 相机位姿</td>
+                    <td>3DGS</td>
+                    <td>Isaac Sim</td>
+                    <td>刚体</td>
+                    <td>—</td>
+                </tr>
+                <tr style="background:#e8f0fe;">
+                    <td><strong>RoboSimGS</strong></td>
+                    <td>2025</td>
+                    <td>多视角 RGB</td>
+                    <td>3DGS + Mesh</td>
+                    <td>MLLM 推断</td>
+                    <td><strong>铰接</strong></td>
+                    <td>接近真实</td>
+                </tr>
+                <tr style="background:#e8f0fe;">
+                    <td><strong>TwinAligner</strong></td>
+                    <td>2025</td>
+                    <td>真实交互数据</td>
+                    <td>SDF + 3DGS</td>
+                    <td>联合优化</td>
+                    <td><strong>刚体</strong></td>
+                    <td>零样本泛化</td>
+                </tr>
+                <tr style="background:#e8f0fe;">
+                    <td><strong>ArtiTwinSplat</strong></td>
+                    <td>2026</td>
+                    <td>RGB-D 视频</td>
+                    <td>3DGS</td>
+                    <td>无监督发现</td>
+                    <td><strong>铰接</strong></td>
+                    <td>—</td>
+                </tr>
+                <tr>
+                    <td><strong>URDFormer</strong></td>
+                    <td>2024</td>
+                    <td><strong>单张 RGB</strong></td>
+                    <td>URDF 生成</td>
+                    <td>仿真器</td>
+                    <td><strong>铰接</strong></td>
+                    <td>78%（柜门）</td>
+                </tr>
+                <tr style="background:#e6f4ea;">
+                    <td><strong>WorldComposer</strong></td>
+                    <td>2026</td>
+                    <td>全景图</td>
+                    <td>生成式 3DGS</td>
+                    <td>物理引擎</td>
+                    <td>刚体</td>
+                    <td>—</td>
+                </tr>
+                <tr style="background:#e6f4ea;">
+                    <td><strong>ComSim</strong></td>
+                    <td>2026</td>
+                    <td>10 条真实演示</td>
+                    <td>经典+神经</td>
+                    <td>物理引擎</td>
+                    <td>刚体</td>
+                    <td>—</td>
+                </tr>
+                <tr style="background:#fef7e0;">
+                    <td><strong>real-is-sim</strong></td>
+                    <td>2025</td>
+                    <td>实时传感器</td>
+                    <td>Embodied GS</td>
+                    <td>60Hz 同步</td>
+                    <td><strong>动态</strong></td>
+                    <td>—</td>
+                </tr>
+                <tr style="background:#fef7e0;">
+                    <td><strong>ExoGS</strong></td>
+                    <td>2026</td>
+                    <td>外骨骼 + RGB</td>
+                    <td>3DGS</td>
+                    <td>物理引擎</td>
+                    <td>刚体</td>
+                    <td>超过遥操作</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="callout">
+        <p><strong>趋势总结：</strong>从上到下，输入越来越轻量（多视角 → 单张图 → 实时传感器），物理交互越来越丰富（刚体 → 铰接 → 动态同步），自动化程度越来越高。</p>
+    </div>
+</section>
+
+<!-- Ch8 -->
+<section id="ch8">
+    <h2>与 AutoDataGen 的融合路径</h2>
+
+    <p>AutoDataGen 目前是<strong>纯 Sim 路线</strong>——从任务描述直接在仿真中生成数据。如果要走向 R2S2R，最自然的演进路径是：</p>
+
+    <div class="flow">
+        <span class="step" style="background:var(--red);">真实场景<br><small>手机/RGB-D 扫描</small></span>
+        <span class="arr">→</span>
+        <span class="step" style="background:var(--purple);">3DGS/NeRF 重建<br><small>数字孪生构建</small></span>
+        <span class="arr">→</span>
+        <span class="step" style="background:var(--blue);">Isaac Lab<br><small>加载数字孪生</small></span>
+        <span class="arr">→</span>
+        <span class="step" style="background:var(--orange);">AutoDataGen<br><small>LLM 分解 + 运动规划</small></span>
+        <span class="arr">→</span>
+        <span class="step" style="background:var(--green);">训练数据<br><small>→ 策略训练 → 部署</small></span>
+    </div>
+
+    <h3>具体融合方案</h3>
+
+    <div class="cg">
+        <div class="card">
+            <span class="tag tag-blue">短期</span>
+            <h4>方案一：场景加载适配</h4>
+            <p>AutoDataGen 的 <code>load_env()</code> 接口已支持加载 Isaac Lab 环境。只需增加从 URDF/USD 文件加载数字孪生的能力，即可将 R2S 重建的场景接入 AutoDataGen 管线。</p>
+        </div>
+        <div class="card">
+            <span class="tag tag-green">中期</span>
+            <h4>方案二：感知增强分解</h4>
+            <p>当前 LLM 分解器依赖文本描述。增加视觉感知模块（VLM），从数字孪生的渲染图像中提取场景信息，实现<strong>基于视觉的任务分解</strong>。</p>
+        </div>
+        <div class="card">
+            <span class="tag tag-purple">长期</span>
+            <h4>方案三：闭环数据飞轮</h4>
+            <p>策略在数字孪生中执行 → 失败案例反馈 → 针对性生成新数据 → 策略改进。结合 R2S 的真实场景感知和 AutoDataGen 的自主数据生成能力。</p>
+        </div>
+    </div>
+
+    <div class="callout ok">
+        <p><strong>核心价值：</strong>AutoDataGen 的 LLM 分解 + 运动规划能力 + R2S 的真实场景感知 = <strong>从真实世界照片直接生成训练数据</strong>。这是"Text2Sim2Real"到"Photo2Sim2Real"的跨越。</p>
+    </div>
+</section>
+
+<!-- Ch9 -->
+<section id="ch9">
+    <h2>参考文献</h2>
+
+    <h4>3DGS + 物理引擎</h4>
+    <ul>
+        <li>SplatSim: Zero-Shot Sim2Real Transfer of RGB Manipulation Policies Using Gaussian Splatting (2024)</li>
+        <li>RoboGSim: A Real2Sim2Real Robotic Gaussian Splatting Simulator (2024)</li>
+        <li>RL-GSBridge: 3D Gaussian Splatting Based Real2Sim2Real Method for Robotic Manipulation Learning (2024)</li>
+        <li>Re3Sim: Generating High-Fidelity Simulation Data via 3D-Photorealistic Real-to-Sim (2025)</li>
+        <li>VR-Robo: A Real-to-Sim-to-Real Framework for Visual Robot Navigation and Locomotion (2025)</li>
+    </ul>
+
+    <h4>3DGS + 物理属性推断</h4>
+    <ul>
+        <li>RoboSimGS: High-Fidelity Simulated Data Generation with Gaussian Splatting (2025)</li>
+        <li>ArtiTwinSplat: Interactable Digital Twin Reconstruction via Gaussian Splatting from RGB-D Videos (2026)</li>
+        <li>TwinAligner: A Novel Real2Sim2Real System for Robotic Manipulation (2025)</li>
+        <li>Splatting Physical Scenes: End-to-End Real-to-Sim from Imperfect Robot Data (2025)</li>
+    </ul>
+
+    <h4>生成式 Real2Sim</h4>
+    <ul>
+        <li>URDFormer: A Pipeline for Constructing Articulated Simulation Environments from Real-World Images (2024)</li>
+        <li>WorldComposer: From Seeing to Simulating with Digital Cousins (2026)</li>
+        <li>ComSim: Building Scalable Real-World Robot Data Generation via Compositional Simulation (2026)</li>
+    </ul>
+
+    <h4>动态数字孪生</h4>
+    <ul>
+        <li>real-is-sim: Bridging the Sim-to-Real Gap with a Dynamic Digital Twin (2025)</li>
+        <li>ExoGS: A 4D Real-to-Sim-to-Real Framework for Scalable Manipulation Data Collection (2026)</li>
+    </ul>
+
+    <h4>综述与评估</h4>
+    <ul>
+        <li>A Real2Sim Digital Twin Pipeline: Evaluating VLA Policy Deployment (OpenReview, 2026)</li>
+        <li>Real-to-Sim Robot Policy Evaluation with Gaussian Splatting Simulation of Soft-Body Interactions (2025)</li>
+        <li>HyperSim: A Holistic Sim-To-Real Framework For Robust Robotic Manipulation (2026)</li>
+    </ul>
+</section>
+
+</main>
+
+<footer>
+    <div class="container">
+        <p>Real-to-Sim 前沿技术调研 · AutoDataGen 项目 · 2026 年 6 月</p>
+        <p>基于 3D Gaussian Splatting、Neural Rendering 及 Isaac Lab 生态</p>
+    </div>
+</footer>
+
+<button class="btt" id="btt" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<script>
+window.addEventListener('scroll', function() {
+    document.getElementById('btt').classList.toggle('on', window.scrollY > 400);
+});
+document.querySelectorAll('.toc a').forEach(function(a) {
+    a.addEventListener('click', function(e) {
+        e.preventDefault();
+        var t = document.querySelector(this.getAttribute('href'));
+        if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+});
+</script>
+
+</body>
+</html>

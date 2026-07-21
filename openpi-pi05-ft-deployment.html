@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OpenPI pi0.5 实际部署 FT 路线分析</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface-2: #1c2128;
+    --surface-3: #222832;
+    --border: #30363d;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --subtle: #6e7681;
+    --blue: #58a6ff;
+    --green: #3fb950;
+    --yellow: #d29922;
+    --red: #f85149;
+    --purple: #bc8cff;
+    --orange: #f0883e;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC", Helvetica, Arial, sans-serif;
+    line-height: 1.72;
+    overflow-x: hidden;
+  }
+  .hero {
+    padding: 64px 24px 46px;
+    border-bottom: 1px solid var(--border);
+    background:
+      radial-gradient(circle at 20% 0%, rgba(88, 166, 255, .20), transparent 34%),
+      radial-gradient(circle at 85% 12%, rgba(188, 140, 255, .14), transparent 30%),
+      linear-gradient(135deg, #0d1117 0%, #111722 46%, #0d1117 100%);
+    text-align: center;
+  }
+  .eyebrow {
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+    padding: 5px 11px;
+    border: 1px solid rgba(88, 166, 255, .35);
+    border-radius: 999px;
+    background: rgba(88, 166, 255, .08);
+    color: var(--blue);
+    font-size: .78rem;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+  }
+  h1 {
+    max-width: 980px;
+    margin: 18px auto 12px;
+    font-size: clamp(2rem, 5vw, 3.25rem);
+    line-height: 1.1;
+    letter-spacing: -.04em;
+  }
+  .hero p {
+    max-width: 860px;
+    margin: 0 auto;
+    color: var(--muted);
+    font-size: 1rem;
+  }
+  .tags { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--muted);
+    font-size: .8rem;
+    white-space: nowrap;
+  }
+  .tag.ok { color: var(--green); border-color: rgba(63, 185, 80, .38); background: rgba(63, 185, 80, .09); }
+  .tag.info { color: var(--blue); border-color: rgba(88, 166, 255, .38); background: rgba(88, 166, 255, .09); }
+  .tag.warn { color: var(--yellow); border-color: rgba(210, 153, 34, .38); background: rgba(210, 153, 34, .09); }
+  .tag.risk { color: var(--red); border-color: rgba(248, 81, 73, .35); background: rgba(248, 81, 73, .08); }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 30px 24px 60px; }
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: rgba(13, 17, 23, .92);
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: blur(12px);
+    overflow-x: hidden;
+  }
+  nav .nav-inner {
+    max-width: 1120px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 10px 24px;
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+  }
+  nav a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: .82rem;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    padding: 4px 10px;
+    white-space: nowrap;
+  }
+  nav a:hover { color: var(--text); border-color: var(--border); background: var(--surface); }
+  section { margin: 38px 0; }
+  .section-head { display: flex; align-items: end; gap: 14px; margin-bottom: 16px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+  .section-head h2 { font-size: 1.35rem; letter-spacing: -.02em; }
+  .section-head span { color: var(--subtle); font-size: .84rem; margin-left: auto; }
+  .grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 14px; }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 20px;
+    overflow-x: auto;
+  }
+  .span-3 { grid-column: span 3; }
+  .span-4 { grid-column: span 4; }
+  .span-5 { grid-column: span 5; }
+  .span-6 { grid-column: span 6; }
+  .span-7 { grid-column: span 7; }
+  .span-8 { grid-column: span 8; }
+  .span-12 { grid-column: span 12; }
+  .metric .label { color: var(--muted); font-size: .78rem; text-transform: uppercase; letter-spacing: .04em; }
+  .metric .value { margin-top: 5px; font-size: 1.35rem; font-weight: 750; color: var(--green); }
+  .metric .note { margin-top: 4px; color: var(--subtle); font-size: .84rem; }
+  .card h3 { font-size: 1rem; margin-bottom: 8px; }
+  .card p, .card li { color: var(--muted); font-size: .93rem; }
+  .card ul { padding-left: 18px; }
+  .callout {
+    border-left: 3px solid var(--blue);
+    background: rgba(88, 166, 255, .08);
+    border-radius: 0 10px 10px 0;
+    padding: 15px 17px;
+    color: var(--muted);
+  }
+  .callout strong { display: block; color: var(--text); margin-bottom: 3px; }
+  .callout.ok { border-color: var(--green); background: rgba(63, 185, 80, .08); }
+  .callout.warn { border-color: var(--yellow); background: rgba(210, 153, 34, .08); }
+  .callout.risk { border-color: var(--red); background: rgba(248, 81, 73, .08); }
+  table { width: 100%; border-collapse: collapse; font-size: .9rem; overflow: hidden; border-radius: 10px; }
+  th, td { text-align: left; padding: 11px 12px; border-bottom: 1px solid rgba(48, 54, 61, .68); vertical-align: top; }
+  th { background: var(--surface-2); color: var(--muted); font-weight: 650; }
+  tr:hover td { background: rgba(88, 166, 255, .035); }
+  code {
+    background: rgba(88, 166, 255, .10);
+    color: var(--blue);
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-family: "JetBrains Mono", "Fira Code", Consolas, monospace;
+    font-size: .86em;
+    word-break: break-word;
+  }
+  pre {
+    margin: 12px 0 0;
+    padding: 14px 16px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--muted);
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-break: break-all;
+    font-family: "JetBrains Mono", "Fira Code", Consolas, monospace;
+    font-size: .82rem;
+    line-height: 1.6;
+  }
+  .timeline { border-left: 2px solid var(--border); padding-left: 20px; }
+  .event { position: relative; margin-bottom: 18px; }
+  .event:last-child { margin-bottom: 0; }
+  .event::before {
+    content: "";
+    position: absolute;
+    left: -27px;
+    top: 7px;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: var(--surface-3);
+    border: 2px solid var(--blue);
+  }
+  .event.ok::before { border-color: var(--green); background: var(--green); }
+  .event.warn::before { border-color: var(--yellow); }
+  .event.risk::before { border-color: var(--red); }
+  .event .title { font-weight: 700; }
+  .event .body { color: var(--muted); font-size: .92rem; margin-top: 2px; }
+  .phase-title { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 10px; }
+  .phase-title h3 { margin: 0; }
+  .mini { color: var(--subtle); font-size: .8rem; }
+  .source-list { counter-reset: source; display: grid; gap: 10px; }
+  .source {
+    counter-increment: source;
+    display: grid;
+    grid-template-columns: 34px 1fr;
+    gap: 10px;
+    align-items: start;
+  }
+  .source::before {
+    content: counter(source);
+    width: 26px;
+    height: 26px;
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    color: var(--muted);
+    background: var(--surface-2);
+    font-size: .8rem;
+  }
+  .source a { color: var(--blue); text-decoration: none; }
+  .source a:hover { text-decoration: underline; }
+  .source p { color: var(--muted); font-size: .88rem; }
+  footer { color: var(--subtle); text-align: center; border-top: 1px solid var(--border); margin-top: 44px; padding-top: 18px; font-size: .82rem; }
+  @media (max-width: 860px) {
+    .span-3, .span-4, .span-5, .span-6, .span-7, .span-8 { grid-column: span 12; }
+    .section-head { align-items: start; flex-direction: column; gap: 4px; }
+    .section-head span { margin-left: 0; }
+    table { min-width: 640px; }
+  }
+</style>
+
+
+
+<style id="blog-family-style">
+  :root {
+    --blog-bg: #f5f8f8;
+    --blog-bg-soft: #edf4f4;
+    --blog-surface: rgba(255, 255, 255, .92);
+    --blog-surface-strong: #ffffff;
+    --blog-border: rgba(28, 78, 88, .18);
+    --blog-text: #18333b;
+    --blog-muted: #465f68;
+    --blog-subtle: #596f77;
+    --blog-accent: #007f9f;
+    --blog-accent-2: #76b7b2;
+    --blog-warm: #b7791f;
+    --blog-radius: 18px;
+    --blog-shadow: 0 18px 48px rgba(23, 74, 83, .10);
+  }
+  html { scroll-behavior: smooth; }
+  body {
+    background:
+      radial-gradient(circle at 8% -10%, color-mix(in srgb, var(--blog-accent) 16%, transparent), transparent 34%),
+      radial-gradient(circle at 88% 2%, color-mix(in srgb, var(--blog-accent-2) 13%, transparent), transparent 30%),
+      linear-gradient(180deg, #f7faf9 0%, #eef5f5 52%, #f8faf9 100%) !important;
+    color: var(--blog-text) !important;
+    font-family: "Avenir Next", "Inter", "SF Pro Text", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif !important;
+    letter-spacing: .005em;
+    text-rendering: optimizeLegibility;
+  }
+  h1 {
+    color: #102f38 !important;
+    font-family: "Iowan Old Style", "LXGW WenKai Screen", "霞鹜文楷", "Noto Serif SC", "Source Han Serif SC", "Songti SC", Georgia, serif !important;
+    letter-spacing: -.035em;
+    font-weight: 760;
+  }
+  h2, .section-header h2, .section-head h2 {
+    color: #173943 !important;
+    font-family: "Optima", "Avenir Next", "Noto Serif SC", "Noto Sans SC", system-ui, sans-serif !important;
+    letter-spacing: -.025em;
+    font-weight: 720;
+  }
+  h3, .title, .tl-title {
+    color: #1c4049 !important;
+    font-family: "Avenir Next", "Noto Sans SC", "PingFang SC", system-ui, sans-serif !important;
+    letter-spacing: -.01em;
+  }
+  .hero, .cover, header, .page-hero {
+    background:
+      linear-gradient(135deg, rgba(0, 140, 149, .12), rgba(255, 255, 255, .80) 44%, rgba(58, 167, 176, .10)),
+      linear-gradient(180deg, #fbfefe, #eef7f7) !important;
+    border-bottom: 1px solid var(--blog-border) !important;
+    color: var(--blog-text) !important;
+  }
+  .hero p, .cover .subtitle, header .subtitle, header .meta, .cover .meta {
+    color: var(--blog-muted) !important;
+  }
+  .wrap, .container, main {
+    max-width: min(1120px, calc(100vw - 32px));
+  }
+  .card, .panel, .callout, .note, .metric, .section, article, table, pre {
+    border-color: var(--blog-border) !important;
+  }
+  .card, .panel, .metric, .note {
+    background: var(--blog-surface) !important;
+    border-radius: var(--blog-radius) !important;
+    box-shadow: var(--blog-shadow);
+  }
+  .callout {
+    background: color-mix(in srgb, var(--blog-accent) 8%, #ffffff) !important;
+    border-left-color: var(--blog-accent) !important;
+    border-radius: 14px !important;
+    color: var(--blog-muted) !important;
+  }
+  a, .eyebrow, .accent { color: #006f78 !important; }
+  code {
+    color: #005f68 !important;
+    background: color-mix(in srgb, var(--blog-accent) 10%, #ffffff) !important;
+    border: 1px solid color-mix(in srgb, var(--blog-accent) 24%, #ffffff);
+    border-radius: 6px !important;
+    font-family: "JetBrains Mono", "SFMono-Regular", Consolas, "Liberation Mono", monospace !important;
+  }
+  pre {
+    background: #eef6f6 !important;
+    color: #25464e !important;
+    border-radius: 16px !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.72);
+  }
+  pre code { background: transparent !important; border: 0; color: inherit !important; }
+  table {
+    background: rgba(255, 255, 255, .86) !important;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  th {
+    background: color-mix(in srgb, var(--blog-accent) 11%, #f7fbfb) !important;
+    color: #173943 !important;
+  }
+  td, p, li { color: var(--blog-muted) !important; }
+  strong, b { color: #173943 !important; }
+  .tag, .badge, .step-count {
+    background: color-mix(in srgb, var(--blog-accent) 8%, #ffffff) !important;
+    border-color: color-mix(in srgb, var(--blog-accent) 24%, #ffffff) !important;
+    color: #31545d !important;
+  }
+  nav {
+    background: rgba(248, 252, 252, .86) !important;
+    border-bottom: 1px solid var(--blog-border) !important;
+    backdrop-filter: blur(18px);
+  }
+  nav a { color: #46616a !important; }
+  nav a:hover {
+    color: #12333c !important;
+    background: color-mix(in srgb, var(--blog-accent) 10%, #ffffff) !important;
+    border-color: color-mix(in srgb, var(--blog-accent) 32%, #ffffff) !important;
+  }
+  footer {
+    color: var(--blog-subtle) !important;
+    border-top-color: var(--blog-border) !important;
+  }
+  ::selection { background: color-mix(in srgb, var(--blog-accent) 24%, #ffffff); color: #0f2d35; }
+  @media (max-width: 720px) {
+    body { letter-spacing: 0; }
+    .hero, .cover, header { padding-left: 18px !important; padding-right: 18px !important; }
+  }
+</style>
+
+</head>
+<body>
+<header class="hero">
+  <div class="eyebrow">Deployment research report</div>
+  <h1>OpenPI pi0.5 实际部署 FT 路线分析</h1>
+  <p>目标不是罗列名词，而是给出在 Isaac Sim / DROID 风格部署里能执行的训练路线、代码改造、数据契约、算力边界、评估门槛和停损条件。</p>
+  <div class="tags">
+    <span class="tag ok">首选: SFT Full FT</span>
+    <span class="tag info">扩展: DAgger / HIL</span>
+    <span class="tag warn">谨慎: RLFT / PPO / TGRPO</span>
+    <span class="tag risk">避免: 无 reward 直接 RL</span>
+  </div>
+</header>
+
+<nav>
+  <div class="nav-inner">
+    <a href="#verdict">结论</a>
+    <a href="#route">路线架构</a>
+    <a href="#compare">方法对比</a>
+    <a href="#blueprint">部署蓝图</a>
+    <a href="#data">数据契约</a>
+    <a href="#code">代码改造</a>
+    <a href="#eval">评估协议</a>
+    <a href="#schedule">14 天计划</a>
+    <a href="#sources">来源</a>
+  </div>
+</nav>
+
+<main class="wrap">
+  <section id="verdict">
+    <div class="section-head"><h2>1. 结论先行</h2><span>部署优先级和停损线</span></div>
+    <div class="grid">
+      <div class="card span-8 callout ok">
+        <strong>最终推荐路线</strong>
+        <p><code>SFT LoRA smoke</code> -> <code>SFT Full FT</code> -> <code>DAgger/HIL 修失败分布</code> -> <code>reward 稳定后再做 RLFT</code>。这条路线把“链路是否正确”“模型上限是否足够”“真实 rollout 是否偏移”“是否值得 RL”四个问题分开验证。</p>
+      </div>
+      <div class="card span-4 metric">
+        <div class="label">当前阶段最佳动作</div>
+        <div class="value">先不要上 RL</div>
+        <div class="note">先把 Full FT 与 DAgger 数据闭环跑通。</div>
+      </div>
+      <div class="card span-3 metric">
+        <div class="label">LoRA 角色</div>
+        <div class="value">Smoke</div>
+        <div class="note">验证数据、norm stats、loader、保存和回评。</div>
+      </div>
+      <div class="card span-3 metric">
+        <div class="label">Full FT 角色</div>
+        <div class="value">Benchmark</div>
+        <div class="note">判断数据是否真的提升成功率。</div>
+      </div>
+      <div class="card span-3 metric">
+        <div class="label">DAgger 角色</div>
+        <div class="value">修偏移</div>
+        <div class="note">收集 policy 自己导致的失败状态。</div>
+      </div>
+      <div class="card span-3 metric">
+        <div class="label">RLFT 角色</div>
+        <div class="value">后验优化</div>
+        <div class="note">需要稳定 reward 和 rollout 基建。</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="route">
+    <div class="section-head"><h2>2. 实际路线架构</h2><span>从可跑到可部署</span></div>
+    <div class="card">
+      <div class="timeline">
+        <div class="event ok">
+          <div class="title">Phase 0: 固定环境与观测接口</div>
+          <div class="body">冻结 Isaac Sim 场景、相机 prim、机器人 prim、动作维度、action horizon、prompt 集合。任何后续训练都必须复用同一套评估入口，否则无法判断 FT 是否有效。</div>
+        </div>
+        <div class="event ok">
+          <div class="title">Phase 1: LoRA smoke SFT</div>
+          <div class="body">运行 <code>pi05_isaac_lora</code> 的 norm stats 和 1000 step 训练，只看链路：dataloader 成功、loss 打印、checkpoint 保存、policy server 能启动、20 episodes 回评能产出 metrics。</div>
+        </div>
+        <div class="event ok">
+          <div class="title">Phase 2: Full FT 正式 SFT</div>
+          <div class="body">在同一数据集和评估协议下运行 <code>pi05_isaac_full</code>。Full FT 才是判断数据价值的主结论，因为 OpenPI DROID 文档明确提示 LoRA 便宜但他们暂未发现策略效果好。</div>
+        </div>
+        <div class="event warn">
+          <div class="title">Phase 3: DAgger / HIL 失败状态闭环</div>
+          <div class="body">对 Full FT checkpoint 做 rollout，保存失败前 3-8 秒窗口、人工/teleop 修正动作，将修正片段并回训练集。下一轮仍用 <code>scripts/train.py</code> 做 SFT，不先写 RL。</div>
+        </div>
+        <div class="event risk">
+          <div class="title">Phase 4: RLFT / PPO / TGRPO 试验线</div>
+          <div class="body">只有当 success/failure、阶段奖励、reset、并行 rollout 都稳定时才启动。RLFT 需要新训练脚本，不是改 <code>TrainConfig</code> 就能完成。</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="compare">
+    <div class="section-head"><h2>3. 方法对比表</h2><span>部署视角而非论文视角</span></div>
+    <div class="card">
+      <table>
+        <thead>
+          <tr><th>路线</th><th>训练信号</th><th>现有 OpenPI 支持</th><th>数据要求</th><th>推荐度</th><th>部署判断</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>SFT LoRA</code></td>
+            <td>专家动作监督</td>
+            <td>已有 LoRA variant、freeze filter 和训练路径</td>
+            <td>LeRobot/RLDS + norm stats</td>
+            <td>高，但只作 smoke</td>
+            <td>用来发现字段、shape、动作缩放、checkpoint 问题，不作为最终效果上限。</td>
+          </tr>
+          <tr>
+            <td><code>SFT Full FT</code></td>
+            <td>专家动作监督</td>
+            <td>已有 JAX 训练路径；PyTorch 路径不支持 LoRA/EMA 等特性</td>
+            <td>高质量成功示教 + 固定评估协议</td>
+            <td>最高</td>
+            <td>正式 benchmark 主线。若 Full FT 都不提升，先查数据和评估，不要转 RL。</td>
+          </tr>
+          <tr>
+            <td><code>DAgger / HIL</code></td>
+            <td>policy 失败状态上的专家修正动作</td>
+            <td>训练可复用 SFT；采集和合并数据需新增脚本</td>
+            <td>rollout 记录 + 修正动作 + episode 元数据</td>
+            <td>最高的非 SFT 扩展</td>
+            <td>最适合真实部署，因为它直接修正 compounding error 和分布偏移。</td>
+          </tr>
+          <tr>
+            <td><code>Preference FT</code></td>
+            <td>轨迹/片段偏好</td>
+            <td>无开箱训练脚本</td>
+            <td>成对 rollout 视频、偏好标签或 desirability 标签</td>
+            <td>中</td>
+            <td>适合人能判断好坏但难逐步标动作的情况；flow action head 需专门 loss。</td>
+          </tr>
+          <tr>
+            <td><code>Reward-model FT</code></td>
+            <td>learned reward 或 VLM reward</td>
+            <td>无开箱训练脚本</td>
+            <td>视频、语言、成功/进度/偏好标签</td>
+            <td>中</td>
+            <td>适合规则 reward 写不清时；必须先验证 reward 与人工成功率相关。</td>
+          </tr>
+          <tr>
+            <td><code>RLFT / PPO / TGRPO</code></td>
+            <td>online reward、advantage、KL 约束</td>
+            <td>无开箱支持</td>
+            <td>并行环境、reward、trajectory store、reset、安全边界</td>
+            <td>中低，后置</td>
+            <td>潜力大但改造重。没有稳定 reward 时会把工程问题放大。</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="blueprint">
+    <div class="section-head"><h2>4. 部署蓝图</h2><span>每阶段输入、动作、产物</span></div>
+    <div class="grid">
+      <div class="card span-6">
+        <div class="phase-title"><span class="tag ok">Stage A</span><h3>LoRA smoke: 链路验收</h3></div>
+        <p>输入：首版 Isaac Sim LeRobot 数据、固定 prompt、DROID/Isaac transform、base checkpoint。</p>
+        <pre>python scripts/compute_norm_stats.py --config-name pi05_isaac_lora
+        <p>通过标准：无 key/action shape 错误；loss 正常；checkpoint 可 serve；20 episodes 可回评。</p>
+      </div>
+      <div class="card span-6">
+        <div class="phase-title"><span class="tag ok">Stage B</span><h3>Full FT: 正式上限</h3></div>
+        <p>输入：通过 smoke 的同一数据集，扩大 batch/steps，固定评估协议。</p>
+        <pre>python scripts/compute_norm_stats.py --config-name pi05_isaac_full
+        <p>通过标准：100 episodes 成功率超过 base 和 LoRA；失败类型集中且可解释。</p>
+      </div>
+      <div class="card span-6">
+        <div class="phase-title"><span class="tag info">Stage C</span><h3>DAgger/HIL: 失败状态修正</h3></div>
+        <p>新增采集器需要保存：observation、policy action、是否人工接管、corrected action、task id、seed、episode id、失败阶段。</p>
+        <pre>rollout_failures/
+        <p>通过标准：每类高频失败至少补 20-50 条修正片段；加入数据后相同失败率下降。</p>
+      </div>
+      <div class="card span-6">
+        <div class="phase-title"><span class="tag warn">Stage D</span><h3>RLFT: 只在 reward 稳定后启动</h3></div>
+        <p>新增训练基建：并行 rollout runner、reward function、trajectory buffer、old policy logprob、KL reference、update loop、评估和回滚机制。</p>
+        <pre>scripts/train_rlft.py
+        <p>通过标准：reward 与人工 success 排名 Spearman 正相关；PPO/TGRPO 小步更新不破坏 base 能力。</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="data">
+    <div class="section-head"><h2>5. 数据契约</h2><span>不满足这些就不要训练</span></div>
+    <div class="grid">
+      <div class="card span-4">
+        <h3>示教数据</h3>
+        <ul>
+          <li>每条 episode 必须绑定 task prompt、seed、场景版本和相机配置。</li>
+          <li>action 维度必须等于 config 的 <code>action_dim</code>，horizon 与 policy 输出一致。</li>
+          <li>图像 key 必须和 <code>DroidInputs</code> 或自定义 policy inputs 完全匹配。</li>
+          <li>norm stats 按 config 计算并随 checkpoint 保存。</li>
+        </ul>
+      </div>
+      <div class="card span-4">
+        <h3>DAgger 数据</h3>
+        <ul>
+          <li>保存 policy 进入失败状态前的上下文，而不是只保存人工修正后的成功片段。</li>
+          <li>明确区分 <code>policy_action</code> 与 <code>corrected_action</code>。</li>
+          <li>记录 intervention start/end，用于切分可训练窗口。</li>
+          <li>保留失败标签：reach、grasp、lift、place、collision、timeout。</li>
+        </ul>
+      </div>
+      <div class="card span-4">
+        <h3>RLFT 数据</h3>
+        <ul>
+          <li>每步 reward、done、success、truncation reason 必须落盘。</li>
+          <li>保存 old policy action logprob 或可复算 logprob 的采样状态。</li>
+          <li>保留 reference policy 版本，KL 约束要可追溯。</li>
+          <li>每次 update 后立即跑固定 eval seeds。</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="code">
+    <div class="section-head"><h2>6. 代码改造地图</h2><span>哪些能复用，哪些必须新增</span></div>
+    <div class="card">
+      <table>
+        <thead><tr><th>模块</th><th>现状</th><th>SFT/DAgger 需要</th><th>RLFT 需要</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><code>src/openpi/training/config.py</code></td>
+            <td><code>TrainConfig</code> 已包含 model、data、weight_loader、freeze_filter、optimizer。</td>
+            <td>新增 <code>pi05_isaac_lora</code>、<code>pi05_isaac_full</code> 或修正现有 config。</td>
+            <td>不足以表达 rollout/reward/buffer；应新增 RL config 或独立脚本参数。</td>
+          </tr>
+          <tr>
+            <td><code>scripts/train.py</code></td>
+            <td>JAX SFT 主训练入口。</td>
+            <td>LoRA、Full FT、DAgger 聚合数据后都可继续复用。</td>
+            <td>不能直接做 PPO/TGRPO；需要新 update loop。</td>
+          </tr>
+          <tr>
+            <td><code>scripts/serve_policy.py</code></td>
+            <td>可从 checkpoint 启动 websocket policy。</td>
+            <td>用于 base/LoRA/Full/DAgger checkpoint 回评。</td>
+            <td>rollout collector 可调用 policy server，但训练端仍需记录 logprob/reward。</td>
+          </tr>
+          <tr>
+            <td><code>examples/isaac_sim/</code></td>
+            <td>本地计划中作为 rollout/eval 入口。</td>
+            <td>增加 episode recorder、failure tagger、LeRobot delta exporter。</td>
+            <td>增加 parallel env runner、reset controller、reward calculator。</td>
+          </tr>
+          <tr>
+            <td><code>src/openpi/models/pi0_config.py</code></td>
+            <td><code>get_freeze_filter()</code> 定义 LoRA 冻结逻辑。</td>
+            <td>LoRA smoke 必须确认 model variant 和 freeze_filter 一致。</td>
+            <td>RLFT 若只调 LoRA，也应沿用 freeze_filter 限制更新范围。</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="grid" style="margin-top:14px;">
+      <div class="card span-6 callout warn">
+        <strong>最小 DAgger 改造</strong>
+        <p>先不要改训练 loop。只新增 rollout recorder 和 dataset merger，把修正后的片段转成现有 LeRobot 数据格式，然后继续用 <code>scripts/train.py</code>。</p>
+      </div>
+      <div class="card span-6 callout risk">
+        <strong>最小 RLFT 改造</strong>
+        <p>必须新增 <code>train_rlft.py</code>。如果没有 old logprob、KL reference、reward audit 和 eval gate，PPO/TGRPO 结果不可解释，也不适合部署。</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="eval">
+    <div class="section-head"><h2>7. 评估协议与 Go / No-Go</h2><span>防止把波动当提升</span></div>
+    <div class="grid">
+      <div class="card span-7">
+        <h3>固定评估协议</h3>
+        <ul>
+          <li>固定 100 episodes：同一场景版本、同一初始状态池、同一 prompt 列表、同一 camera pose。</li>
+          <li>每个 checkpoint 至少跑 3 个 seed 子集，报告 mean、std、worst bucket。</li>
+          <li>记录 stage success：reach、grasp、lift、transport、place，而不是只看最终 success。</li>
+          <li>每条失败必须落到 failure taxonomy，无法分类的失败不得超过 10%。</li>
+          <li>评估命令必须和训练 run id 绑定，避免 checkpoint/config 错配。</li>
+        </ul>
+      </div>
+      <div class="card span-5">
+        <h3>Go / No-Go 标准</h3>
+        <table>
+          <tbody>
+            <tr><td>LoRA smoke -> Full FT</td><td>checkpoint 可 serve，20 episode 无接口错误。</td></tr>
+            <tr><td>Full FT -> DAgger</td><td>Full FT 明显优于 base，且失败集中在 1-3 类。</td></tr>
+            <tr><td>DAgger -> 第二轮 Full</td><td>每类失败有足够修正片段，数据质量人工抽检通过。</td></tr>
+            <tr><td>进入 RLFT</td><td>reward 与人工成功判断一致，reset 和并行 rollout 稳定。</td></tr>
+            <tr><td>停止 RLFT</td><td>KL 飙升、base 能力退化、reward 高但人工 success 不升。</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section id="risks">
+    <div class="section-head"><h2>8. 风险矩阵</h2><span>失败模式和处理动作</span></div>
+    <div class="card">
+      <table>
+        <thead><tr><th>风险</th><th>表现</th><th>优先排查</th><th>处理动作</th></tr></thead>
+        <tbody>
+          <tr><td>数据字段错配</td><td>训练能跑但动作无意义</td><td>observation key、RGB/BGR、camera pose、action scale</td><td>回到 LoRA smoke，随机抽 20 帧对齐观测和动作。</td></tr>
+          <tr><td>norm stats 错</td><td>policy 输出幅度异常</td><td>assets 目录、asset_id、state/action 分布</td><td>重新计算 norm stats，并与 base/dataset 分布对比。</td></tr>
+          <tr><td>LoRA 假阴性</td><td>LoRA 效果差但 Full FT 有效</td><td>freeze_filter、rank、训练步数</td><td>不要因此否定数据，按计划进入 Full FT。</td></tr>
+          <tr><td>评估波动</td><td>单次 success 大起大落</td><td>seed、初始物体位置、仿真 reset</td><td>增加 episode 数和分桶统计，只比较同一协议。</td></tr>
+          <tr><td>DAgger 数据污染</td><td>修正后反而退化</td><td>修正片段切分、失败动作混入 label</td><td>只训练 corrected action 窗口，保留 policy action 作负例或元数据。</td></tr>
+          <tr><td>RL reward hacking</td><td>reward 上升但成功率不升</td><td>reward 定义、阶段权重、终止条件</td><td>冻结 RLFT，回到 DAgger 或重写 reward。</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="schedule">
+    <div class="section-head"><h2>9. 14 天执行计划</h2><span>按最短可验证路径安排</span></div>
+    <div class="card">
+      <div class="timeline">
+        <div class="event ok"><div class="title">Day 1-2: 冻结协议</div><div class="body">固定 Isaac Sim 场景、相机、prompt、episode seeds、metrics schema；产出 <code>eval_protocol.md</code> 和 base checkpoint 100 episodes 报告。</div></div>
+        <div class="event ok"><div class="title">Day 3-4: LoRA smoke</div><div class="body">计算 norm stats，跑 1000 steps，serve checkpoint，20 episodes 回评；只修接口问题，不调模型。</div></div>
+        <div class="event ok"><div class="title">Day 5-7: Full FT v1</div><div class="body">跑 <code>pi05_isaac_full</code> 30000 steps；每 5000 steps 保存并抽测；选最佳 checkpoint 做 100 episodes。</div></div>
+        <div class="event warn"><div class="title">Day 8: 失败聚类</div><div class="body">把失败按 stage 分类，挑 top 3 failure buckets；如果失败随机分散，先修数据/评估，不进入 DAgger。</div></div>
+        <div class="event warn"><div class="title">Day 9-11: DAgger 采集</div><div class="body">对 top failures 做 teleop/人工修正，至少每类 20-50 条修正片段；导出 LeRobot delta dataset。</div></div>
+        <div class="event ok"><div class="title">Day 12-13: Full FT v2</div><div class="body">用原始数据 + DAgger delta 继续训练；对比 v1 和 v2 的 stage success。</div></div>
+        <div class="event risk"><div class="title">Day 14: RLFT 立项门</div><div class="body">只有当 DAgger 后仍存在可 reward 化的稳定失败，才写 RLFT 设计；否则继续 DAgger 数据闭环。</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="sources">
+    <div class="section-head"><h2>10. 证据来源</h2><span>项目事实 + 外部研究</span></div>
+    <div class="grid">
+      <div class="card span-6">
+        <h3>本项目证据</h3>
+        <div class="source-list">
+          <div class="source"><div><code>src/openpi/training/config.py</code><p><code>TrainConfig</code>、<code>freeze_filter</code>、<code>trainable_filter</code> 说明当前训练配置以 SFT/LoRA/Full FT 为主。</p></div></div>
+          <div class="source"><div><code>examples/droid/README_train.md</code><p>OpenPI DROID 训练说明：full DROID 训练成本高，并指出 LoRA 便宜但策略效果目前不理想。</p></div></div>
+          <div class="source"><div><code>docs/isaac_sim_full_ft_pipeline.md</code><p>本地 Isaac Sim 路线已按 LoRA smoke -> Full FT -> 回评组织，适合作为实际部署主线。</p></div></div>
+        </div>
+      </div>
+      <div class="card span-6">
+        <h3>外部研究证据</h3>
+        <div class="source-list">
+          <div class="source"><div><a href="https://proceedings.mlr.press/v15/ross11a.html">DAgger, PMLR 2011</a><p>说明 imitation learning 在顺序决策里会遇到分布偏移，数据聚合可缓解误差累积。</p></div></div>
+          <div class="source"><div><a href="https://arxiv.org/html/2505.19789v3">What Can RL Bring to VLA Generalization?</a><p>比较 SFT、PPO、DPO、GRPO，指出 PPO 对 VLA 泛化和执行鲁棒性更有效。</p></div></div>
+          <div class="source"><div><a href="https://arxiv.org/html/2502.05450v2">ConRFT</a><p>离线 BC/Q-learning + 在线 HIL 的 VLA reinforced fine-tuning，强调安全和样本效率。</p></div></div>
+          <div class="source"><div><a href="https://arxiv.org/html/2506.08440v3">TGRPO</a><p>用多阶段 dense reward 和轨迹/step 双层 advantage 做 VLA 在线 RLFT。</p></div></div>
+          <div class="source"><div><a href="https://arxiv.org/html/2502.11918">VLP</a><p>学习 vision-language preference model，为 embodied manipulation 提供偏好反馈。</p></div></div>
+          <div class="source"><div><a href="https://proceedings.mlr.press/v305/zhang25a.html">ReWiND, CoRL 2025</a><p>从少量示教学习 language-conditioned reward，再做离线和少量在线适配。</p></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    OpenPI pi0.5 FT deployment analysis - generated for local engineering planning. Suggested file: docs/ft_deployment_analysis.html
+  </footer>
+</main>
+</body>
+</html>

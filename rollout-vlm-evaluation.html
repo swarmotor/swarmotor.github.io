@@ -1,0 +1,597 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>自动评测应从“看完视频判成败”升级为混合式评测系统</title>
+  <style>
+    :root {
+      --bg: #f6f4ef;
+      --surface: #fffdf8;
+      --surface-strong: #f0ebe0;
+      --ink: #171717;
+      --muted: #676159;
+      --line: #ded6c9;
+      --accent: #0f766e;
+      --accent-strong: #0b4f49;
+      --accent-soft: #d8f3ee;
+      --warn: #a7551d;
+      --danger: #9f2d2d;
+      --shadow: 0 20px 60px rgba(35, 31, 26, 0.12);
+      --radius-lg: 28px;
+      --radius-md: 18px;
+      --radius-sm: 12px;
+      --max: 1180px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(15, 118, 110, 0.16), transparent 34rem),
+        linear-gradient(180deg, #fbf8f0 0%, var(--bg) 44%, #ebe5da 100%);
+      font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+      line-height: 1.72;
+    }
+
+    a { color: var(--accent-strong); text-decoration: none; border-bottom: 1px solid rgba(15, 118, 110, 0.35); }
+    a:hover { border-bottom-color: var(--accent-strong); }
+
+    .page {
+      width: min(var(--max), calc(100% - 40px));
+      margin: 0 auto;
+      padding: 44px 0 72px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.25fr 0.75fr;
+      gap: 28px;
+      align-items: stretch;
+      margin-bottom: 28px;
+    }
+
+    .hero-main, .hero-side, .section, .callout {
+      background: rgba(255, 253, 248, 0.86);
+      border: 1px solid rgba(222, 214, 201, 0.86);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+    }
+
+    .hero-main { padding: 42px; }
+    .hero-side { padding: 28px; display: grid; gap: 16px; }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      color: var(--accent-strong);
+      background: var(--accent-soft);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    h1, h2, h3 { line-height: 1.18; letter-spacing: -0.035em; }
+    h1 { margin: 22px 0 20px; font-size: clamp(40px, 7vw, 76px); }
+    h2 { margin: 0 0 18px; font-size: clamp(28px, 4vw, 44px); }
+    h3 { margin: 0 0 10px; font-size: 21px; }
+    p { margin: 0 0 14px; }
+
+    .lead {
+      max-width: 850px;
+      color: #37322d;
+      font-size: clamp(18px, 2.3vw, 24px);
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 28px;
+    }
+
+    .pill {
+      padding: 8px 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.46);
+      font-size: 13px;
+      font-weight: 650;
+    }
+
+    .score-card {
+      padding: 18px;
+      border-radius: var(--radius-md);
+      background: var(--surface-strong);
+      border: 1px solid var(--line);
+    }
+
+    .score-card strong {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 15px;
+    }
+
+    .score-card span { color: var(--muted); font-size: 14px; }
+
+    .grid { display: grid; gap: 20px; }
+    .grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+    .section {
+      margin-top: 22px;
+      padding: 32px;
+    }
+
+    .section-kicker {
+      margin-bottom: 12px;
+      color: var(--accent-strong);
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .card {
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.58);
+    }
+
+    .card p, .card li { color: var(--muted); }
+    ul, ol { margin: 12px 0 0; padding-left: 22px; }
+    li { margin: 8px 0; }
+
+    .verdict {
+      border-left: 5px solid var(--accent);
+      background: linear-gradient(90deg, rgba(216, 243, 238, 0.88), rgba(255, 253, 248, 0.88));
+    }
+
+    .warning { border-left: 5px solid var(--warn); }
+    .danger { border-left: 5px solid var(--danger); }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .flow-step {
+      min-height: 112px;
+      padding: 14px;
+      border-radius: var(--radius-sm);
+      background: #171717;
+      color: #fffdf8;
+    }
+
+    .flow-step b { display: block; margin-bottom: 8px; font-size: 14px; }
+    .flow-step span { color: rgba(255, 253, 248, 0.72); font-size: 13px; line-height: 1.45; }
+
+    .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius-md); }
+    table { width: 100%; border-collapse: collapse; min-width: 760px; background: rgba(255, 255, 255, 0.55); }
+    th, td { padding: 14px 16px; text-align: left; border-bottom: 1px solid var(--line); vertical-align: top; }
+    th { background: var(--surface-strong); font-size: 13px; letter-spacing: 0.04em; text-transform: uppercase; }
+    tr:last-child td { border-bottom: 0; }
+
+    .timeline {
+      counter-reset: step;
+      display: grid;
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .timeline-item {
+      position: relative;
+      padding: 18px 18px 18px 58px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.56);
+    }
+
+    .timeline-item::before {
+      counter-increment: step;
+      content: counter(step);
+      position: absolute;
+      left: 18px;
+      top: 18px;
+      width: 28px;
+      height: 28px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      color: white;
+      background: var(--accent);
+      font-weight: 800;
+    }
+
+    .sources li { word-break: break-word; }
+
+    footer {
+      margin-top: 28px;
+      color: var(--muted);
+      text-align: center;
+      font-size: 13px;
+    }
+
+    @media (max-width: 920px) {
+      .hero, .grid.two, .grid.three { grid-template-columns: 1fr; }
+      .flow { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .hero-main, .section { padding: 26px; }
+    }
+
+    @media (max-width: 560px) {
+      .page { width: min(100% - 24px, var(--max)); padding-top: 20px; }
+      .flow { grid-template-columns: 1fr; }
+      .hero-main, .hero-side, .section { border-radius: 20px; }
+      h1 { font-size: 38px; }
+    }
+  </style>
+
+
+
+<style id="blog-family-style">
+  :root {
+    --blog-bg: #f5f8f8;
+    --blog-bg-soft: #edf4f4;
+    --blog-surface: rgba(255, 255, 255, .92);
+    --blog-surface-strong: #ffffff;
+    --blog-border: rgba(28, 78, 88, .18);
+    --blog-text: #18333b;
+    --blog-muted: #465f68;
+    --blog-subtle: #596f77;
+    --blog-accent: #008c95;
+    --blog-accent-2: #3aa7b0;
+    --blog-warm: #b7791f;
+    --blog-radius: 18px;
+    --blog-shadow: 0 18px 48px rgba(23, 74, 83, .10);
+  }
+  html { scroll-behavior: smooth; }
+  body {
+    background:
+      radial-gradient(circle at 8% -10%, color-mix(in srgb, var(--blog-accent) 16%, transparent), transparent 34%),
+      radial-gradient(circle at 88% 2%, color-mix(in srgb, var(--blog-accent-2) 13%, transparent), transparent 30%),
+      linear-gradient(180deg, #f7faf9 0%, #eef5f5 52%, #f8faf9 100%) !important;
+    color: var(--blog-text) !important;
+    font-family: "Avenir Next", "Inter", "SF Pro Text", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif !important;
+    letter-spacing: .005em;
+    text-rendering: optimizeLegibility;
+  }
+  h1 {
+    color: #102f38 !important;
+    font-family: "Iowan Old Style", "LXGW WenKai Screen", "霞鹜文楷", "Noto Serif SC", "Source Han Serif SC", "Songti SC", Georgia, serif !important;
+    letter-spacing: -.035em;
+    font-weight: 760;
+  }
+  h2, .section-header h2, .section-head h2 {
+    color: #173943 !important;
+    font-family: "Optima", "Avenir Next", "Noto Serif SC", "Noto Sans SC", system-ui, sans-serif !important;
+    letter-spacing: -.025em;
+    font-weight: 720;
+  }
+  h3, .title, .tl-title {
+    color: #1c4049 !important;
+    font-family: "Avenir Next", "Noto Sans SC", "PingFang SC", system-ui, sans-serif !important;
+    letter-spacing: -.01em;
+  }
+  .hero, .cover, header, .page-hero {
+    background:
+      linear-gradient(135deg, rgba(0, 140, 149, .12), rgba(255, 255, 255, .80) 44%, rgba(58, 167, 176, .10)),
+      linear-gradient(180deg, #fbfefe, #eef7f7) !important;
+    border-bottom: 1px solid var(--blog-border) !important;
+    color: var(--blog-text) !important;
+  }
+  .hero p, .cover .subtitle, header .subtitle, header .meta, .cover .meta {
+    color: var(--blog-muted) !important;
+  }
+  .wrap, .container, main {
+    max-width: min(1120px, calc(100vw - 32px));
+  }
+  .card, .panel, .callout, .note, .metric, .section, article, table, pre {
+    border-color: var(--blog-border) !important;
+  }
+  .card, .panel, .metric, .note {
+    background: var(--blog-surface) !important;
+    border-radius: var(--blog-radius) !important;
+    box-shadow: var(--blog-shadow);
+  }
+  .callout {
+    background: color-mix(in srgb, var(--blog-accent) 8%, #ffffff) !important;
+    border-left-color: var(--blog-accent) !important;
+    border-radius: 14px !important;
+    color: var(--blog-muted) !important;
+  }
+  a, .eyebrow, .accent { color: #006f78 !important; }
+  code {
+    color: #005f68 !important;
+    background: color-mix(in srgb, var(--blog-accent) 10%, #ffffff) !important;
+    border: 1px solid color-mix(in srgb, var(--blog-accent) 24%, #ffffff);
+    border-radius: 6px !important;
+    font-family: "JetBrains Mono", "SFMono-Regular", Consolas, "Liberation Mono", monospace !important;
+  }
+  pre {
+    background: #eef6f6 !important;
+    color: #25464e !important;
+    border-radius: 16px !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.72);
+  }
+  pre code { background: transparent !important; border: 0; color: inherit !important; }
+  table {
+    background: rgba(255, 255, 255, .86) !important;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  th {
+    background: color-mix(in srgb, var(--blog-accent) 11%, #f7fbfb) !important;
+    color: #173943 !important;
+  }
+  td, p, li { color: var(--blog-muted) !important; }
+  strong, b { color: #173943 !important; }
+  .tag, .badge, .step-count {
+    background: color-mix(in srgb, var(--blog-accent) 8%, #ffffff) !important;
+    border-color: color-mix(in srgb, var(--blog-accent) 24%, #ffffff) !important;
+    color: #31545d !important;
+  }
+  nav {
+    background: rgba(248, 252, 252, .86) !important;
+    border-bottom: 1px solid var(--blog-border) !important;
+    backdrop-filter: blur(18px);
+  }
+  nav a { color: #46616a !important; }
+  nav a:hover {
+    color: #12333c !important;
+    background: color-mix(in srgb, var(--blog-accent) 10%, #ffffff) !important;
+    border-color: color-mix(in srgb, var(--blog-accent) 32%, #ffffff) !important;
+  }
+  footer {
+    color: var(--blog-subtle) !important;
+    border-top-color: var(--blog-border) !important;
+  }
+  ::selection { background: color-mix(in srgb, var(--blog-accent) 24%, #ffffff); color: #0f2d35; }
+  @media (max-width: 720px) {
+    body { letter-spacing: 0; }
+    .hero, .cover, header { padding-left: 18px !important; padding-right: 18px !important; }
+  }
+</style>
+
+</head>
+<body>
+  <main class="page">
+    <section class="hero">
+      <div class="hero-main">
+        <span class="eyebrow">Research Report · SOTA Rollout + VLM Eval</span>
+        <h1>自动评测应从“看完视频判成败”升级为混合式评测系统</h1>
+        <p class="lead">面向 OpenPI / Isaac Sim / 真实机器人 rollout，本方案建议采用硬规则、子目标向量、VLM 证据判断、pairwise 排名和人工校准闭环。核心目标不是替代所有人工，而是把人工从逐条看视频转移到标注校准集、复核低置信样本和审查评测偏差。</p>
+        <div class="meta">
+          <span class="pill">主指标：Subgoal Vector</span>
+          <span class="pill">评测对象：视频 / 多相机帧 / 状态事件</span>
+          <span class="pill">适配：OpenPI、Isaac Sim、DROID 风格数据</span>
+          <span class="pill">输出：HTML 报告 + JSON 结果</span>
+        </div>
+      </div>
+      <aside class="hero-side">
+        <div class="score-card">
+          <strong>结论</strong>
+          <span>不要用单一 VLM 二分类成功率作为最终评测。</span>
+        </div>
+        <div class="score-card">
+          <strong>MVP 优先级</strong>
+          <span>先评测已有真实/仿真 rollout，再做 world-model rollout。</span>
+        </div>
+        <div class="score-card">
+          <strong>质量闸门</strong>
+          <span>规则信号优先；VLM 只负责视觉语义与模糊子目标。</span>
+        </div>
+      </aside>
+    </section>
+
+    <section class="section verdict">
+      <div class="section-kicker">Executive Decision</div>
+      <h2>推荐方案：RolloutVLM-Eval</h2>
+      <p>构建一个“后验自动评测”框架：记录 rollout 后，用任务规格和硬规则先提取确定性信号，再让 VLM 对可见子目标、失败原因和安全风险做结构化判断。最终输出每个 episode 的子目标成功向量、进度分、失败分类、证据帧和置信度；对多策略比较则使用 pairwise A/B + Bradley-Terry 或 Elo 聚合排名。</p>
+    </section>
+
+    <section class="section">
+      <div class="section-kicker">SOTA Signals</div>
+      <h2>已核验的关键项目与可借鉴点</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>来源</th>
+              <th>核心贡献</th>
+              <th>对本项目的启发</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><a href="https://ar5iv.labs.arxiv.org/html/2509.19524">StepEval</a></td>
+              <td>用 VLM 对机器人操作轨迹做子目标级评测，主产物是 per-subgoal success vector。</td>
+              <td>把整体成功率降级为聚合指标，核心报告每一步做成/没做成。</td>
+            </tr>
+            <tr>
+              <td><a href="https://worldeval.github.io">WorldEval</a></td>
+              <td>用 world model 生成 action-conditioned robot video，在线替代部分真实评测。</td>
+              <td>二期方向：用视频世界模型扩大 policy 评测规模，但不应作为 MVP 起点。</td>
+            </tr>
+            <tr>
+              <td><a href="https://arxiv.org/html/2506.18123v2">RoboArena</a></td>
+              <td>分布式真实机器人双盲 A/B policy 比较，基于 progress score 和 preference 聚合排名。</td>
+              <td>多策略比较不要只看平均成功率；引入 pairwise ranking 和任务难度建模。</td>
+            </tr>
+            <tr>
+              <td><a href="https://os-world.github.io/">OSWorld</a></td>
+              <td>真实电脑环境任务具备 setup、执行过程记录和 execution-based evaluator。</td>
+              <td>每个任务应自带可复现初始化和可执行硬评测脚本。</td>
+            </tr>
+            <tr>
+              <td><a href="https://github.com/google-research/android_world">AndroidWorld</a></td>
+              <td>116 个 Android 任务、动态参数化、durable reward signals。</td>
+              <td>任务随机化和稳定 reward signal 可迁移到 Isaac Sim 场景扰动。</td>
+            </tr>
+            <tr>
+              <td><a href="https://github.com/ServiceNow/WorkArena">WorkArena</a></td>
+              <td>BrowserGym 生态下的企业工作流 benchmark，每个任务有 validate 逻辑。</td>
+              <td>机器人任务也应把 oracle/validator 作为任务定义的一部分。</td>
+            </tr>
+            <tr>
+              <td><a href="https://github.com/open-compass/VLMEvalKit">VLMEvalKit</a> / <a href="https://github.com/open-compass/opencompass">OpenCompass</a></td>
+              <td>成熟的模型适配、并发评测、缓存、LLM judge 和 cascade evaluator 基础设施。</td>
+              <td>复用其“模型统一接口 + evaluator 可插拔 + 结果可复现”的工程模式。</td>
+            </tr>
+            <tr>
+              <td>WFM-Eval</td>
+              <td>指出 holistic VLM judge 在机器人视频评测中存在偏置，应拆分 task completion、object hallucination、temporal consistency。</td>
+              <td>本项目必须多维诊断，禁止把 VLM 的单个整体分数当作最终真值。</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-kicker">System Architecture</div>
+      <h2>六段式评测流水线</h2>
+      <p>系统以 rollout artifact 为中心，不侵入 policy 本身。每个模块输出结构化数据，方便缓存、复跑、审计和模型替换。</p>
+      <div class="flow">
+        <div class="flow-step"><b>1. Recorder</b><span>采集视频、关键帧、动作、状态、事件、policy metadata。</span></div>
+        <div class="flow-step"><b>2. Task Spec</b><span>定义 subgoals、硬规则、可见证据、失败模式和安全约束。</span></div>
+        <div class="flow-step"><b>3. Hard Eval</b><span>先跑状态/仿真/脚本验证，生成确定性标签。</span></div>
+        <div class="flow-step"><b>4. Sampler</b><span>按事件、动作阶段和视觉变化抽取多视角帧或短片段。</span></div>
+        <div class="flow-step"><b>5. VLM Judge</b><span>按 rubric 输出 JSON：子目标、置信度、证据帧、失败原因。</span></div>
+        <div class="flow-step"><b>6. Ranker</b><span>聚合报告，生成 policy 对比、A/B 排名和低置信复核队列。</span></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-kicker">Data Contract</div>
+      <h2>推荐数据格式</h2>
+      <div class="grid two">
+        <div class="card">
+          <h3>Episode Artifact</h3>
+          <ul>
+            <li><code>metadata.json</code>：policy、checkpoint、task、seed、环境版本、相机配置。</li>
+            <li><code>events.json</code>：仿真事件、接触、碰撞、目标状态、timeout。</li>
+            <li><code>actions.parquet</code>：时间戳、动作、控制模式、推理延迟。</li>
+            <li><code>videos/*.mp4</code> 与 <code>frames/</code>：外部相机、腕部相机、可选深度图。</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Task Spec</h3>
+          <ul>
+            <li><code>instruction</code>：自然语言任务。</li>
+            <li><code>subgoals</code>：有序步骤、成功条件、必要证据。</li>
+            <li><code>hard_checks</code>：可执行 evaluator 或仿真状态条件。</li>
+            <li><code>vlm_rubric</code>：评分尺度、反例、不可见时返回 unknown。</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-kicker">Metrics</div>
+      <h2>最小指标集</h2>
+      <div class="grid three">
+        <div class="card"><h3>主评测</h3><p>overall success rate、subgoal success rate、progress score 0-5、time-to-completion。</p></div>
+        <div class="card"><h3>失败诊断</h3><p>failure taxonomy、object missing/wrong-object、temporal inconsistency、safety violation。</p></div>
+        <div class="card"><h3>裁判质量</h3><p>VLM-human agreement、hard-VLM disagreement、judge confidence、multi-judge agreement。</p></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-kicker">Judge Design</div>
+      <h2>VLM Judge 设计原则</h2>
+      <div class="grid two">
+        <div class="card verdict">
+          <h3>必须做</h3>
+          <ul>
+            <li>用 JSON schema 限制输出，不让模型自由写作文。</li>
+            <li>每个判断必须引用证据帧或短片段时间戳。</li>
+            <li>允许 <code>unknown</code>，不可见或证据不足时不能强判。</li>
+            <li>对同一任务维护少量人工 gold label，定期校准 prompt 和模型。</li>
+            <li>对低置信、高影响、规则冲突样本进入人工复核池。</li>
+          </ul>
+        </div>
+        <div class="card danger">
+          <h3>必须避免</h3>
+          <ul>
+            <li>避免单 prompt、单模型、单分数作为最终真值。</li>
+            <li>避免只给完整视频，长视频容易丢关键动作和时序细节。</li>
+            <li>避免把 VLM 视觉幻觉当作物理事实。</li>
+            <li>避免用 prompt 调参直接追 leaderboard，而不看人工一致性。</li>
+            <li>避免忽略相机盲区；看不到就应返回 unknown。</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-kicker">Implementation Roadmap</div>
+      <h2>六周 MVP 路线</h2>
+      <div class="timeline">
+        <div class="timeline-item"><h3>第 1 周：定义协议</h3><p>完成 rollout artifact 目录、task.yaml 模板、评测结果 JSON schema。接入 OpenPI remote policy 与 Isaac Sim 记录器。</p></div>
+        <div class="timeline-item"><h3>第 2 周：硬评测优先</h3><p>实现 3-5 个任务的 hard evaluator：目标位姿、抓取状态、放置区域、碰撞、timeout、路径越界。</p></div>
+        <div class="timeline-item"><h3>第 3 周：VLM Judge</h3><p>实现关键帧采样、多视角输入、JSON judge prompt、成本/延迟记录、结果缓存。</p></div>
+        <div class="timeline-item"><h3>第 4 周：校准集</h3><p>每个任务采集约 20 条 rollout，人工标注 100-300 个子目标样本，统计 VLM-human agreement。</p></div>
+        <div class="timeline-item"><h3>第 5 周：报告与复核</h3><p>生成 HTML/JSON 报告、失败热力图、证据帧索引、低置信复核队列。</p></div>
+        <div class="timeline-item"><h3>第 6 周：策略比较</h3><p>加入 pairwise A/B 评测和 Bradley-Terry/Elo 排名，输出 policy rank、置信区间和任务簇表现。</p></div>
+      </div>
+    </section>
+
+    <section class="section warning">
+      <div class="section-kicker">Risk Register</div>
+      <h2>主要风险与缓解</h2>
+      <div class="grid two">
+        <div class="card"><h3>VLM 偏置</h3><p>用多模型一致性、人工校准集和硬规则冲突检测缓解；不要把单模型结果称为 ground truth。</p></div>
+        <div class="card"><h3>相机不可见</h3><p>任务规格中写明必要证据和推荐相机；证据不足时返回 unknown，进入复核而非强判失败。</p></div>
+        <div class="card"><h3>仿真与真实差异</h3><p>仿真 hard checks 只作为可验证信号；真实视频仍需 VLM/人工校准。</p></div>
+        <div class="card"><h3>评测被 prompt 过拟合</h3><p>固定隐藏校准集，分离开发集和验收集，记录每次 prompt/model 版本。</p></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-kicker">Recommended Stack</div>
+      <h2>建议技术栈</h2>
+      <div class="grid three">
+        <div class="card"><h3>评测运行</h3><p>Python + uv，任务 evaluator 用可插拔 Python module；并发用 Ray、Celery 或简单进程池。</p></div>
+        <div class="card"><h3>数据存储</h3><p>本地 artifact + JSON/Parquet；后续可接 S3/MinIO，报告索引进 SQLite 或 DuckDB。</p></div>
+        <div class="card"><h3>模型接入</h3><p>API judge 用 GPT-4o/Gemini/Claude；本地 judge 用 Qwen-VL、InternVL、Kimi-VL、GLM-V。</p></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-kicker">Final Recommendation</div>
+      <h2>先做“可信自动评测”，再做“自动生成评测环境”</h2>
+      <p>短期最值得做的是把现有真实/Isaac Sim rollout 评得更细、更稳、更可复核。WorldEval/RoboWorld 这类世界模型评测很有潜力，但它们引入新的模型误差源，适合作为二期扩展：当基础评测框架、校准集和报告体系稳定后，再用 world model 扩大覆盖和做安全预筛。</p>
+    </section>
+
+    <section class="section sources">
+      <div class="section-kicker">Sources</div>
+      <h2>主要来源</h2>
+      <ol>
+        <li>StepEval: <a href="https://ar5iv.labs.arxiv.org/html/2509.19524">https://ar5iv.labs.arxiv.org/html/2509.19524</a></li>
+        <li>WorldEval: <a href="https://worldeval.github.io">https://worldeval.github.io</a></li>
+        <li>RoboArena: <a href="https://arxiv.org/html/2506.18123v2">https://arxiv.org/html/2506.18123v2</a></li>
+        <li>OSWorld: <a href="https://os-world.github.io/">https://os-world.github.io/</a></li>
+        <li>VisualWebArena: <a href="https://github.com/web-arena-x/visualwebarena">https://github.com/web-arena-x/visualwebarena</a></li>
+        <li>AndroidWorld: <a href="https://github.com/google-research/android_world">https://github.com/google-research/android_world</a></li>
+        <li>WorkArena: <a href="https://github.com/ServiceNow/WorkArena">https://github.com/ServiceNow/WorkArena</a></li>
+        <li>AgentBench: <a href="https://github.com/THUDM/AgentBench">https://github.com/THUDM/AgentBench</a></li>
+        <li>VLMEvalKit: <a href="https://github.com/open-compass/VLMEvalKit">https://github.com/open-compass/VLMEvalKit</a></li>
+        <li>OpenCompass: <a href="https://github.com/open-compass/opencompass">https://github.com/open-compass/opencompass</a></li>
+      </ol>
+    </section>
+
+    <footer>Generated as a standalone HTML research report for rollout + VLM automatic evaluation planning.</footer>
+  </main>
+</body>
+</html>

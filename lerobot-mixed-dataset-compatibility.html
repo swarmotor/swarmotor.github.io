@@ -1,0 +1,545 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OpenPI 微调中混合 LeRobot 数据集的兼容性说明</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f7f8fb;
+      --panel: #ffffff;
+      --text: #172033;
+      --muted: #5e6978;
+      --border: #dce2eb;
+      --accent: #1d5fd0;
+      --accent-soft: #eef4ff;
+      --ok: #0d7a53;
+      --warn: #a15b00;
+      --danger: #b42318;
+      --code-bg: #101624;
+      --code-text: #edf3ff;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.65;
+    }
+
+    main {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 36px 20px 56px;
+    }
+
+    header,
+    section {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: 0 8px 28px rgba(21, 31, 50, 0.06);
+      margin-bottom: 18px;
+      padding: 24px;
+    }
+
+    h1,
+    h2,
+    h3 {
+      line-height: 1.25;
+      margin: 0 0 12px;
+    }
+
+    h1 {
+      font-size: 30px;
+    }
+
+    h2 {
+      border-left: 4px solid var(--accent);
+      font-size: 22px;
+      padding-left: 10px;
+    }
+
+    h3 {
+      font-size: 17px;
+      margin-top: 18px;
+    }
+
+    p {
+      margin: 10px 0;
+    }
+
+    ul,
+    ol {
+      margin: 10px 0 10px 24px;
+      padding: 0;
+    }
+
+    li {
+      margin: 6px 0;
+    }
+
+    code {
+      background: var(--accent-soft);
+      border-radius: 5px;
+      color: #163b92;
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      font-size: 0.94em;
+      padding: 2px 5px;
+    }
+
+    pre {
+      background: var(--code-bg);
+      border-radius: 12px;
+      color: var(--code-text);
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      font-size: 13px;
+      line-height: 1.55;
+      overflow-x: auto;
+      padding: 16px;
+      white-space: pre;
+    }
+
+    pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+    }
+
+    table {
+      border-collapse: collapse;
+      margin: 12px 0;
+      width: 100%;
+    }
+
+    th,
+    td {
+      border: 1px solid var(--border);
+      padding: 9px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: #f0f3f8;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .ok {
+      color: var(--ok);
+      font-weight: 700;
+    }
+
+    .warn {
+      color: var(--warn);
+      font-weight: 700;
+    }
+
+    .danger {
+      color: var(--danger);
+      font-weight: 700;
+    }
+
+    .cards {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      margin-top: 16px;
+    }
+
+    .card {
+      background: #fbfcff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    .tag {
+      background: var(--accent-soft);
+      border: 1px solid #cbd8ff;
+      border-radius: 999px;
+      color: var(--accent);
+      display: inline-block;
+      font-size: 13px;
+      font-weight: 700;
+      margin: 4px 6px 4px 0;
+      padding: 3px 10px;
+    }
+  </style>
+
+
+
+<style id="blog-family-style">
+  :root {
+    --blog-bg: #f5f8f8;
+    --blog-bg-soft: #edf4f4;
+    --blog-surface: rgba(255, 255, 255, .92);
+    --blog-surface-strong: #ffffff;
+    --blog-border: rgba(28, 78, 88, .18);
+    --blog-text: #18333b;
+    --blog-muted: #465f68;
+    --blog-subtle: #596f77;
+    --blog-accent: #168a8f;
+    --blog-accent-2: #8fb8c8;
+    --blog-warm: #b7791f;
+    --blog-radius: 18px;
+    --blog-shadow: 0 18px 48px rgba(23, 74, 83, .10);
+  }
+  html { scroll-behavior: smooth; }
+  body {
+    background:
+      radial-gradient(circle at 8% -10%, color-mix(in srgb, var(--blog-accent) 16%, transparent), transparent 34%),
+      radial-gradient(circle at 88% 2%, color-mix(in srgb, var(--blog-accent-2) 13%, transparent), transparent 30%),
+      linear-gradient(180deg, #f7faf9 0%, #eef5f5 52%, #f8faf9 100%) !important;
+    color: var(--blog-text) !important;
+    font-family: "Avenir Next", "Inter", "SF Pro Text", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif !important;
+    letter-spacing: .005em;
+    text-rendering: optimizeLegibility;
+  }
+  h1 {
+    color: #102f38 !important;
+    font-family: "Iowan Old Style", "LXGW WenKai Screen", "霞鹜文楷", "Noto Serif SC", "Source Han Serif SC", "Songti SC", Georgia, serif !important;
+    letter-spacing: -.035em;
+    font-weight: 760;
+  }
+  h2, .section-header h2, .section-head h2 {
+    color: #173943 !important;
+    font-family: "Optima", "Avenir Next", "Noto Serif SC", "Noto Sans SC", system-ui, sans-serif !important;
+    letter-spacing: -.025em;
+    font-weight: 720;
+  }
+  h3, .title, .tl-title {
+    color: #1c4049 !important;
+    font-family: "Avenir Next", "Noto Sans SC", "PingFang SC", system-ui, sans-serif !important;
+    letter-spacing: -.01em;
+  }
+  .hero, .cover, header, .page-hero {
+    background:
+      linear-gradient(135deg, rgba(0, 140, 149, .12), rgba(255, 255, 255, .80) 44%, rgba(58, 167, 176, .10)),
+      linear-gradient(180deg, #fbfefe, #eef7f7) !important;
+    border-bottom: 1px solid var(--blog-border) !important;
+    color: var(--blog-text) !important;
+  }
+  .hero p, .cover .subtitle, header .subtitle, header .meta, .cover .meta {
+    color: var(--blog-muted) !important;
+  }
+  .wrap, .container, main {
+    max-width: min(1120px, calc(100vw - 32px));
+  }
+  .card, .panel, .callout, .note, .metric, .section, article, table, pre {
+    border-color: var(--blog-border) !important;
+  }
+  .card, .panel, .metric, .note {
+    background: var(--blog-surface) !important;
+    border-radius: var(--blog-radius) !important;
+    box-shadow: var(--blog-shadow);
+  }
+  .callout {
+    background: color-mix(in srgb, var(--blog-accent) 8%, #ffffff) !important;
+    border-left-color: var(--blog-accent) !important;
+    border-radius: 14px !important;
+    color: var(--blog-muted) !important;
+  }
+  a, .eyebrow, .accent { color: #006f78 !important; }
+  code {
+    color: #005f68 !important;
+    background: color-mix(in srgb, var(--blog-accent) 10%, #ffffff) !important;
+    border: 1px solid color-mix(in srgb, var(--blog-accent) 24%, #ffffff);
+    border-radius: 6px !important;
+    font-family: "JetBrains Mono", "SFMono-Regular", Consolas, "Liberation Mono", monospace !important;
+  }
+  pre {
+    background: #eef6f6 !important;
+    color: #25464e !important;
+    border-radius: 16px !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.72);
+  }
+  pre code { background: transparent !important; border: 0; color: inherit !important; }
+  table {
+    background: rgba(255, 255, 255, .86) !important;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  th {
+    background: color-mix(in srgb, var(--blog-accent) 11%, #f7fbfb) !important;
+    color: #173943 !important;
+  }
+  td, p, li { color: var(--blog-muted) !important; }
+  strong, b { color: #173943 !important; }
+  .tag, .badge, .step-count {
+    background: color-mix(in srgb, var(--blog-accent) 8%, #ffffff) !important;
+    border-color: color-mix(in srgb, var(--blog-accent) 24%, #ffffff) !important;
+    color: #31545d !important;
+  }
+  nav {
+    background: rgba(248, 252, 252, .86) !important;
+    border-bottom: 1px solid var(--blog-border) !important;
+    backdrop-filter: blur(18px);
+  }
+  nav a { color: #46616a !important; }
+  nav a:hover {
+    color: #12333c !important;
+    background: color-mix(in srgb, var(--blog-accent) 10%, #ffffff) !important;
+    border-color: color-mix(in srgb, var(--blog-accent) 32%, #ffffff) !important;
+  }
+  footer {
+    color: var(--blog-subtle) !important;
+    border-top-color: var(--blog-border) !important;
+  }
+  ::selection { background: color-mix(in srgb, var(--blog-accent) 24%, #ffffff); color: #0f2d35; }
+  @media (max-width: 720px) {
+    body { letter-spacing: 0; }
+    .hero, .cover, header { padding-left: 18px !important; padding-right: 18px !important; }
+  }
+</style>
+
+</head>
+<body>
+<main>
+  <header>
+    <h1>OpenPI 微调中混合 LeRobot 数据集的兼容性说明</h1>
+    <p class="muted">说明一次微调是否可以使用同属 LeRobot 格式但字段不完全一致的数据，尤其是部分数据带有 <code>episode_metadata</code>、<code>force_torque</code> 等附加字段时，OpenPI 是否会使用这些字段。</p>
+    <div>
+      <span class="tag">OpenPI</span>
+      <span class="tag">LeRobot</span>
+      <span class="tag">LIBERO</span>
+      <span class="tag">mixed dataset</span>
+      <span class="tag">compatibility smoke</span>
+    </div>
+    <div class="cards">
+      <div class="card"><strong>核心结论</strong><br><span class="ok">可以混，但训练入口看到的 schema 必须一致</span></div>
+      <div class="card"><strong>额外字段</strong><br><code>episode_metadata</code>、<code>force_torque</code> 默认不会被模型使用</div>
+      <div class="card"><strong>关键风险</strong><br><span class="warn">action/state 维度和动作语义不能乱混</span></div>
+    </div>
+  </header>
+
+  <section>
+    <h2>1. 结论</h2>
+    <p>一次 OpenPI 微调可以使用多个同属 LeRobot 格式的数据源，也可以让一部分 episode 多带一些附加字段。前提是：</p>
+    <ul>
+      <li>最终进入 OpenPI transform 的核心训练字段必须一致。</li>
+      <li>核心字段的 shape、dtype、语义必须一致。</li>
+      <li>额外字段只要没有被 <code>RepackTransform</code> 或自定义 transform 引用，就不会进入模型，也不会参与 loss。</li>
+    </ul>
+    <p>一句话：<strong>原始 LeRobot repo 里可以有更多字段，但训练 config 看到并使用的 schema 必须统一。</strong></p>
+  </section>
+
+  <section>
+    <h2>2. OpenPI 实际读取哪些字段</h2>
+    <p>OpenPI 不是“LeRobot 里有什么字段就都训练”。它由 config 里的 transform 显式取字段。LIBERO 路线会把 LeRobot item repack 成 OpenPI 训练 schema。</p>
+    <p>典型 LIBERO 风格的 repack 逻辑类似：</p>
+    <pre><code>_transforms.RepackTransform(
+    {
+        "observation/image": "image",
+        "observation/wrist_image": "wrist_image",
+        "observation/state": "state",
+        "actions": "actions",
+        "prompt": "prompt",
+    }
+)</code></pre>
+    <p>因此，模型实际关心的是这些字段：</p>
+    <table>
+      <tr><th>字段</th><th>用途</th><th>必须统一吗</th></tr>
+      <tr><td><code>image</code></td><td>主视角 RGB 图像</td><td>是</td></tr>
+      <tr><td><code>wrist_image</code></td><td>腕部 RGB 图像</td><td>是</td></tr>
+      <tr><td><code>state</code></td><td>机器人 proprio/state</td><td>是</td></tr>
+      <tr><td><code>actions</code></td><td>动作 chunk / target</td><td>是</td></tr>
+      <tr><td><code>prompt</code> 或 <code>task_index</code></td><td>语言任务指令</td><td>是</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h2>3. 额外字段会不会被训练使用</h2>
+    <p><span class="ok">默认不会。</span>如果你的 LeRobot repo 里有这里这些字段，但 config 没有引用它们，它们会被忽略：</p>
+    <pre><code>episode_metadata
+force_torque
+camera_intrinsics
+segmentation
+extra_labels
+timestamp
+robot_serial</code></pre>
+    <p>这些字段不会自动进入模型，也不会自动参与 loss。OpenPI 只会沿着当前 <code>DataConfig</code>、<code>RepackTransform</code>、policy transform 和 model transform 明确读取的数据流走。</p>
+
+    <h3>什么时候会被使用</h3>
+    <ul>
+      <li>如果你把 <code>force_torque</code> 拼进 <code>state</code>，它就会被模型当作 state 使用。</li>
+      <li>如果你在 <code>RepackTransform</code> 里显式引用 <code>force_torque</code>，它就会进入 transform 输出。</li>
+      <li>如果你写了自定义 transform，把 <code>episode_metadata</code> 转成 prompt 或 state，它就会间接影响训练。</li>
+      <li>如果你改了 model input spec 或 policy transform 接收新字段，它就可能参与训练。</li>
+    </ul>
+
+    <h3>什么时候可能报错</h3>
+    <ul>
+      <li>额外字段本身在 LeRobot 数据集中声明不合法。</li>
+      <li>同一个 feature 在不同 episode 中 shape 不一致，LeRobot loader 或 batch collate 失败。</li>
+      <li>你把只在部分数据中存在的字段写进 <code>RepackTransform</code>，另一部分样本没有这个 key。</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>4. 可以混的数据与不能混的数据</h2>
+    <table>
+      <tr><th>情况</th><th>能否混</th><th>说明</th></tr>
+      <tr><td>一部分 episode 多 <code>episode_metadata</code></td><td><span class="ok">可以</span></td><td>只要训练 config 不读取它。</td></tr>
+      <tr><td>一部分 episode 多 <code>force_torque</code></td><td><span class="ok">可以</span></td><td>只要不拼进 <code>state</code>，不参与训练。</td></tr>
+      <tr><td>一部分没有 <code>wrist_image</code></td><td><span class="danger">不建议直接混</span></td><td>需要转换时补齐或统一映射。</td></tr>
+      <tr><td>一部分 <code>action_dim=7</code>，一部分 <code>action_dim=8</code></td><td><span class="danger">不能直接混</span></td><td>必须统一 action 维度和语义。</td></tr>
+      <tr><td>一部分 action 是 delta，一部分是 absolute</td><td><span class="danger">不能直接混</span></td><td>即使 shape 一样，语义不同也会污染训练。</td></tr>
+      <tr><td>一部分 state 多 force/torque 维度</td><td><span class="warn">需要处理</span></td><td>要么全部 pad/映射到同一 state schema，要么不要放进 state。</td></tr>
+      <tr><td>prompt 缺失</td><td><span class="warn">需要补齐</span></td><td>可用 default prompt 或 task_index 映射。</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h2>5. 推荐的混合方式</h2>
+    <p>不要把不同 schema 的原始数据直接拼在一起训练。建议先创建一个“训练视图 schema”。</p>
+    <pre><code>必需训练字段：
+  image
+  wrist_image
+  state
+  actions
+  prompt 或 task_index
+
+可保留但默认不用的额外字段：
+  episode_metadata
+  force_torque
+  depth
+  camera_intrinsics
+  segmentation
+  extra_labels</code></pre>
+
+    <h3>转换阶段建议</h3>
+    <ul>
+      <li>统一图像 key：主视角都映射到 <code>image</code>，腕部都映射到 <code>wrist_image</code>。</li>
+      <li>统一 state：所有样本输出相同维度、相同含义的 <code>state</code>。</li>
+      <li>统一 actions：所有样本输出相同 <code>action_dim</code>、相同 horizon、相同动作语义。</li>
+      <li>统一 prompt：所有样本都能得到语言任务。</li>
+      <li>额外字段可以保留，但先不要让训练 config 读取。</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>6. OpenPI config 示例</h2>
+    <p>如果你已经生成了一个本地 mixed LeRobot repo，可以仿照 <code>pi05_libero</code> 加一个 smoke config。</p>
+    <pre><code>TrainConfig(
+    name="pi05_libero_lerobot_mix_smoke",
+    model=pi0_config.Pi0Config(pi05=True, action_horizon=10, discrete_state_input=False),
+    data=LeRobotLiberoDataConfig(
+        repo_id="/absolute/path/to/your_mixed_lerobot_repo",
+        base_config=DataConfig(prompt_from_task=True),
+        extra_delta_transform=False,
+    ),
+    batch_size=8,
+    weight_loader=weight_loaders.CheckpointWeightLoader("gs://openpi-assets/checkpoints/pi05_base/params"),
+    num_train_steps=10,
+)</code></pre>
+    <p>这个 config 仍然只会使用 LIBERO transform 需要的核心字段。额外字段默认不会被读取。</p>
+  </section>
+
+  <section>
+    <h2>7. 训练 smoke 命令</h2>
+    <p>先不要直接长时间训练，先跑 10 step 确认 dataloader、transform、model forward 都能过。</p>
+    <pre><code>cd /home/zj/PycharmProjects/pi0.5/openpi
+PYTHONPATH=/home/zj/PycharmProjects/pi0.5/openpi \
+  .venv/bin/python scripts/train.py pi05_libero_lerobot_mix_smoke \
+  --exp-name=compat_smoke \
+  --overwrite \
+  --num-train-steps=10 \
+  --batch-size=8 \
+  --num-workers=0</code></pre>
+  </section>
+
+  <section>
+    <h2>8. 只检查 batch 的脚本</h2>
+    <p>更保守的做法是先只取一个 batch，打印最终进入训练的 key、shape、dtype。</p>
+    <pre><code>cd /home/zj/PycharmProjects/pi0.5/openpi
+cat &gt; /tmp/check_lerobot_mix_batch.py &lt;&lt;'PY'
+import jax
+
+from openpi.training import config as train_config
+from openpi.training import data_loader
+
+
+cfg = train_config.get_config("pi05_libero_lerobot_mix_smoke")
+data_cfg = cfg.data.create(cfg.assets_dirs, cfg.model)
+
+loader = data_loader.create_torch_data_loader(
+    data_config=data_cfg,
+    model_config=cfg.model,
+    action_horizon=cfg.model.action_horizon,
+    batch_size=2,
+    skip_norm_stats=True,
+    shuffle=False,
+    num_batches=1,
+    num_workers=0,
+    sharding=jax.sharding.SingleDeviceSharding(jax.devices()[0]),
+)
+
+obs, actions = next(iter(loader))
+print("observation=", obs)
+print("actions shape=", actions.shape, "dtype=", actions.dtype)
+PY
+
+PYTHONPATH=/home/zj/PycharmProjects/pi0.5/openpi \
+  .venv/bin/python /tmp/check_lerobot_mix_batch.py</code></pre>
+    <p>如果额外字段没有被 transform 引用，它们不会出现在最终 <code>obs</code> 或 <code>actions</code> 里。</p>
+  </section>
+
+  <section>
+    <h2>9. 判断额外字段是否被使用</h2>
+    <p>最直接的判断方法：</p>
+    <ol>
+      <li>搜索 config 里的 <code>RepackTransform</code> 是否引用了该字段。</li>
+      <li>搜索自定义 transform 是否读取了该字段。</li>
+      <li>检查 batch 输出中是否出现该字段或由它派生的字段。</li>
+    </ol>
+
+    <h3>不会被使用的例子</h3>
+    <pre><code>LeRobot item:
+{
+  "image": ...,
+  "wrist_image": ...,
+  "state": ...,
+  "actions": ...,
+  "prompt": "pick up the cup",
+  "episode_metadata": {...},
+  "force_torque": [...]
+}
+
+RepackTransform 只读取：
+  image, wrist_image, state, actions, prompt
+
+结果：
+  episode_metadata 和 force_torque 不进入训练。</code></pre>
+
+    <h3>会被使用的例子</h3>
+    <pre><code># 转换数据时把 force_torque 拼进 state：
+state = concat([joint_position, gripper_position, force_torque])
+
+结果：
+  force_torque 已经变成 state 的一部分，会被模型使用。</code></pre>
+  </section>
+
+  <section>
+    <h2>10. 建议实验顺序</h2>
+    <ol>
+      <li>先让单个 LeRobot 数据源转换成 LIBERO-like schema，并跑 batch smoke。</li>
+      <li>再做小比例混合，例如 90% LIBERO + 10% 自有 LeRobot。</li>
+      <li>先跑 <code>num_train_steps=10</code>，确认无 shape/dtype/key 错误。</li>
+      <li>再跑短训练，观察 loss 是否异常。</li>
+      <li>最后才做正式混训。</li>
+    </ol>
+    <p><span class="warn">不要在 action 语义没对齐前混训。</span> shape 对齐只代表程序能跑，不代表训练语义正确。</p>
+  </section>
+</main>
+</body>
+</html>

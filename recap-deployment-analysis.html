@@ -1,0 +1,581 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RECAP 实际部署具体分析</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --panel: #111827;
+      --panel-2: #172033;
+      --ink: #edf2f7;
+      --muted: #aab4c3;
+      --line: rgba(180, 195, 218, .18);
+      --cyan: #67e8f9;
+      --blue: #60a5fa;
+      --green: #72d6a1;
+      --amber: #f7c66a;
+      --red: #fb7185;
+      --violet: #b8a1ff;
+      --code: #090d14;
+      --paper: rgba(17, 24, 39, .82);
+      --shadow: 0 28px 90px rgba(0, 0, 0, .38);
+      font-family: "Noto Sans SC", "Source Han Sans SC", "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 12% 4%, rgba(103, 232, 249, .18), transparent 28rem),
+        radial-gradient(circle at 86% 0%, rgba(184, 161, 255, .18), transparent 30rem),
+        linear-gradient(135deg, #09111f 0%, #0d1117 42%, #111827 100%);
+      line-height: 1.72;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+      background-size: 36px 36px;
+      mask-image: linear-gradient(to bottom, rgba(0,0,0,.82), rgba(0,0,0,.12));
+    }
+
+    a { color: var(--cyan); text-underline-offset: 4px; }
+    h1, h2, h3 { line-height: 1.18; margin-top: 0; letter-spacing: -.035em; }
+    h1 { font-size: clamp(2.5rem, 7.2vw, 6.8rem); margin-bottom: 1rem; }
+    h2 { font-size: clamp(1.7rem, 3.4vw, 2.8rem); margin-bottom: 1rem; }
+    h3 { font-size: clamp(1.15rem, 2vw, 1.45rem); margin-bottom: .55rem; }
+    p { margin: .65rem 0; }
+    code, pre, .mono { font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace; }
+
+    .wrap { width: min(1540px, calc(100% - 40px)); margin: 0 auto; position: relative; }
+
+    .hero {
+      min-height: 78vh;
+      padding: 72px 0 44px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(340px, .8fr);
+      gap: 34px;
+      align-items: center;
+    }
+
+    .eyebrow {
+      color: var(--cyan);
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      font-weight: 900;
+      font-size: .78rem;
+      display: inline-flex;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .eyebrow::before { content: ""; width: 34px; height: 2px; background: var(--cyan); }
+    .lead { font-size: clamp(1.05rem, 1.8vw, 1.32rem); color: #c7d2e1; max-width: 980px; }
+
+    .panel, section, .toc {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(16px);
+    }
+
+    .panel { padding: 24px; }
+    .signal-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 20px; }
+    .signal { background: rgba(96, 165, 250, .08); border: 1px solid var(--line); border-radius: 18px; padding: 14px; }
+    .signal b { display: block; color: var(--cyan); font-size: 1.4rem; }
+    .signal span { color: var(--muted); font-size: .92rem; }
+
+    .layout { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 28px; align-items: start; padding-bottom: 90px; }
+    .toc { position: sticky; top: 18px; padding: 18px; }
+    .toc strong { display: block; margin-bottom: 10px; color: var(--ink); }
+    .toc a { display: block; padding: 8px 10px; color: #c8d3e2; text-decoration: none; border-radius: 12px; font-size: .94rem; }
+    .toc a:hover { color: #07111d; background: var(--cyan); }
+
+    main { display: grid; gap: 24px; }
+    section { padding: clamp(24px, 4vw, 46px); overflow: hidden; }
+    .kicker { color: var(--cyan); font-weight: 900; text-transform: uppercase; letter-spacing: .12em; font-size: .74rem; }
+    .subtle { color: var(--muted); }
+    .tag { display: inline-flex; border: 1px solid rgba(103, 232, 249, .32); color: var(--cyan); background: rgba(103, 232, 249, .08); padding: 3px 10px; border-radius: 999px; font-size: .78rem; font-weight: 800; }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+    .card { background: rgba(23, 32, 51, .82); border: 1px solid var(--line); border-radius: 20px; padding: 18px; }
+    .card h3 { margin-top: 0; }
+
+    .flow { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; margin: 18px 0; }
+    .node { min-height: 150px; border: 1px solid var(--line); border-radius: 18px; padding: 16px; background: linear-gradient(160deg, rgba(96,165,250,.12), rgba(23,32,51,.88)); }
+    .node .num { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; background: var(--blue); color: #07111d; font-weight: 900; margin-bottom: 9px; }
+
+    .callout { border: 1px solid var(--line); border-left: 5px solid var(--cyan); background: rgba(103,232,249,.06); border-radius: 18px; padding: 18px; margin: 18px 0; }
+    .callout.warn { border-left-color: var(--amber); background: rgba(247,198,106,.07); }
+    .callout.bad { border-left-color: var(--red); background: rgba(251,113,133,.07); }
+    .callout.ok { border-left-color: var(--green); background: rgba(114,214,161,.07); }
+
+    pre { background: var(--code); border: 1px solid rgba(255,255,255,.12); color: #dbeafe; border-radius: 18px; padding: 18px; overflow-x: auto; line-height: 1.55; }
+    code { color: #dbeafe; background: rgba(255,255,255,.08); padding: 2px 5px; border-radius: 7px; }
+    pre code { background: transparent; padding: 0; border-radius: 0; }
+
+    table { width: 100%; border-collapse: collapse; margin: 18px 0; font-size: .94rem; }
+    th, td { border-bottom: 1px solid var(--line); padding: 12px 10px; text-align: left; vertical-align: top; }
+    th { background: rgba(103,232,249,.08); color: #eaf8ff; }
+    tr:last-child td { border-bottom: 0; }
+
+    .checklist { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .check { border: 1px solid var(--line); border-radius: 16px; background: rgba(17,24,39,.78); padding: 14px; }
+    .danger { color: var(--red); font-weight: 800; }
+    .ok-text { color: var(--green); font-weight: 800; }
+    .warn-text { color: var(--amber); font-weight: 800; }
+
+    @media (max-width: 1160px) {
+      .hero, .layout { grid-template-columns: 1fr; }
+      .toc { position: relative; top: 0; }
+      .flow, .grid-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 740px) {
+      .wrap { width: min(100% - 24px, 1540px); }
+      .hero { min-height: auto; padding-top: 44px; }
+      .signal-grid, .grid-2, .grid-3, .flow, .checklist { grid-template-columns: 1fr; }
+      table { display: block; overflow-x: auto; white-space: nowrap; }
+      section { padding: 22px; }
+    }
+  </style>
+
+
+
+<style id="blog-family-style">
+  :root {
+    --blog-bg: #f5f8f8;
+    --blog-bg-soft: #edf4f4;
+    --blog-surface: rgba(255, 255, 255, .92);
+    --blog-surface-strong: #ffffff;
+    --blog-border: rgba(28, 78, 88, .18);
+    --blog-text: #18333b;
+    --blog-muted: #465f68;
+    --blog-subtle: #596f77;
+    --blog-accent: #0b8f87;
+    --blog-accent-2: #6aaed6;
+    --blog-warm: #b7791f;
+    --blog-radius: 18px;
+    --blog-shadow: 0 18px 48px rgba(23, 74, 83, .10);
+  }
+  html { scroll-behavior: smooth; }
+  body {
+    background:
+      radial-gradient(circle at 8% -10%, color-mix(in srgb, var(--blog-accent) 16%, transparent), transparent 34%),
+      radial-gradient(circle at 88% 2%, color-mix(in srgb, var(--blog-accent-2) 13%, transparent), transparent 30%),
+      linear-gradient(180deg, #f7faf9 0%, #eef5f5 52%, #f8faf9 100%) !important;
+    color: var(--blog-text) !important;
+    font-family: "Avenir Next", "Inter", "SF Pro Text", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif !important;
+    letter-spacing: .005em;
+    text-rendering: optimizeLegibility;
+  }
+  h1 {
+    color: #102f38 !important;
+    font-family: "Iowan Old Style", "LXGW WenKai Screen", "霞鹜文楷", "Noto Serif SC", "Source Han Serif SC", "Songti SC", Georgia, serif !important;
+    letter-spacing: -.035em;
+    font-weight: 760;
+  }
+  h2, .section-header h2, .section-head h2 {
+    color: #173943 !important;
+    font-family: "Optima", "Avenir Next", "Noto Serif SC", "Noto Sans SC", system-ui, sans-serif !important;
+    letter-spacing: -.025em;
+    font-weight: 720;
+  }
+  h3, .title, .tl-title {
+    color: #1c4049 !important;
+    font-family: "Avenir Next", "Noto Sans SC", "PingFang SC", system-ui, sans-serif !important;
+    letter-spacing: -.01em;
+  }
+  .hero, .cover, header, .page-hero {
+    background:
+      linear-gradient(135deg, rgba(0, 140, 149, .12), rgba(255, 255, 255, .80) 44%, rgba(58, 167, 176, .10)),
+      linear-gradient(180deg, #fbfefe, #eef7f7) !important;
+    border-bottom: 1px solid var(--blog-border) !important;
+    color: var(--blog-text) !important;
+  }
+  .hero p, .cover .subtitle, header .subtitle, header .meta, .cover .meta {
+    color: var(--blog-muted) !important;
+  }
+  .wrap, .container, main {
+    max-width: min(1120px, calc(100vw - 32px));
+  }
+  .card, .panel, .callout, .note, .metric, .section, article, table, pre {
+    border-color: var(--blog-border) !important;
+  }
+  .card, .panel, .metric, .note {
+    background: var(--blog-surface) !important;
+    border-radius: var(--blog-radius) !important;
+    box-shadow: var(--blog-shadow);
+  }
+  .callout {
+    background: color-mix(in srgb, var(--blog-accent) 8%, #ffffff) !important;
+    border-left-color: var(--blog-accent) !important;
+    border-radius: 14px !important;
+    color: var(--blog-muted) !important;
+  }
+  a, .eyebrow, .accent { color: #006f78 !important; }
+  code {
+    color: #005f68 !important;
+    background: color-mix(in srgb, var(--blog-accent) 10%, #ffffff) !important;
+    border: 1px solid color-mix(in srgb, var(--blog-accent) 24%, #ffffff);
+    border-radius: 6px !important;
+    font-family: "JetBrains Mono", "SFMono-Regular", Consolas, "Liberation Mono", monospace !important;
+  }
+  pre {
+    background: #eef6f6 !important;
+    color: #25464e !important;
+    border-radius: 16px !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.72);
+  }
+  pre code { background: transparent !important; border: 0; color: inherit !important; }
+  table {
+    background: rgba(255, 255, 255, .86) !important;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  th {
+    background: color-mix(in srgb, var(--blog-accent) 11%, #f7fbfb) !important;
+    color: #173943 !important;
+  }
+  td, p, li { color: var(--blog-muted) !important; }
+  strong, b { color: #173943 !important; }
+  .tag, .badge, .step-count {
+    background: color-mix(in srgb, var(--blog-accent) 8%, #ffffff) !important;
+    border-color: color-mix(in srgb, var(--blog-accent) 24%, #ffffff) !important;
+    color: #31545d !important;
+  }
+  nav {
+    background: rgba(248, 252, 252, .86) !important;
+    border-bottom: 1px solid var(--blog-border) !important;
+    backdrop-filter: blur(18px);
+  }
+  nav a { color: #46616a !important; }
+  nav a:hover {
+    color: #12333c !important;
+    background: color-mix(in srgb, var(--blog-accent) 10%, #ffffff) !important;
+    border-color: color-mix(in srgb, var(--blog-accent) 32%, #ffffff) !important;
+  }
+  footer {
+    color: var(--blog-subtle) !important;
+    border-top-color: var(--blog-border) !important;
+  }
+  ::selection { background: color-mix(in srgb, var(--blog-accent) 24%, #ffffff); color: #0f2d35; }
+  @media (max-width: 720px) {
+    body { letter-spacing: 0; }
+    .hero, .cover, header { padding-left: 18px !important; padding-right: 18px !important; }
+  }
+</style>
+
+</head>
+<body>
+  <div class="wrap">
+    <header class="hero">
+      <div>
+        <div class="eyebrow">Deployment playbook</div>
+        <h1>RECAP 实际部署具体分析</h1>
+        <p class="lead">这份文档只谈落地：训练出来的 RECAP/CFG π0.5 策略如何从 checkpoint 变成 Isaac Sim 或真实机器人上的闭环控制系统。重点放在环境矩阵、模型产物、policy server、客户端 observation、动作 chunk、校准、延迟、安全、监控和回滚。</p>
+      </div>
+      <aside class="panel">
+        <span class="tag">部署结论</span>
+        <p><strong>能接上不等于能控制。</strong> RECAP 部署的真正难点不是启动 server，而是让训练时的数据坐标系、推理时的 observation key、图像预处理、关节顺序、夹爪定义、action horizon、控制频率、初始位姿和安全边界全部一致。</p>
+        <div class="signal-grid">
+          <div class="signal"><b>Server</b><span>GPU 侧 OpenPI/RLinf policy</span></div>
+          <div class="signal"><b>Client</b><span>Isaac Sim / robot control loop</span></div>
+          <div class="signal"><b>Data</b><span>LeRobot sidecar + advantage tag</span></div>
+          <div class="signal"><b>Risk</b><span>坐标/延迟/夹爪/分布外</span></div>
+        </div>
+      </aside>
+    </header>
+
+    <div class="layout">
+      <nav class="toc" aria-label="目录">
+        <strong>目录</strong>
+        <a href="#target">1. 部署目标到底是什么</a>
+        <a href="#topology">2. 推荐部署拓扑</a>
+        <a href="#artifacts">3. 训练产物与版本</a>
+        <a href="#environment">4. 环境矩阵</a>
+        <a href="#server">5. Policy Server</a>
+        <a href="#client">6. Isaac/机器人客户端</a>
+        <a href="#control">7. 控制闭环</a>
+        <a href="#calibration">8. 校准清单</a>
+        <a href="#recap-specific">9. RECAP 特有部署项</a>
+        <a href="#failure">10. 故障定位</a>
+        <a href="#rollout">11. 上线流程</a>
+      </nav>
+
+      <main>
+        <section id="target">
+          <div class="kicker">Deployment target</div>
+          <h2>1. 部署目标：把离线训练策略变成实时控制服务</h2>
+          <p>RECAP 训练阶段输出的是一个经过 advantage-conditioned / CFG 训练的 OpenPI π0.5 policy checkpoint。部署阶段要做的事情，是把它包装成一个稳定服务，让仿真或真机每隔若干控制周期发送 observation，收到 action chunk，并安全执行。</p>
+          <div class="callout ok">
+            <strong>部署验收标准：</strong>不是“代码能跑”，而是同一个任务 prompt、同一个初始位姿、同一个 observation schema 下，策略能稳定地产生形状正确、数值范围正确、时序连续、不会越界的动作，并且成功率高于 baseline SFT 或未 RECAP 的 π0.5。
+          </div>
+          <table>
+            <thead><tr><th>层级</th><th>部署对象</th><th>必须一致的东西</th><th>常见误判</th></tr></thead>
+            <tbody>
+              <tr><td>模型层</td><td>RECAP/CFG π0.5 checkpoint</td><td>config_name、checkpoint、norm stats、guidance scale</td><td>只换 checkpoint，不确认 config 和数据 transform。</td></tr>
+              <tr><td>服务层</td><td>OpenPI/RLinf policy server</td><td>Python 3.11、GPU、端口、序列化格式、batch/timeout</td><td>server 能启动就以为部署完成。</td></tr>
+              <tr><td>客户端层</td><td>Isaac Sim 或机器人控制程序</td><td>observation key、图像尺寸、state 顺序、prompt</td><td>字段名用官方泛化示例，但模型实际需要 DROID/LIBERO 专用 key。</td></tr>
+              <tr><td>控制层</td><td>action chunk 执行器</td><td>动作维度、单位、关节顺序、夹爪定义、控制频率</td><td>机械臂“抽搐”被误认为模型差，而不是动作解释错。</td></tr>
+              <tr><td>安全层</td><td>限幅、急停、回滚、监控</td><td>workspace 边界、速度限制、异常动作拦截</td><td>直接把模型输出喂给真机。</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section id="topology">
+          <div class="kicker">Runtime topology</div>
+          <h2>2. 推荐部署拓扑：训练机/推理机跑 server，仿真或机器人跑 client</h2>
+          <div class="flow">
+            <div class="node"><div class="num">1</div><h3>Camera/State</h3><p>采集 RGB、wrist RGB、joint、gripper、task prompt。</p></div>
+            <div class="node"><div class="num">2</div><h3>Preprocess</h3><p>RGBA→RGB，resize pad 到 224，state 按训练顺序组装。</p></div>
+            <div class="node"><div class="num">3</div><h3>Websocket</h3><p>发送 observation 到 policy server，等待 action chunk。</p></div>
+            <div class="node"><div class="num">4</div><h3>Action Adapter</h3><p>把模型动作转为 Isaac/机器人控制命令。</p></div>
+            <div class="node"><div class="num">5</div><h3>Safety Gate</h3><p>限幅、碰撞、速度、夹爪、急停、日志。</p></div>
+          </div>
+          <pre><code>GPU machine / workstation
+------------------------------------------------------+
+| openpi or RLinf env, Python >= 3.11, CUDA, checkpoint |
+| uv run scripts/serve_policy.py ...                   |
++--------------------------^---------------------------+
+                           | websocket, observation/actions
+Isaac Sim / robot client   v
++------------------------------------------------------+
+| openpi-client, camera/state adapter, action executor  |
+| control loop, safety limit, logging, emergency stop   |
++------------------------------------------------------+</code></pre>
+          <p>这种拆法的好处是：GPU 推理环境和 Isaac/机器人环境互不污染。特别是本地笔记指出 Isaac Sim 4.5 使用 Python 3.10，而 OpenPI/RLinf 通常要求 Python 3.11，部署时容易因为 Python 版本不一致卡住。Isaac Sim 5.0 或独立 robot client 更适合安装 <code>openpi-client</code>。</p>
+        </section>
+
+        <section id="artifacts">
+          <div class="kicker">Artifacts</div>
+          <h2>3. 部署前必须冻结的产物：不要只记一个 checkpoint 路径</h2>
+          <p>RECAP 的部署产物至少包括四类：base policy 配置、CFG 训练 checkpoint、advantage 标签版本、推理参数。缺任何一个，复现就会变成“看起来加载了同一个模型，实际行为完全不同”。</p>
+          <table>
+            <thead><tr><th>产物</th><th>例子</th><th>部署时用途</th><th>必须记录</th></tr></thead>
+            <tbody>
+              <tr><td>Policy checkpoint</td><td><code>logs/cfg_sft/.../checkpoints/global_step_N</code></td><td>被 server 加载用于推理。</td><td>绝对路径、step、训练命令、git commit。</td></tr>
+              <tr><td>OpenPI config</td><td><code>pi05_droid</code>、<code>pi05_libero</code></td><td>决定 observation transform、action dim、norm stats。</td><td>config name 与训练时完全一致。</td></tr>
+              <tr><td>Advantage tag</td><td><code>fail300_N10_ckpt18000_q30</code></td><td>说明策略学的是哪一版优势标签。</td><td>returns_tag、positive_quantile、N、value checkpoint。</td></tr>
+              <tr><td>Guidance 参数</td><td><code>cfgrl_guidance_scale=1.0</code></td><td>推理时控制高优势偏置强度。</td><td>上线 scale、扫描范围、默认回退值。</td></tr>
+              <tr><td>Normalization stats</td><td>训练数据统计</td><td>server 端归一化 state/action。</td><td>数据集版本、统计生成命令。</td></tr>
+            </tbody>
+          </table>
+          <div class="callout warn">
+            <strong>版本原则：</strong>一次部署只能对应一个不可变 manifest。manifest 里写清楚 checkpoint、config、数据集、returns_tag、advantage_tag、value checkpoint、guidance scale、action horizon、客户端 commit。没有 manifest，不上真机。
+          </div>
+        </section>
+
+        <section id="environment">
+          <div class="kicker">Environment matrix</div>
+          <h2>4. 环境矩阵：先把 Python、CUDA、Isaac、OpenPI 分开</h2>
+          <div class="grid-2">
+            <div class="card">
+              <span class="tag">Server 环境</span>
+              <h3>OpenPI/RLinf 推理侧</h3>
+              <ul>
+                <li>Ubuntu 22.04 更稳。</li>
+                <li>Python >= 3.11。</li>
+                <li>GPU 显存：推理通常至少 8GB，更复杂模型更高。</li>
+                <li>用 <code>uv</code> 管理 OpenPI 仓库依赖。</li>
+                <li>checkpoint 可从本地路径或 <code>gs://</code> 下载。</li>
+              </ul>
+            </div>
+            <div class="card">
+              <span class="tag">Client 环境</span>
+              <h3>Isaac Sim / Robot 侧</h3>
+              <ul>
+                <li>只需要轻量 <code>openpi-client</code>。</li>
+                <li>Isaac Sim 4.5 Python 3.10 可能不匹配。</li>
+                <li>Isaac Sim 5.0 更适合 Python 3.11 生态。</li>
+                <li>不要在 Isaac 环境里装完整训练栈。</li>
+                <li>客户端重点是采集、预处理和执行动作。</li>
+              </ul>
+            </div>
+          </div>
+          <pre><code># OpenPI server side, from openpi/
+GIT_LFS_SKIP_SMUDGE=1 uv sync
+GIT_LFS_SKIP_SMUDGE=1 uv pip install -e .
+
+# Client side, install lightweight websocket client
+cd $OPENPI_ROOT/packages/openpi-client
+pip install -e .</code></pre>
+        </section>
+
+        <section id="server">
+          <div class="kicker">Policy server</div>
+          <h2>5. Policy Server：先用假 observation 跑通，再接 Isaac</h2>
+          <p>部署顺序一定是：本地单进程推理 smoke test → policy server 启动 → websocket client 假数据调用 → Isaac/机器人真实数据调用。不要一开始就把 Isaac 接进来，否则你无法区分是模型加载错、server 错、网络错、还是 observation 错。</p>
+          <pre><code># 示例：OpenPI pi0.5 DROID checkpoint server
+cd /home/zj/PycharmProjects/pi0.5/openpi
+uv run scripts/serve_policy.py policy:checkpoint \
+  --policy.config=pi05_droid \
+  --policy.dir=gs://openpi-assets/checkpoints/pi05_droid</code></pre>
+          <p>如果是 RECAP 训练后的 checkpoint，把 <code>--policy.dir</code> 换成 Step 4 CFG 训练输出目录，并确保 <code>--policy.config</code> 与训练时的 OpenPI config 对齐。若 RLinf 的 CFG policy 使用不同启动脚本，需要以其 <code>cfg_rl_openpi.yaml</code> 中的 <code>actor.model.model_path</code> 和 <code>actor.model.openpi.config_name</code> 为准。</p>
+          <div class="callout bad">
+            <strong>最常见错误：</strong>server 用 <code>pi05_droid</code>，客户端却按通用示例发送 <code>observation/image</code> 和 <code>observation/wrist_image</code>。DROID 实际常见 key 是 <code>observation/exterior_image_1_left</code>、<code>observation/wrist_image_left</code>、<code>observation/joint_position</code>、<code>observation/gripper_position</code> 和 <code>prompt</code>。
+          </div>
+          <pre><code># 最小 smoke test 的 observation 形状，来自本地 hello_pi05.py 经验
+example = {
+    "observation/exterior_image_1_left": np.zeros((224, 224, 3), dtype=np.uint8),
+    "observation/wrist_image_left": np.zeros((224, 224, 3), dtype=np.uint8),
+    "observation/joint_position": np.zeros(7, dtype=np.float32),
+    "prompt": "pick up the fork",
+}
+action_chunk = policy.infer(example)["actions"]
+print(action_chunk.shape)</code></pre>
+        </section>
+
+        <section id="client">
+          <div class="kicker">Client adapter</div>
+          <h2>6. Isaac/机器人客户端：observation adapter 是部署成败的核心</h2>
+          <p>客户端每一轮控制循环要构造的不是“看起来差不多的 observation”，而是训练 transform 精确期望的 schema。字段名、dtype、shape、通道顺序、归一化职责必须明确。</p>
+          <table>
+            <thead><tr><th>字段</th><th>推荐形状/类型</th><th>来源</th><th>必须检查</th></tr></thead>
+            <tbody>
+              <tr><td><code>observation/exterior_image_1_left</code></td><td><code>(224,224,3) uint8 RGB</code></td><td>外部相机</td><td>不是 RGBA；不是 BGR；resize_with_pad 后不拉伸。</td></tr>
+              <tr><td><code>observation/wrist_image_left</code></td><td><code>(224,224,3) uint8 RGB</code></td><td>腕部相机</td><td>相机朝向与训练集一致。</td></tr>
+              <tr><td><code>observation/joint_position</code></td><td><code>(7,) float32</code></td><td>机械臂关节</td><td>关节顺序、弧度/角度、零位、正方向。</td></tr>
+              <tr><td><code>observation/gripper_position</code></td><td><code>(1,) float32</code></td><td>夹爪开合</td><td>0/1 哪个是开，是否与训练一致。</td></tr>
+              <tr><td><code>prompt</code></td><td>字符串</td><td>任务指令</td><td>与训练 prompt 风格一致，不要临时换说法。</td></tr>
+            </tbody>
+          </table>
+          <pre><code>from openpi_client import image_tools
+from openpi_client import websocket_client_policy
+
+client = websocket_client_policy.WebsocketClientPolicy(host="localhost", port=8000)
+
+def build_observation(exterior_rgba, wrist_rgba, joint_position, gripper, prompt):
+    exterior_rgb = exterior_rgba[:, :, :3]
+    wrist_rgb = wrist_rgba[:, :, :3]
+    return {
+        "observation/exterior_image_1_left": image_tools.convert_to_uint8(
+            image_tools.resize_with_pad(exterior_rgb, 224, 224)
+        ),
+        "observation/wrist_image_left": image_tools.convert_to_uint8(
+            image_tools.resize_with_pad(wrist_rgb, 224, 224)
+        ),
+        "observation/joint_position": joint_position.astype("float32"),
+        "observation/gripper_position": np.array([gripper], dtype="float32"),
+        "prompt": prompt,
+    }</code></pre>
+          <div class="callout warn">
+            <strong>不要盲信夹爪转换：</strong>本地笔记里的左右夹爪位姿到 0-1 开合度转换只是初步方案。部署前要做物理标定：完全闭合、半开、完全打开三点采样，确认模型输出的 gripper 方向和仿真/真机控制方向一致。
+          </div>
+        </section>
+
+        <section id="control">
+          <div class="kicker">Control loop</div>
+          <h2>7. 控制闭环：action chunk 不是每一步都重新规划</h2>
+          <p>OpenPI policy 往往返回一个 action chunk，形状类似 <code>(action_horizon, action_dim)</code>。部署时通常每隔 N 步推理一次，然后开环执行 chunk 中的若干步。关键是推理频率、执行频率、chunk 重叠策略要固定，否则策略训练时的时序假设会被破坏。</p>
+          <pre><code>for episode in range(num_episodes):
+    reset_to_known_initial_pose()
+    action_chunk = None
+    chunk_index = 0
+
+    for t in range(max_steps):
+        if action_chunk is None or chunk_index >= replan_interval:
+            obs = build_observation(...)
+            result = client.infer(obs)
+            action_chunk = result["actions"]
+            chunk_index = 0
+
+        raw_action = action_chunk[chunk_index]
+        safe_action = safety_filter(raw_action)
+        execute_action(safe_action)
+        chunk_index += 1</code></pre>
+          <table>
+            <thead><tr><th>控制项</th><th>具体要定</th><th>错了的表现</th></tr></thead>
+            <tbody>
+              <tr><td>Action dim</td><td>每维代表 joint delta、absolute joint、EEF delta 还是 gripper。</td><td>机械臂大幅抽搐或完全不动。</td></tr>
+              <tr><td>单位</td><td>弧度/角度、米/厘米、归一化量/真实量。</td><td>动作幅度放大或缩小 10-100 倍。</td></tr>
+              <tr><td>控制频率</td><td>policy inference Hz 和低层 controller Hz。</td><td>动作延迟、震荡、过冲。</td></tr>
+              <tr><td>重规划间隔</td><td>执行 chunk 的几步后重新 infer。</td><td>太短会抖，太长会错过反馈。</td></tr>
+              <tr><td>夹爪策略</td><td>连续控制、阈值开关还是延迟执行。</td><td>夹爪提前闭合、永远不闭合或反向。</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section id="calibration">
+          <div class="kicker">Calibration</div>
+          <h2>8. 校准清单：机械臂“抽搐”通常不是模型问题</h2>
+          <div class="checklist">
+            <div class="check"><strong>相机外参</strong><br>训练时外部相机在左前还是右前？Isaac 相机是否镜像？图像是否上下翻转？</div>
+            <div class="check"><strong>图像颜色</strong><br>Isaac 输出 RGBA，必须去 alpha；如果是 OpenCV 路径，还要确认不是 BGR。</div>
+            <div class="check"><strong>关节顺序</strong><br>训练数据 joint_0...joint_6 与 Isaac articulation 顺序是否一致，不能只看维度都是 7。</div>
+            <div class="check"><strong>关节单位</strong><br>确认 state 是 rad 还是 degree；action 是 delta 还是 target。</div>
+            <div class="check"><strong>夹爪方向</strong><br>0 是闭合还是打开；左右 finger 是否对称；是否需要取平均。</div>
+            <div class="check"><strong>初始位姿</strong><br>初始 pose 与训练/评测环境差一点，VLA 可能完全分布外。</div>
+            <div class="check"><strong>prompt 风格</strong><br>不要把训练中 “pick up the fork” 临时改成中文或复杂长句。</div>
+            <div class="check"><strong>动作限幅</strong><br>部署第一天必须限速度、限位置、限夹爪力，先保守后放开。</div>
+          </div>
+        </section>
+
+        <section id="recap-specific">
+          <div class="kicker">RECAP-specific deployment</div>
+          <h2>9. RECAP 特有部署项：CFG scale 和正样本偏置要单独上线</h2>
+          <p>普通 π0.5 SFT 部署只需要确认 checkpoint 和 transform。RECAP 多了一个变量：推理时是否启用 advantage-conditioned/CFG，以及 guidance scale 多大。这个变量会直接改变动作分布，不能和普通模型一样“一次上线”。</p>
+          <table>
+            <thead><tr><th>部署模式</th><th>含义</th><th>适用阶段</th><th>风险</th></tr></thead>
+            <tbody>
+              <tr><td>Baseline SFT</td><td>未 RECAP 的原始 π0.5。</td><td>对照组。</td><td>性能可能低，但行为更熟悉。</td></tr>
+              <tr><td>RECAP, scale=1</td><td>使用条件策略，但不强烈放大。</td><td>首个 RECAP 部署点。</td><td>提升可能温和。</td></tr>
+              <tr><td>RECAP, scale&gt;1</td><td>放大高优势方向。</td><td>仿真扫描后再考虑。</td><td>动作更激进，可能越界或抖动。</td></tr>
+              <tr><td>RECAP, scale=0 或 uncond</td><td>近似普通行为分布。</td><td>回滚/诊断。</td><td>不体现 RECAP 增益。</td></tr>
+            </tbody>
+          </table>
+          <div class="callout bad">
+            <strong>上线规则：</strong>不要直接把 <code>cfgrl_guidance_scale</code> 调高上真机。先在仿真或离线回放中扫 <code>0, 0.5, 1.0, 1.5, 2.0</code>，观察动作幅度、夹爪时机、碰撞率、成功率，再选择最小可用 scale。
+          </div>
+        </section>
+
+        <section id="failure">
+          <div class="kicker">Failure diagnosis</div>
+          <h2>10. 故障定位：按现象反推是哪一层错</h2>
+          <table>
+            <thead><tr><th>现象</th><th>优先怀疑</th><th>具体检查</th><th>修复方向</th></tr></thead>
+            <tbody>
+              <tr><td>server 启动失败</td><td>环境/权重/config</td><td>Python 版本、CUDA、checkpoint 路径、config name。</td><td>先用 hello_pi05 式本地 fake obs 推理。</td></tr>
+              <tr><td>client 报缺字段</td><td>observation key 不匹配</td><td>查看 policy example/schema，确认 DROID/LIBERO key。</td><td>改 adapter，不改模型。</td></tr>
+              <tr><td>动作 shape 不对</td><td>config 或 checkpoint 错</td><td>action_dim、action_horizon、robot_type。</td><td>核对训练 manifest。</td></tr>
+              <tr><td>机械臂抽搐</td><td>动作解释/单位/关节顺序</td><td>逐维打印 action，单维注入测试。</td><td>建立 action adapter 和限幅。</td></tr>
+              <tr><td>能动但任务失败</td><td>初始位姿/相机/prompt 分布外</td><td>对比训练数据首帧和部署首帧。</td><td>重置场景、采集微调数据。</td></tr>
+              <tr><td>RECAP 比 SFT 更差</td><td>advantage 标签或 scale</td><td>scale=0/1/更高对照，查看高优势动作是否合理。</td><td>降低 scale，重标 q20/q30，重训。</td></tr>
+              <tr><td>延迟导致错过物体</td><td>网络/推理频率/chunk 策略</td><td>记录 capture→infer→execute 延迟。</td><td>客户端 resize，减少传输，调 replan interval。</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section id="rollout">
+          <div class="kicker">Rollout plan</div>
+          <h2>11. 从仿真到真机的上线流程：每一步都有停止条件</h2>
+          <div class="grid-3">
+            <div class="card"><span class="tag">Phase 0</span><h3>离线验证</h3><p>fake observation 推理成功，action shape 正确，server/client websocket 正常，manifest 完整。</p></div>
+            <div class="card"><span class="tag">Phase 1</span><h3>仿真空动作</h3><p>Isaac 中只打印动作不执行，确认 latency、shape、数值范围、字段。</p></div>
+            <div class="card"><span class="tag">Phase 2</span><h3>仿真限幅执行</h3><p>低速、短 episode、固定初始位姿，先看是否安全，再看任务成功。</p></div>
+            <div class="card"><span class="tag">Phase 3</span><h3>仿真批量评估</h3><p>baseline vs RECAP scale 扫描，统计成功率、碰撞、超时、动作幅度。</p></div>
+            <div class="card"><span class="tag">Phase 4</span><h3>真机影子模式</h3><p>真机采集 observation，模型只输出建议动作，不执行，比较人工/现有控制。</p></div>
+            <div class="card"><span class="tag">Phase 5</span><h3>真机受控上线</h3><p>低速、急停、人值守、小范围 workspace，逐步放开。</p></div>
+          </div>
+          <div class="callout ok">
+            <strong>最终交付物：</strong>部署 manifest、server 启动脚本、client adapter、action adapter、安全过滤器、评估日志、失败视频、scale 扫描表、回滚命令。没有这些，不能称为“实际部署完成”。
+          </div>
+          <p class="subtle">依据来源：RLinf RECAP 文档、OpenPI 本地项目说明、本工作区 <code>isaacsim_pi0_inference.md</code> 和 <code>hello_pi05.py</code> 中的远程推理与 pi0.5 DROID observation 经验。</p>
+        </section>
+      </main>
+    </div>
+  </div>
+</body>
+</html>

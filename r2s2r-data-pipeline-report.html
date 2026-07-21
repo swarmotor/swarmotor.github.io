@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>R2S2R 数据生成管线全景图</title>
+    <style>
+        :root {
+            --primary: #1a73e8;
+            --primary-light: #e8f0fe;
+            --secondary: #34a853;
+            --warning: #ea4335;
+            --bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --text: #202124;
+            --text-secondary: #5f6368;
+            --border: #dadce0;
+            --shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans SC', sans-serif;
+            line-height: 1.7;
+            color: var(--text);
+            background: var(--bg);
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+            padding: 60px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 16px;
+        }
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+        header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        .pipeline-visual {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            margin-bottom: 40px;
+            box-shadow: var(--shadow);
+            overflow-x: auto;
+        }
+        .pipeline-flow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0;
+            min-width: 900px;
+            padding: 20px 0;
+        }
+        .pipeline-stage {
+            flex: 1;
+            text-align: center;
+            padding: 20px 15px;
+            background: var(--primary-light);
+            border: 2px solid var(--primary);
+            border-radius: 12px;
+            position: relative;
+            min-width: 140px;
+        }
+        .pipeline-stage.active {
+            background: var(--primary);
+            color: white;
+        }
+        .pipeline-stage h3 {
+            font-size: 1em;
+            margin-bottom: 8px;
+        }
+        .pipeline-stage p {
+            font-size: 0.85em;
+            opacity: 0.8;
+        }
+        .pipeline-arrow {
+            font-size: 2em;
+            color: var(--primary);
+            padding: 0 5px;
+            flex-shrink: 0;
+        }
+        .pipeline-arrow.down {
+            transform: rotate(90deg);
+        }
+        section {
+            margin-bottom: 50px;
+        }
+        h2 {
+            font-size: 1.8em;
+            color: var(--primary);
+            margin-bottom: 30px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid var(--primary);
+        }
+        h3 {
+            font-size: 1.3em;
+            color: var(--text);
+            margin: 25px 0 15px;
+        }
+        .stage-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+        }
+        .stage-number {
+            font-size: 2.5em;
+            font-weight: 700;
+            opacity: 0.9;
+        }
+        .stage-title h2 {
+            color: white;
+            border: none;
+            margin: 0;
+            padding: 0;
+            font-size: 1.6em;
+        }
+        .stage-title p {
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+        th {
+            background: var(--primary);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--border);
+        }
+        tr:hover td {
+            background: var(--primary-light);
+        }
+        .tag {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 500;
+            margin: 2px;
+        }
+        .tag-open {
+            background: #e6f4ea;
+            color: #137333;
+        }
+        .tag-closed {
+            background: #fce8e6;
+            color: #c5221f;
+        }
+        .tag-year {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+        .tag-type {
+            background: #fef7e0;
+            color: #b06000;
+        }
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 20px 0;
+            box-shadow: var(--shadow);
+        }
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--border);
+        }
+        .card-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            background: var(--primary-light);
+        }
+        .highlight-box {
+            background: linear-gradient(135deg, #667eea20 0%, #764ba220 100%);
+            border-left: 4px solid var(--primary);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .comparison-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            border-top: 4px solid var(--primary);
+        }
+        .comparison-card h4 {
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+        .comparison-card ul {
+            list-style: none;
+            padding: 0;
+        }
+        .comparison-card li {
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .comparison-card li:last-child {
+            border-bottom: none;
+        }
+        .autodatagen-position {
+            background: linear-gradient(135deg, #34a85320 0%, #34a85340 100%);
+            border: 2px solid var(--secondary);
+            border-radius: 12px;
+            padding: 30px;
+            margin: 30px 0;
+        }
+        .autodatagen-position h3 {
+            color: var(--secondary);
+            margin-bottom: 20px;
+        }
+        .position-flow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+        .position-box {
+            padding: 15px 20px;
+            border-radius: 8px;
+            text-align: center;
+            min-width: 120px;
+        }
+        .position-box.highlight {
+            background: var(--secondary);
+            color: white;
+            font-weight: 600;
+        }
+        .position-box.normal {
+            background: #e8f5e9;
+            color: var(--secondary);
+            border: 1px solid var(--secondary);
+        }
+        .end-to-end-table {
+            margin: 20px 0;
+        }
+        .end-to-end-table th {
+            background: #34a853;
+        }
+        .milestone {
+            background: #fef7e0;
+            border-left: 4px solid #fbbc04;
+            padding: 15px 20px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .milestone strong {
+            color: #b06000;
+        }
+        footer {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-secondary);
+            border-top: 1px solid var(--border);
+            margin-top: 60px;
+        }
+        @media print {
+            .container { padding: 0; }
+            header { background: #667eea; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .pipeline-stage, .pipeline-arrow { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        }
+    </style>
+
+
+
+<style id="blog-family-style">
+  :root {
+    --blog-bg: #f5f8f8;
+    --blog-bg-soft: #edf4f4;
+    --blog-surface: rgba(255, 255, 255, .92);
+    --blog-surface-strong: #ffffff;
+    --blog-border: rgba(28, 78, 88, .18);
+    --blog-text: #18333b;
+    --blog-muted: #465f68;
+    --blog-subtle: #596f77;
+    --blog-accent: #168a8f;
+    --blog-accent-2: #8fb8c8;
+    --blog-warm: #b7791f;
+    --blog-radius: 18px;
+    --blog-shadow: 0 18px 48px rgba(23, 74, 83, .10);
+  }
+  html { scroll-behavior: smooth; }
+  body {
+    background:
+      radial-gradient(circle at 8% -10%, color-mix(in srgb, var(--blog-accent) 16%, transparent), transparent 34%),
+      radial-gradient(circle at 88% 2%, color-mix(in srgb, var(--blog-accent-2) 13%, transparent), transparent 30%),
+      linear-gradient(180deg, #f7faf9 0%, #eef5f5 52%, #f8faf9 100%) !important;
+    color: var(--blog-text) !important;
+    font-family: "Avenir Next", "Inter", "SF Pro Text", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif !important;
+    letter-spacing: .005em;
+    text-rendering: optimizeLegibility;
+  }
+  h1 {
+    color: #102f38 !important;
+    font-family: "Iowan Old Style", "LXGW WenKai Screen", "霞鹜文楷", "Noto Serif SC", "Source Han Serif SC", "Songti SC", Georgia, serif !important;
+    letter-spacing: -.035em;
+    font-weight: 760;
+  }
+  h2, .section-header h2, .section-head h2 {
+    color: #173943 !important;
+    font-family: "Optima", "Avenir Next", "Noto Serif SC", "Noto Sans SC", system-ui, sans-serif !important;
+    letter-spacing: -.025em;
+    font-weight: 720;
+  }
+  h3, .title, .tl-title {
+    color: #1c4049 !important;
+    font-family: "Avenir Next", "Noto Sans SC", "PingFang SC", system-ui, sans-serif !important;
+    letter-spacing: -.01em;
+  }
+  .hero, .cover, header, .page-hero {
+    background:
+      linear-gradient(135deg, rgba(0, 140, 149, .12), rgba(255, 255, 255, .80) 44%, rgba(58, 167, 176, .10)),
+      linear-gradient(180deg, #fbfefe, #eef7f7) !important;
+    border-bottom: 1px solid var(--blog-border) !important;
+    color: var(--blog-text) !important;
+  }
+  .hero p, .cover .subtitle, header .subtitle, header .meta, .cover .meta {
+    color: var(--blog-muted) !important;
+  }
+  .wrap, .container, main {
+    max-width: min(1120px, calc(100vw - 32px));
+  }
+  .card, .panel, .callout, .note, .metric, .section, article, table, pre {
+    border-color: var(--blog-border) !important;
+  }
+  .card, .panel, .metric, .note {
+    background: var(--blog-surface) !important;
+    border-radius: var(--blog-radius) !important;
+    box-shadow: var(--blog-shadow);
+  }
+  .callout {
+    background: color-mix(in srgb, var(--blog-accent) 8%, #ffffff) !important;
+    border-left-color: var(--blog-accent) !important;
+    border-radius: 14px !important;
+    color: var(--blog-muted) !important;
+  }
+  a, .eyebrow, .accent { color: #006f78 !important; }
+  code {
+    color: #005f68 !important;
+    background: color-mix(in srgb, var(--blog-accent) 10%, #ffffff) !important;
+    border: 1px solid color-mix(in srgb, var(--blog-accent) 24%, #ffffff);
+    border-radius: 6px !important;
+    font-family: "JetBrains Mono", "SFMono-Regular", Consolas, "Liberation Mono", monospace !important;
+  }
+  pre {
+    background: #eef6f6 !important;
+    color: #25464e !important;
+    border-radius: 16px !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.72);
+  }
+  pre code { background: transparent !important; border: 0; color: inherit !important; }
+  table {
+    background: rgba(255, 255, 255, .86) !important;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  th {
+    background: color-mix(in srgb, var(--blog-accent) 11%, #f7fbfb) !important;
+    color: #173943 !important;
+  }
+  td, p, li { color: var(--blog-muted) !important; }
+  strong, b { color: #173943 !important; }
+  .tag, .badge, .step-count {
+    background: color-mix(in srgb, var(--blog-accent) 8%, #ffffff) !important;
+    border-color: color-mix(in srgb, var(--blog-accent) 24%, #ffffff) !important;
+    color: #31545d !important;
+  }
+  nav {
+    background: rgba(248, 252, 252, .86) !important;
+    border-bottom: 1px solid var(--blog-border) !important;
+    backdrop-filter: blur(18px);
+  }
+  nav a { color: #46616a !important; }
+  nav a:hover {
+    color: #12333c !important;
+    background: color-mix(in srgb, var(--blog-accent) 10%, #ffffff) !important;
+    border-color: color-mix(in srgb, var(--blog-accent) 32%, #ffffff) !important;
+  }
+  footer {
+    color: var(--blog-subtle) !important;
+    border-top-color: var(--blog-border) !important;
+  }
+  ::selection { background: color-mix(in srgb, var(--blog-accent) 24%, #ffffff); color: #0f2d35; }
+  @media (max-width: 720px) {
+    body { letter-spacing: 0; }
+    .hero, .cover, header { padding-left: 18px !important; padding-right: 18px !important; }
+  }
+</style>
+
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>R2S2R 数据生成管线全景图</h1>
+            <p>从真实场景到仿真数据到真实机器人：完整管线 + 前沿项目映射</p>
+        </header>
+
+        <!-- 管线总览 -->
+        <section class="pipeline-visual">
+            <h2 style="text-align:center; margin-bottom:30px;">管线总览</h2>
+            <div class="pipeline-flow">
+                <div class="pipeline-stage">
+                    <h3>🌍 Real</h3>
+                    <p>真实场景</p>
+                </div>
+                <div class="pipeline-arrow">→</div>
+                <div class="pipeline-stage">
+                    <h3>① 3DGS</h3>
+                    <p>高斯/NeRF 重建</p>
+                </div>
+                <div class="pipeline-arrow">→</div>
+                <div class="pipeline-stage">
+                    <h3>② 分割+物理</h3>
+                    <p>SAM/MLLM 推断</p>
+                </div>
+                <div class="pipeline-arrow">→</div>
+                <div class="pipeline-stage">
+                    <h3>③ Isaac Lab</h3>
+                    <p>资产导入 URDF/USD</p>
+                </div>
+                <div class="pipeline-arrow">→</div>
+                <div class="pipeline-stage active">
+                    <h3>④ 训练</h3>
+                    <p>RL/IL/World Model</p>
+                </div>
+                <div class="pipeline-arrow">→</div>
+                <div class="pipeline-stage">
+                    <h3>⑤ 部署</h3>
+                    <p>Real 机器人</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 阶段 ① -->
+        <section>
+            <div class="stage-header">
+                <div class="stage-number">①</div>
+                <div class="stage-title">
+                    <h2>3DGS/NeRF 重建</h2>
+                    <p>Real → 3DGS 场景资产</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">📸</div>
+                    <div>
+                        <h3 style="margin:0;">核心问题</h3>
+                        <p style="color:var(--text-secondary);">如何从多视角 RGB 图像重建高质量 3D 场景？</p>
+                    </div>
+                </div>
+                <p>传统 SLAM 建图依赖结构化场景且耗时，3DGS 通过可微分高斯渲染实现高质量自由视角合成。NeRF 系列虽质量高但速度慢，3DGS 在速度和质量间取得平衡。</p>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>项目</th>
+                        <th>开源/闭源</th>
+                        <th>年份</th>
+                        <th>输入</th>
+                        <th>核心能力</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>3D Gaussian Splatting</strong> (Inria)</td>
+                        <td><span class="tag tag-open">✅ 开源</span></td>
+                        <td><span class="tag tag-year">2023</span></td>
+                        <td>多视角 RGB + COLMAP</td>
+                        <td>可微分高斯渲染，实时渲染，高质量 3D 重建</td>
+                    </tr>
+                    <tr>
+                        <td><strong>InstantSplat</strong> (NVIDIA)</td>
+                        <td><span class="tag tag-open">✅ 开源</span></td>
+                        <td><span class="tag tag-year">2024</span></td>
+                        <td>少量视角 RGB</td>
+                        <td>稀疏视角初始化，快速收敛，few-shot 3DGS</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Nerfstudio</strong></td>
+                        <td><span class="tag tag-open">✅ 开源</span></td>
+                        <td><span class="tag tag-year">2023+</span></td>
+                        <td>多视角 RGB</td>
+                        <td>统一 NeRF/3DGS 框架，支持多种变体</td>
+                    </tr>
+                    <tr>
+                        <td><strong>COLMAP</strong></td>
+                        <td><span class="tag tag-open">✅ 开源</span></td>
+                        <td><span class="tag tag-year">2010+</span></td>
+                        <td>多视角 RGB</td>
+                        <td>SfM 稀疏重建 + MVS 稠密重建</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Feature Splatting</strong></td>
+                        <td><span class="tag tag-open">✅ 开源</span></td>
+                        <td><span class="tag tag-year">2024</span></td>
+                        <td>多视角 RGB</td>
+                        <td>语义特征嵌入 3DGS，支持开放词汇查询</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Gaussian Grouping</strong></td>
+                        <td><span class="tag tag-open">✅ 开源</span></td>
+                        <td><span class="tag tag-year">2024</span></td>
+                        <td>多视角 RGB</td>
+                        <td>逐高斯语义分组，无需分割模型</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Segment Anything in 3D Gaussian</strong></td>
+                        <td><span class="tag tag-open">✅ 开源</span></td>
+                        <td><span class="tag tag-year">2024</span></td>
+                        <td>3DGS + 文本/框/点</td>
+                        <td>在 3DGS 空间直接分割，无需逐帧标注</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="highlight-box">
+                <strong>💡 关键洞察：</strong>3DGS 已成为 Real2Sim 的主流重建格式，速度快（实时渲染）、质量高（接近 NeRF）、支持语义嵌入（特征高斯）。NVIDIA InstantSplat 专门为机器人场景优化。
+            </div>
+        </section>
+
+        <!-- 阶段 ② -->
+        <section>
+            <div class="stage-header">
+                <div class="stage-number">②</div>
+                <div class="stage-title">
+                    <h2>场景分割 + 物理属性推断</h2>
+                    <p>3DGS → 可交互资产</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">🧠</div>
+                    <div>
+                        <h3 style="margin:0;">核心问题</h3>
+                        <p style="color:var(--text-secondary);">如何从 3DGS 场景中分离物体并推断物理属性？</p>
+                    </div>
+                </div>
+                <p>3DGS 重建的是整个场景的静态表示，但机器人需要与独立物体交互。需要分割出单个物体，并推断其质量、摩擦、关节类型等物理属性。</p>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>项目</th>
+                        <th>开源/闭源</th>
+                        <th>年份</th>
+                        <th>核心能力</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>SAM 2</strong> (Meta)</td>
+                        <td><span class="tag tag-open">✅ 开源</span></td>
+                        <td><span class="tag tag-year">2024</span></td>
+                        <td>零样本视频/图像分割，通用性强</td>
+                    </tr>
+                    <tr>
+                        <td><strong>SAMpro3D</strong></td>
+                        <td><span class="tag tag-open">✅ 开源</span></td>
+                        <td><span class="tag tag-year">2025</span></td>
+                        <td>零样本 3D 分割 + 增强投影，支持铰接物体</td>
+                    </tr>
+                    <tr>
+                        <td><strong>GroundingDINO</strong></td>
+                        <td><span class="tag tag-open">✅ 开源</span></td>
+                        <td><span class="tag tag-year">2024</span></td>
+                        <td>语言引导目标检测，开放词汇</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Assist-GS</strong></td>
+                        <td><span class="tag tag-open">✅ 开源</span></td>
+                        <td><span class="tag tag-year">2025</span></td>
+                        <td>分解式 3DGS 重建，层次化实例/部件分割</td>
+                    </tr>
+                    <tr>
+                        <td><strong>RoboSimGS</strong> MLLM 物理推断</td>
+                        <td><span class="tag tag-open">✅ 开源</span></td>
+                        <td><span class="tag tag-year">2025</span></td>
+                        <td>多模态 LLM 推断密度、刚度、摩擦、铰接类型</td>
+                    </tr>
+                    <tr>
+                        <td><strong>ArtiTwinSplat</strong></td>
+                        <td><span class="tag tag-open">✅ 开源</span></td>
+                        <td><span class="tag tag-year">2026</span></td>
+                        <td>无监督铰接发现 + URDF 生成，无需 CAD</td>
+                    </tr>
+                    <tr>
+                        <td><strong>URDFormer</strong></td>
+                        <td><span class="tag tag-open">✅ 开源</span></td>
+                        <td><span class="tag tag-year">2024</span></td>
+                        <td>单张图 → URDF 生成，支持铰接物体</td>
+                    </tr>
+                    <tr>
+                        <td><strong>RoboGS</strong></td>
+                        <td><span class="tag tag-open">✅ 开源</span></td>
+                        <td><span class="tag tag-year">2025</span></td>
+                        <td>语义高斯分割 + 部件级物理属性推断</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="milestone">
+                <strong>🎯 技术路线对比：</strong><br>
+                <strong>MLLM 推断路线</strong>（RoboSimGS）：通用但依赖 LLM 质量<br>
+                <strong>监督学习路线</strong>（RoboGS）：需要高质量标注数据<br>
+                <strong>几何启发路线</strong>（ArtiTwinSplat）：无需标注但受限于铰接结构
+            </div>
+        </section>
+
+        <!-- 阶段 ③ -->
+        <section>
+            <div class="stage-header">
+                <div class="stage-number">③</div>
+                <div class="stage-title">
+                    <h2>Isaac Lab 资产导入</h2>
+                    <p>URDF/USD → 仿真环境</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">📦</div>
+                    <div>
+                        <h3 style="margin:0;">核心问题</h3>
+                        <p style="color:var(--text-secondary);">如何将 3D 资产转换为 Isaac Lab 可用的仿真环境？</p>
+                    </div>
+                </div>
+                <p>Isaac Lab 使用 OpenUSD 格式构建场景，支持 URDF 和 MJCF 导入。URDF 适合描述机器人（连杆+关节），MJCF 适合物理仿真，USD 适合场景渲染和组合。</p>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>项目</th>
+                        <th>开源/闭源</th>
+                        <th>格式转换</th>
+                        <th>核心能力</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Isaac Sim URDF Importer</strong></td>
+                        <td><span class="tag tag-closed">🔒 NVIDIA 官方</span></td>
+                        <td>URDF → USD</td>
+                        <td>图形界面拖拽导入，自动物理材质映射</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Isaac Lab convert_urdf.py</strong></td>
+                        <td><span class="tag tag-open">✅ 开源</span></td>
+                        <td>URDF → USD</td>
+                        <td>命令行批量转换，支持 ROS 2 资产</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Isaac Lab MJCF Importer</strong></td>
+                        <td><span class="tag tag-closed">🔒 NVIDIA 官方</span></td>
+                        <td>MJCF → USD</td>
+                        <td>MuJoCo XML 导入，支持丰富接触模型</td>
+                    </tr>
+                    <tr>
+                        <td><strong>GSDF</strong> (GSWorld)</td>
+                        <td><span class="tag tag-open">✅ 开源</span></td>
+                        <td>3DGS + URDF → GSDF</td>
+                        <td>高斯渲染 + 物理仿真资产融合格式</td>
+                    </tr>
+                    <tr>
+                        <td><strong>GS-Playground</strong></td>
+                        <td><span class="tag tag-open">✅ 开源</span></td>
+                        <td>3DGS → Isaac Lab</td>
+                        <td>批量 3DGS 场景导入，支持并行仿真</td>
+                    </tr>
+                    <tr>
+                        <td><strong>RoboTwin 2.0 资产</strong></td>
+                        <td><span class="tag tag-open">✅ 开源</span></td>
+                        <td>URDF + USD</td>
+                        <td>120+ 模型库，52 种纹理，生成式双胞胎资产</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="highlight-box">
+                <strong>💡 关键洞察：</strong>Isaac Lab 的资产管道是 <code>URDF/MJCF → USD</code>。3DGS 本身不是仿真格式，需要通过 GSDF 或 mesh 提取后转换为 USD 才能导入 Isaac Lab。<strong>GSWorld 的 GSDF 格式</strong>是目前最接近"3DGS 直接进 Isaac Lab"的方案。
+            </div>
+        </section>
+
+        <!-- 阶段 ④ -->
+        <section>
+            <div class="stage-header">
+                <div class="stage-number">④</div>
+                <div class="stage-title">
+                    <h2>RL / IL / World Model 训练</h2>
+                    <p>仿真环境 → 策略模型</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">🎯</div>
+                    <div>
+                        <h3 style="margin:0;">核心问题</h3>
+                        <p style="color:var(--text-secondary);">如何在仿真环境中高效生成训练数据并训练策略？</p>
+                    </div>
+                </div>
+                <p>这是 AutoDataGen 的核心领域。数据生成方法从模仿学习（需要示教）到强化学习（自动探索）再到世界模型（预测性训练）演进。Isaac Lab 提供 GPU 并行仿真，大幅提升数据生成效率。</p>
+            </div>
+
+            <table class="end-to-end-table">
+                <thead>
+                    <tr>
+                        <th>项目</th>
+                        <th>开源/闭源</th>
+                        <th>年份</th>
+                        <th>类型</th>
+                        <th>核心能力</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Isaac Lab RL</strong></td>
+                        <td><span class="tag tag-open">✅ 开源</span></td>
+                        <td><span class="tag tag-year">2024+</span></td>
+                        <td><span class="tag tag-type">RL</span></td>
+                        <td>GPU 并行强化学习，集成 PPO/SAC/DDPG</td>
+                    </tr>
+                    <tr>
+                        <td><strong>RoboTwin 2.0</strong></td>
+                        <td><span class="tag tag-open">✅ 开源</span></td>
+                        <td><span class="tag tag-year">2025+</span></td>
+                        <td><span class="tag tag-type">IL + 基准</span></td>
+                        <td>生成式数字双胞胎，双臂操作，50 个基准任务</td>
+                    </tr>
+                    <tr>
+                        <td><strong>InternDataEngine</strong></td>
+                        <td><span class="tag tag-open">✅ 开源</span></td>
+                        <td><span class="tag tag-year">2026</span></td>
+                        <td><span class="tag tag-type">数据生成</span></td>
+                        <td>Isaac Sim 大规模数据引擎，630K+ 轨迹，5 万任务</td>
+                    </tr>
+                    <tr>
+                        <td><strong>SoftMimicGen</strong></td>
+                        <td><span class="tag tag-open">✅ 开源</span></td>
+                        <td><span class="tag tag-year">2026</span></td>
+                        <td><span class="tag tag-type">IL 数据</span></td>
+                        <td>可变形物体数据生成，软体操作</td>
+                    </tr>
+                    <tr>
+                        <td><strong>AutoDataGen</strong></td>
+                        <td><span class="tag tag-open">✅ 开源</span></td>
+                        <td><span class="tag tag-year">2026</span></td>
+                        <td><span class="tag tag-type">IL 数据</span></td>
+                        <td>LLM 分解 + 原子技能 + cuRobo 运动规划</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MimicGen</strong></td>
+                        <td><span class="tag tag-open">✅ 开源</span></td>
+                        <td><span class="tag tag-year">2023</span></td>
+                        <td><span class="tag tag-type">IL 数据</span></td>
+                        <td>示教变换，从少量示教生成大规模数据</td>
+                    </tr>
+                    <tr>
+                        <td><strong>LeRobot</strong> (HuggingFace)</td>
+                        <td><span class="tag tag-open">✅ 开源</span></td>
+                        <td><span class="tag tag-year">2024+</span></td>
+                        <td><span class="tag tag-type">IL 框架</span></td>
+                        <td>统一 IL 训练框架，支持 ACT/Diffusion Policy</td>
+                    </tr>
+                    <tr>
+                        <td><strong>robomimic</strong></td>
+                        <td><span class="tag tag-open">✅ 开源</span></td>
+                        <td><span class="tag tag-year">2022+</span></td>
+                        <td><span class="tag tag-type">IL 框架</span></td>
+                        <td>BC/IL 策略训练，RoboMimic 基准</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Diffusion Policy</strong></td>
+                        <td><span class="tag tag-open">✅ 开源</span></td>
+                        <td><span class="tag tag-year">2023</span></td>
+                        <td><span class="tag tag-type">IL 策略</span></td>
+                        <td>扩散模型生成动作序列，多模态动作分布</td>
+                    </tr>
+                    <tr>
+                        <td><strong>ACT</strong> (Aloha)</td>
+                        <td><span class="tag tag-open">✅ 开源</span></td>
+                        <td><span class="tag tag-year">2024</span></td>
+                        <td><span class="tag tag-type">IL 策略</span></td>
+                        <td>动作分块 Transformer，双臂协调</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="comparison-grid">
+                <div class="comparison-card">
+                    <h4>📊 数据生成方法对比</h4>
+                    <ul>
+                        <li><strong>MimicGen 系列</strong>：需要少量示教 → 变换生成（轨迹级）</li>
+                        <li><strong>AutoDataGen</strong>：零示教 → LLM 分解 + 运动规划（技能级）</li>
+                        <li><strong>InternDataEngine</strong>：零示教 → LLM 任务定义 + Isaac Sim（大规模）</li>
+                        <li><strong>RoboTwin 2.0</strong>：生成式双胞胎 → 动作数据（双臂专用）</li>
+                    </ul>
+                </div>
+                <div class="comparison-card">
+                    <h4>⚡ 效率对比</h4>
+                    <ul>
+                        <li><strong>MimicGen</strong>：1 条示教 → ~1K-10K 轨迹</li>
+                        <li><strong>AutoDataGen</strong>：1 个任务描述 → ~10-100 轨迹</li>
+                        <li><strong>InternDataEngine</strong>：5 万任务 → 630K+ 轨迹（最大规模）</li>
+                        <li><strong>RoboTwin 2.0</strong>：50 个任务 → ~1K 轨迹/任务</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- 阶段 ⑤ -->
+        <section>
+            <div class="stage-header">
+                <div class="stage-number">⑤</div>
+                <div class="stage-title">
+                    <h2>测试部署</h2>
+                    <p>策略模型 → 真实机器人</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">🚀</div>
+                    <div>
+                        <h3 style="margin:0;">核心问题</h3>
+                        <p style="color:var(--text-secondary);">如何将仿真训练的策略可靠地部署到真实机器人？</p>
+                    </div>
+                </div>
+                <p>Sim2Real 迁移是 R2S2R 的最后一步，也是最关键的一步。视觉 gap（渲染 vs 真实）和动力学 gap（仿真物理 vs 真实物理）是主要挑战。</p>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>项目</th>
+                        <th>开源/闭源</th>
+                        <th>年份</th>
+                        <th>核心能力</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Isaac Sim SIL/HIL</strong></td>
+                        <td><span class="tag tag-closed">🔒 NVIDIA 官方</span></td>
+                        <td><span class="tag tag-year">2024+</span></td>
+                        <td>软件/硬件在环测试，数字孪生同步</td>
+                    </tr>
+                    <tr>
+                        <td><strong>ROS 2 + MoveIt 2</strong></td>
+                        <td><span class="tag tag-open">✅ 开源</span></td>
+                        <td><span class="tag tag-year">2024+</span></td>
+                        <td>真实机器人部署标准栈，运动规划 + 控制</td>
+                    </tr>
+                    <tr>
+                        <td><strong>real-is-sim</strong></td>
+                        <td><span class="tag tag-open">✅ 开源</span></td>
+                        <td><span class="tag tag-year">2025</span></td>
+                        <td>动态数字孪生 60Hz 同步，降低 sim2real gap</td>
+                    </tr>
+                    <tr>
+                        <td><strong>ExoGS CmdExo</strong></td>
+                        <td><span class="tag tag-open">✅ 开源</span></td>
+                        <td><span class="tag tag-year">2026</span></td>
+                        <td>外骨骼采集 → 3DGS → 策略 → 真实部署</td>
+                    </tr>
+                    <tr>
+                        <td><strong>RoboTwin 2.0 sim2real</strong></td>
+                        <td><span class="tag tag-open">✅ 开源</span></td>
+                        <td><span class="tag tag-year">2025+</span></td>
+                        <td>生成式双胞胎 + 物理一致性验证 + 真实部署</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="highlight-box">
+                <strong>💡 关键洞察：</strong>Sim2Real 的核心挑战是 <strong>视觉 gap + 物理 gap + 动态 gap</strong>。3DGS 通过照片级真实感渲染缩小视觉 gap，但物理参数（摩擦、阻尼）的准确性仍然依赖人工调参或 LLM 推断。<strong>real-is-sim</strong> 的动态数字孪生思路（60Hz 真实→仿真同步）是解决 gap 的新方向。
+            </div>
+        </section>
+
+        <!-- 端到端项目 -->
+        <section>
+            <h2>🔗 端到端管线项目（覆盖多个阶段）</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>项目</th>
+                        <th>覆盖阶段</th>
+                        <th>开源/闭源</th>
+                        <th>年份</th>
+                        <th>核心能力</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>GSWorld</strong></td>
+                        <td>①②③④⑤</td>
+                        <td><span class="tag tag-open">✅ 开源</span></td>
+                        <td><span class="tag tag-year">2025</span></td>
+                        <td>3DGS → GSDF 资产 → Isaac Lab 训练 → sim2real</td>
+                    </tr>
+                    <tr>
+                        <td><strong>DISCOVERSE</strong></td>
+                        <td>①②③④</td>
+                        <td><span class="tag tag-open">✅ 开源</span></td>
+                        <td><span class="tag tag-year">2025</span></td>
+                        <td>3DGS + Isaac Sim + 多机器人 + Real2Sim 管线</td>
+                    </tr>
+                    <tr>
+                        <td><strong>RoboSimGS</strong></td>
+                        <td>①②④⑤</td>
+                        <td><span class="tag tag-open">✅ 开源</span></td>
+                        <td><span class="tag tag-year">2025</span></td>
+                        <td>3DGS + MLLM 物理推断 + 数据生成 + sim2real</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Real2Render2Real</strong></td>
+                        <td>①②④⑤</td>
+                        <td><span class="tag tag-open">✅ 开源</span></td>
+                        <td><span class="tag tag-year">2025</span></td>
+                        <td>3DGS → mesh → Isaac Lab 数据生成（无物理仿真）</td>
+                    </tr>
+                    <tr>
+                        <td><strong>RoboGSim</strong></td>
+                        <td>①②③④</td>
+                        <td><span class="tag tag-open">✅ 开源</span></td>
+                        <td><span class="tag tag-year">2024</span></td>
+                        <td>3DGS → Isaac Sim 数字孪生 + 演示合成</td>
+                    </tr>
+                    <tr>
+                        <td><strong>SplatSim</strong></td>
+                        <td>①③④⑤</td>
+                        <td><span class="tag tag-open">✅ 开源</span></td>
+                        <td><span class="tag tag-year">2024</span></td>
+                        <td>3DGS 替代 mesh 渲染 → 零样本 sim2real</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Re3Sim</strong></td>
+                        <td>①③④⑤</td>
+                        <td><span class="tag tag-open">✅ 开源</span></td>
+                        <td><span class="tag tag-year">2025</span></td>
+                        <td>MVS + 3DGS + PhysX → 策略训练</td>
+                    </tr>
+                    <tr>
+                        <td><strong>GS-Playground</strong></td>
+                        <td>①③④</td>
+                        <td><span class="tag tag-open">✅ 开源</span></td>
+                        <td><span class="tag tag-year">2026</span></td>
+                        <td>批量 3DGS 渲染 + 并行物理引擎</td>
+                    </tr>
+                    <tr>
+                        <td><strong>RoboTwin 2.0</strong></td>
+                        <td>③④⑤</td>
+                        <td><span class="tag tag-open">✅ 开源</span></td>
+                        <td><span class="tag tag-year">2025</span></td>
+                        <td>生成式数字双胞胎 + 双臂基准 + sim2real</td>
+                    </tr>
+                    <tr>
+                        <td><strong>InternDataEngine</strong></td>
+                        <td>③④</td>
+                        <td><span class="tag tag-open">✅ 开源</span></td>
+                        <td><span class="tag tag-year">2026</span></td>
+                        <td>Isaac Sim 大规模数据引擎（630K+ 轨迹）</td>
+                    </tr>
+                    <tr>
+                        <td><strong>ExoGS</strong></td>
+                        <td>①②④⑤</td>
+                        <td><span class="tag tag-open">✅ 开源</span></td>
+                        <td><span class="tag tag-year">2026</span></td>
+                        <td>外骨骼采集 + 3DGS + 策略训练 + 真实部署</td>
+                    </tr>
+                    <tr>
+                        <td><strong>URDFormer</strong></td>
+                        <td>②③④⑤</td>
+                        <td><span class="tag tag-open">✅ 开源</span></td>
+                        <td><span class="tag tag-year">2024</span></td>
+                        <td>单张图 → URDF → 仿真 → sim2real</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="milestone">
+                <strong>🏆 最完整的端到端管线：</strong><br>
+                <strong>GSWorld</strong>（2025）是目前覆盖最全的开源项目：从 RGB 图像 → 3DGS 重建 → GSDF 资产 → Isaac Lab RL/IL 训练 → sim2real 部署。其 GSDF 格式是连接 3DGS 和物理仿真的关键桥梁。
+            </div>
+        </section>
+
+        <!-- AutoDataGen 定位 -->
+        <section class="autodatagen-position">
+            <h3>🎯 AutoDataGen 在 R2S2R 管线中的定位</h3>
+
+            <div class="position-flow">
+                <div class="position-box normal">🌍 Real</div>
+                <div class="position-box normal">① 3DGS</div>
+                <div class="position-box normal">② 分割</div>
+                <div class="position-box normal">③ Isaac Lab</div>
+                <div class="position-box highlight">④ AutoDataGen</div>
+                <div class="position-box normal">⑤ 部署</div>
+            </div>
+
+            <div style="margin-top:25px;">
+                <h4 style="margin-bottom:15px;">AutoDataGen 的核心能力</h4>
+                <ul style="padding-left:20px;">
+                    <li><strong>零示教数据生成</strong>：从任务描述到动作数据，无需人类示教</li>
+                    <li><strong>LLM 任务分解</strong>：将高层任务分解为原子技能序列</li>
+                    <li><strong>运动规划集成</strong>：cuRobo GPU 加速运动规划 + A*/DWA 导航</li>
+                    <li><strong>技能库扩展</strong>：Reach/Grasp/Navigate/Rotate/Retract/RelativeReach</li>
+                </ul>
+            </div>
+
+            <div style="margin-top:25px;">
+                <h4 style="margin-bottom:15px;">如果要走完整 R2S2R 管线，需要补充</h4>
+                <div class="comparison-grid">
+                    <div class="comparison-card" style="border-top-color: var(--warning);">
+                        <h4 style="color: var(--warning);">阶段 ①② 缺失</h4>
+                        <ul>
+                            <li>3DGS 重建能力</li>
+                            <li>场景分割 + 物理推断</li>
+                            <li>URDF/资产生成</li>
+                        </ul>
+                    </div>
+                    <div class="comparison-card" style="border-top-color: var(--secondary);">
+                        <h4 style="color: var(--secondary);">阶段 ④⑤ 已有</h4>
+                        <ul>
+                            <li>✅ LLM 任务分解</li>
+                            <li>✅ 原子技能库</li>
+                            <li>✅ 运动规划</li>
+                            <li>✅ PipelineOutput 格式</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 技术路线总结 -->
+        <section>
+            <h2>🗺️ 技术路线总结</h2>
+
+            <div class="comparison-grid">
+                <div class="comparison-card">
+                    <h4>路线 A：3DGS 直接进 Isaac</h4>
+                    <ul>
+                        <li><strong>核心</strong>：GSDF 格式（GSWorld）</li>
+                        <li><strong>优势</strong>：端到端，保留 3DGS 渲染质量</li>
+                        <li><strong>劣势</strong>：GSDF 还在早期，生态不成熟</li>
+                        <li><strong>代表</strong>：GSWorld, RoboSimGS, Re3Sim</li>
+                    </ul>
+                </div>
+                <div class="comparison-card">
+                    <h4>路线 B：3DGS → Mesh → URDF → USD</h4>
+                    <ul>
+                        <li><strong>核心</strong>：传统资产管线</li>
+                        <li><strong>优势</strong>：成熟，Isaac Lab 原生支持</li>
+                        <li><strong>劣势</strong>：信息丢失，mesh 质量依赖提取</li>
+                        <li><strong>代表</strong>：Real2Render2Real, DISCOVERSE</li>
+                    </ul>
+                </div>
+                <div class="comparison-card">
+                    <h4>路线 C：生成式资产</h4>
+                    <ul>
+                        <li><strong>核心</strong>：LLM/扩散模型直接生成资产</li>
+                        <li><strong>优势</strong>：无需真实场景，无限扩展</li>
+                        <li><strong>劣势</strong>：物理真实性难以保证</li>
+                        <li><strong>代表</strong>：URDFormer, RoboGen, RoboTwin 2.0</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="highlight-box" style="margin-top:30px;">
+                <strong>🔑 AutoDataGen 的扩展方向：</strong><br>
+                <strong>短期</strong>：在阶段 ④ 深化——支持更多技能类型、优化 LLM 分解质量、集成更多运动规划器<br>
+                <strong>中期</strong>：向阶段 ③ 扩展——支持从 URDF/USD 直接加载环境，减少手动配置<br>
+                <strong>长期</strong>：向阶段 ①② 扩展——集成 3DGS 重建 + 物理推断，实现真正的端到端 R2S2R 数据生成
+            </div>
+        </section>
+
+        <footer>
+            <p>R2S2R 数据生成管线全景图 | AutoDataGen 项目参考文档 | 2026</p>
+        </footer>
+    </div>
+</body>
+</html>

@@ -1,0 +1,451 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RECAP 数据、算量与收敛风险分析</title>
+  <style>
+    :root {
+      --bg: #faf7ef;
+      --ink: #17202a;
+      --muted: #637083;
+      --paper: rgba(255, 252, 245, .9);
+      --line: #dfd4c4;
+      --red: #9f2d3d;
+      --orange: #b96823;
+      --blue: #255e7c;
+      --green: #286f54;
+      --soft: #f0e6d6;
+      --code: #1d2430;
+      --code-ink: #f9f0df;
+      --shadow: 0 24px 80px rgba(57, 45, 29, .16);
+      font-family: "Noto Sans SC", "Source Han Sans SC", "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 15% 5%, rgba(185, 104, 35, .18), transparent 26rem),
+        radial-gradient(circle at 88% 0%, rgba(37, 94, 124, .16), transparent 28rem),
+        linear-gradient(135deg, #fbf7ee 0%, #efe4d2 52%, #f8f3ea 100%);
+      line-height: 1.72;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image: linear-gradient(rgba(23,32,42,.035) 1px, transparent 1px), linear-gradient(90deg, rgba(23,32,42,.035) 1px, transparent 1px);
+      background-size: 34px 34px;
+      mask-image: linear-gradient(to bottom, rgba(0,0,0,.85), rgba(0,0,0,.14));
+    }
+
+    h1, h2, h3 { line-height: 1.18; letter-spacing: -.035em; margin-top: 0; }
+    h1 { font-size: clamp(2.4rem, 7vw, 6.4rem); margin-bottom: 1rem; }
+    h2 { font-size: clamp(1.65rem, 3.4vw, 2.75rem); margin-bottom: .8rem; }
+    h3 { font-size: clamp(1.12rem, 2vw, 1.45rem); margin-bottom: .5rem; }
+    p { margin: .65rem 0; }
+    code, pre { font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace; }
+    code { background: rgba(23,32,42,.08); padding: 2px 6px; border-radius: 7px; }
+    pre { background: var(--code); color: var(--code-ink); padding: 18px; border-radius: 18px; overflow-x: auto; line-height: 1.55; }
+    a { color: var(--blue); text-underline-offset: 4px; }
+
+    .wrap { width: min(1500px, calc(100% - 40px)); margin: 0 auto; position: relative; }
+    .hero { min-height: 72vh; padding: 72px 0 36px; display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(340px, .8fr); gap: 32px; align-items: center; }
+    .eyebrow { color: var(--red); font-weight: 900; letter-spacing: .14em; text-transform: uppercase; font-size: .78rem; display: inline-flex; gap: 12px; align-items: center; margin-bottom: 1rem; }
+    .eyebrow::before { content: ""; width: 34px; height: 2px; background: var(--red); }
+    .lead { color: #3d4a59; font-size: clamp(1.05rem, 1.8vw, 1.32rem); max-width: 980px; }
+
+    .panel, section, .toc { background: var(--paper); border: 1px solid rgba(116, 92, 61, .22); border-radius: 24px; box-shadow: var(--shadow); backdrop-filter: blur(14px); }
+    .panel { padding: 24px; }
+    .verdict { display: grid; gap: 12px; margin-top: 18px; }
+    .verdict div { border: 1px solid var(--line); background: rgba(240,230,214,.75); border-radius: 16px; padding: 14px; }
+    .verdict b { color: var(--red); display: block; font-size: 1.25rem; }
+    .verdict span { color: var(--muted); font-size: .92rem; }
+
+    .layout { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 28px; align-items: start; padding-bottom: 88px; }
+    .toc { position: sticky; top: 18px; padding: 18px; }
+    .toc strong { display: block; margin-bottom: 10px; }
+    .toc a { display: block; color: #354355; text-decoration: none; padding: 8px 10px; border-radius: 12px; font-size: .94rem; }
+    .toc a:hover { background: var(--soft); color: var(--red); }
+    main { display: grid; gap: 24px; }
+    section { padding: clamp(24px, 4vw, 46px); overflow: hidden; }
+    .kicker { color: var(--red); font-weight: 900; letter-spacing: .1em; text-transform: uppercase; font-size: .74rem; }
+    .tag { display: inline-flex; color: var(--red); border: 1px solid rgba(159,45,61,.25); background: rgba(159,45,61,.07); border-radius: 999px; padding: 3px 10px; font-size: .78rem; font-weight: 800; }
+    .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+    .card { background: rgba(245, 236, 222, .82); border: 1px solid var(--line); border-radius: 20px; padding: 18px; }
+    .card h3 { margin-top: .65rem; }
+    .callout { border: 1px solid var(--line); border-left: 5px solid var(--blue); background: rgba(37,94,124,.07); border-radius: 18px; padding: 18px; margin: 18px 0; }
+    .callout.bad { border-left-color: var(--red); background: rgba(159,45,61,.07); }
+    .callout.warn { border-left-color: var(--orange); background: rgba(185,104,35,.08); }
+    .callout.ok { border-left-color: var(--green); background: rgba(40,111,84,.08); }
+
+    table { width: 100%; border-collapse: collapse; margin: 18px 0; font-size: .95rem; }
+    th, td { padding: 12px 10px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+    th { background: rgba(240,230,214,.78); color: #293544; }
+    tr:last-child td { border-bottom: 0; }
+
+    .score { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; margin: 18px 0; }
+    .score div { border: 1px solid var(--line); background: rgba(245,236,222,.82); border-radius: 16px; padding: 14px; min-height: 140px; }
+    .score b { display: block; font-size: 1.65rem; color: var(--red); }
+    .muted { color: var(--muted); }
+    .danger { color: var(--red); font-weight: 900; }
+    .warn-text { color: var(--orange); font-weight: 900; }
+    .ok-text { color: var(--green); font-weight: 900; }
+
+    @media (max-width: 1120px) {
+      .hero, .layout { grid-template-columns: 1fr; }
+      .toc { position: relative; top: 0; }
+      .score, .grid-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 720px) {
+      .wrap { width: min(100% - 24px, 1500px); }
+      .hero { min-height: auto; padding-top: 42px; }
+      .grid-2, .grid-3, .score { grid-template-columns: 1fr; }
+      table { display: block; overflow-x: auto; white-space: nowrap; }
+      section { padding: 22px; }
+    }
+  </style>
+
+
+
+<style id="blog-family-style">
+  :root {
+    --blog-bg: #f5f8f8;
+    --blog-bg-soft: #edf4f4;
+    --blog-surface: rgba(255, 255, 255, .92);
+    --blog-surface-strong: #ffffff;
+    --blog-border: rgba(28, 78, 88, .18);
+    --blog-text: #18333b;
+    --blog-muted: #465f68;
+    --blog-subtle: #596f77;
+    --blog-accent: #087f8c;
+    --blog-accent-2: #5aa6a6;
+    --blog-warm: #b7791f;
+    --blog-radius: 18px;
+    --blog-shadow: 0 18px 48px rgba(23, 74, 83, .10);
+  }
+  html { scroll-behavior: smooth; }
+  body {
+    background:
+      radial-gradient(circle at 8% -10%, color-mix(in srgb, var(--blog-accent) 16%, transparent), transparent 34%),
+      radial-gradient(circle at 88% 2%, color-mix(in srgb, var(--blog-accent-2) 13%, transparent), transparent 30%),
+      linear-gradient(180deg, #f7faf9 0%, #eef5f5 52%, #f8faf9 100%) !important;
+    color: var(--blog-text) !important;
+    font-family: "Avenir Next", "Inter", "SF Pro Text", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif !important;
+    letter-spacing: .005em;
+    text-rendering: optimizeLegibility;
+  }
+  h1 {
+    color: #102f38 !important;
+    font-family: "Iowan Old Style", "LXGW WenKai Screen", "霞鹜文楷", "Noto Serif SC", "Source Han Serif SC", "Songti SC", Georgia, serif !important;
+    letter-spacing: -.035em;
+    font-weight: 760;
+  }
+  h2, .section-header h2, .section-head h2 {
+    color: #173943 !important;
+    font-family: "Optima", "Avenir Next", "Noto Serif SC", "Noto Sans SC", system-ui, sans-serif !important;
+    letter-spacing: -.025em;
+    font-weight: 720;
+  }
+  h3, .title, .tl-title {
+    color: #1c4049 !important;
+    font-family: "Avenir Next", "Noto Sans SC", "PingFang SC", system-ui, sans-serif !important;
+    letter-spacing: -.01em;
+  }
+  .hero, .cover, header, .page-hero {
+    background:
+      linear-gradient(135deg, rgba(0, 140, 149, .12), rgba(255, 255, 255, .80) 44%, rgba(58, 167, 176, .10)),
+      linear-gradient(180deg, #fbfefe, #eef7f7) !important;
+    border-bottom: 1px solid var(--blog-border) !important;
+    color: var(--blog-text) !important;
+  }
+  .hero p, .cover .subtitle, header .subtitle, header .meta, .cover .meta {
+    color: var(--blog-muted) !important;
+  }
+  .wrap, .container, main {
+    max-width: min(1120px, calc(100vw - 32px));
+  }
+  .card, .panel, .callout, .note, .metric, .section, article, table, pre {
+    border-color: var(--blog-border) !important;
+  }
+  .card, .panel, .metric, .note {
+    background: var(--blog-surface) !important;
+    border-radius: var(--blog-radius) !important;
+    box-shadow: var(--blog-shadow);
+  }
+  .callout {
+    background: color-mix(in srgb, var(--blog-accent) 8%, #ffffff) !important;
+    border-left-color: var(--blog-accent) !important;
+    border-radius: 14px !important;
+    color: var(--blog-muted) !important;
+  }
+  a, .eyebrow, .accent { color: #006f78 !important; }
+  code {
+    color: #005f68 !important;
+    background: color-mix(in srgb, var(--blog-accent) 10%, #ffffff) !important;
+    border: 1px solid color-mix(in srgb, var(--blog-accent) 24%, #ffffff);
+    border-radius: 6px !important;
+    font-family: "JetBrains Mono", "SFMono-Regular", Consolas, "Liberation Mono", monospace !important;
+  }
+  pre {
+    background: #eef6f6 !important;
+    color: #25464e !important;
+    border-radius: 16px !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.72);
+  }
+  pre code { background: transparent !important; border: 0; color: inherit !important; }
+  table {
+    background: rgba(255, 255, 255, .86) !important;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  th {
+    background: color-mix(in srgb, var(--blog-accent) 11%, #f7fbfb) !important;
+    color: #173943 !important;
+  }
+  td, p, li { color: var(--blog-muted) !important; }
+  strong, b { color: #173943 !important; }
+  .tag, .badge, .step-count {
+    background: color-mix(in srgb, var(--blog-accent) 8%, #ffffff) !important;
+    border-color: color-mix(in srgb, var(--blog-accent) 24%, #ffffff) !important;
+    color: #31545d !important;
+  }
+  nav {
+    background: rgba(248, 252, 252, .86) !important;
+    border-bottom: 1px solid var(--blog-border) !important;
+    backdrop-filter: blur(18px);
+  }
+  nav a { color: #46616a !important; }
+  nav a:hover {
+    color: #12333c !important;
+    background: color-mix(in srgb, var(--blog-accent) 10%, #ffffff) !important;
+    border-color: color-mix(in srgb, var(--blog-accent) 32%, #ffffff) !important;
+  }
+  footer {
+    color: var(--blog-subtle) !important;
+    border-top-color: var(--blog-border) !important;
+  }
+  ::selection { background: color-mix(in srgb, var(--blog-accent) 24%, #ffffff); color: #0f2d35; }
+  @media (max-width: 720px) {
+    body { letter-spacing: 0; }
+    .hero, .cover, header { padding-left: 18px !important; padding-right: 18px !important; }
+  }
+</style>
+
+</head>
+<body>
+  <div class="wrap">
+    <header class="hero">
+      <div>
+        <div class="eyebrow">Reality check</div>
+        <h1>RECAP 数据、算量与收敛风险分析</h1>
+        <p class="lead">这份报告把一个核心判断展开：RECAP 对数据和算量的要求明显高，而且收敛困难。它不适合被当成“小数据快速增强技巧”，更像是有足够 rollout、GPU、诊断工具和部署闭环之后才值得上的离线 RL 工程管线。</p>
+      </div>
+      <aside class="panel">
+        <span class="tag">总判断</span>
+        <p><strong>如果 value model 学不稳，RECAP 后半段全部会变成噪声放大器。</strong> 它的风险链条是：数据分布不够好 → return/value 学偏 → advantage 标签脏 → CFG 放大错误方向 → 策略不如干净 SFT。</p>
+        <div class="verdict">
+          <div><b>数据门槛高</b><span>需要成功、失败、接近成功、多阶段失败和高质量对齐。</span></div>
+          <div><b>算量链条长</b><span>value SFT、advantage 推理、CFG 训练都不是免费附加项。</span></div>
+          <div><b>收敛脆弱</b><span>最终效果取决于 value 排序、阈值、guidance 和部署一致性。</span></div>
+        </div>
+      </aside>
+    </header>
+
+    <div class="layout">
+      <nav class="toc" aria-label="目录">
+        <strong>目录</strong>
+        <a href="#verdict">1. 结论先行</a>
+        <a href="#data">2. 数据为什么要求高</a>
+        <a href="#compute">3. 算量账怎么算</a>
+        <a href="#convergence">4. 为什么难收敛</a>
+        <a href="#noise">5. 噪声如何被放大</a>
+        <a href="#symptoms">6. 失败症状</a>
+        <a href="#threshold">7. 什么时候值得上</a>
+        <a href="#alternatives">8. 替代路线</a>
+        <a href="#checklist">9. 开工检查表</a>
+      </nav>
+
+      <main>
+        <section id="verdict">
+          <div class="kicker">Executive verdict</div>
+          <h2>1. 结论先行：RECAP 是重型离线 RL，不是普通微调增强</h2>
+          <p>普通 SFT/LoRA 的目标很直接：让策略模仿数据里的动作。RECAP 多了一层价值评估系统：先判断哪些动作“比预期更好”，再训练策略偏向这些动作。这个设计很强，但也意味着它的成败不只取决于策略模型，还取决于 value model、advantage 标签和 CFG 推理是否全部可靠。</p>
+          <div class="score">
+            <div><b>高</b><span>数据规模要求</span><p class="muted">没有足够失败和近成功轨迹，优势估计缺乏对比。</p></div>
+            <div><b>高</b><span>数据质量要求</span><p class="muted">帧、动作、prompt、outcome 对齐必须严格。</p></div>
+            <div><b>高</b><span>GPU 预算</span><p class="muted">value 训练和 advantage 推理会明显增加成本。</p></div>
+            <div><b>高</b><span>调参复杂度</span><p class="muted">reward、N、quantile、dropout、scale 互相耦合。</p></div>
+            <div><b>中低</b><span>小实验性价比</span><p class="muted">小数据场景常不如把 SFT 和部署校准做好。</p></div>
+          </div>
+          <div class="callout bad">
+            <strong>关键判断：</strong>RECAP 的最小可行前提不是“我有一些轨迹”，而是“我有足够多能训练出可靠 value 排序的轨迹”。如果 <code>eval/spearman_correlation</code> 不稳定或很低，不应该继续做 CFG。
+          </div>
+        </section>
+
+        <section id="data">
+          <div class="kicker">Data burden</div>
+          <h2>2. 数据为什么要求高：RECAP 需要的是“可比较的行为分布”</h2>
+          <p>RECAP 要计算每个时间步的 advantage。它不是只需要成功演示，而是需要知道：同一任务、相近状态下，哪些行为后来成功，哪些行为后来失败，哪些行为更快完成，哪些行为导致偏离。没有这种对比，value model 只能学到粗糙的成败或时间长度。</p>
+          <table>
+            <thead><tr><th>数据类型</th><th>为什么需要</th><th>缺失后果</th><th>最低检查</th></tr></thead>
+            <tbody>
+              <tr><td>成功 SFT 轨迹</td><td>提供可模仿的高质量动作。</td><td>策略不知道任务应该怎么完成。</td><td>成功轨迹覆盖主要任务阶段。</td></tr>
+              <tr><td>失败 rollout</td><td>提供负面对比，让 value 知道什么状态危险。</td><td>value 只会把所有演示都看成好。</td><td>失败类型不止一种，不只随机崩溃。</td></tr>
+              <tr><td>接近成功轨迹</td><td>让 value 学会细粒度进展差异。</td><td>advantage 只能区分成败，不能指导中间动作。</td><td>有“差一步成功”的 episode。</td></tr>
+              <tr><td>多阶段任务轨迹</td><td>让 value 区分阶段进展。</td><td>模型可能只学最后阶段，早期动作无信号。</td><td>每个阶段都有足够样本。</td></tr>
+              <tr><td>一致 prompt 和 schema</td><td>让语言条件、视觉状态、动作含义对齐。</td><td>value 学到数据源或措辞偏差。</td><td>prompt 风格统一，字段无漂移。</td></tr>
+            </tbody>
+          </table>
+          <div class="callout warn">
+            <strong>小数据最危险的点：</strong>top 30% advantage 总能被选出来，但它不一定是真的好动作。如果数据整体质量差，top 30% 只是“坏里面相对不坏”，CFG 会把这类行为强化。
+          </div>
+        </section>
+
+        <section id="compute">
+          <div class="kicker">Compute cost</div>
+          <h2>3. 算量账：RECAP 至少比 SFT 多三笔重成本</h2>
+          <p>普通微调主要消耗在 policy training。RECAP 的消耗是链式的：return 计算便宜，但 value model SFT、全数据 advantage 推理、CFG policy training 都要显存和时间。更麻烦的是，任何前置阶段出错，后面训练都可能白跑。</p>
+          <table>
+            <thead><tr><th>阶段</th><th>主要成本</th><th>为什么贵</th><th>失败后损失</th></tr></thead>
+            <tbody>
+              <tr><td>Step 1 Return</td><td>CPU / IO</td><td>遍历 LeRobot parquet 和 episode metadata。</td><td>较低，主要是 tag 和统计重算。</td></tr>
+              <tr><td>Step 2 Value SFT</td><td>GPU 训练</td><td>SigLIP2 + Gemma3 + critic head，多模态输入。</td><td>高，value 不可靠则 Step 3/4 无意义。</td></tr>
+              <tr><td>Step 3 Advantage</td><td>GPU 推理 + IO</td><td>要对大量帧跑 value inference，并写 sidecar。</td><td>中高，阈值可重标，但 value 错要重跑。</td></tr>
+              <tr><td>Step 4 CFG Training</td><td>GPU 训练</td><td>π0.5 policy 训练本身就重，还引入 conditional/unconditional。</td><td>最高，训练完才知道策略是否变好。</td></tr>
+              <tr><td>Eval / Deployment</td><td>仿真或真机时间</td><td>最终必须 rollout 验证，离线 loss 不够。</td><td>真实机器人时间成本高。</td></tr>
+            </tbody>
+          </table>
+          <pre><code>总成本不是：一次 policy fine-tune
+而是：
+  数据清洗
++ return 计算
++ value model 训练
++ value checkpoint 选择
++ advantage 全量推理
++ threshold/quantile 重标
++ CFG policy 训练
++ 多 guidance scale 评估
++ 部署闭环校准</code></pre>
+        </section>
+
+        <section id="convergence">
+          <div class="kicker">Convergence</div>
+          <h2>4. 为什么难收敛：它有两个模型、三个目标、多个阈值</h2>
+          <p>RECAP 的收敛难不是单一 loss 不下降，而是多个目标不一定朝同一方向变好。value loss 下降不代表排序好；排序好不代表 advantage 标签干净；标签干净不代表 CFG policy 在真实控制中稳定。</p>
+          <div class="grid-3">
+            <div class="card"><span class="tag">Value 层</span><h3>预测值可能校准差</h3><p>分类分布 loss 下降，但 Spearman 不高，说明模型可能学均值或捷径。</p></div>
+            <div class="card"><span class="tag">Advantage 层</span><h3>阈值制造标签噪声</h3><p>positive_quantile 过大污染正样本，过小导致样本不足。</p></div>
+            <div class="card"><span class="tag">Policy 层</span><h3>CFG 放大错误差异</h3><p>conditional/unconditional 差异若来自数据源偏差，guidance 会放大伪信号。</p></div>
+          </div>
+          <div class="callout bad">
+            <strong>典型收敛陷阱：</strong>你看到 Step 4 的 policy loss 正常下降，但 rollout 成功率下降。这不是矛盾，因为 policy loss 只说明模型更好地拟合了 advantage 标签，而不是标签本身正确。
+          </div>
+        </section>
+
+        <section id="noise">
+          <div class="kicker">Noise amplification</div>
+          <h2>5. 噪声如何被放大：RECAP 是单向误差传播管线</h2>
+          <table>
+            <thead><tr><th>误差来源</th><th>进入哪里</th><th>如何放大</th><th>最终表现</th></tr></thead>
+            <tbody>
+              <tr><td>episode outcome 错</td><td>return</td><td>错误监督 value。</td><td>失败轨迹被标成高价值。</td></tr>
+              <tr><td>图像/action 错帧</td><td>value 和 policy</td><td>因果关系断裂。</td><td>策略学到不对应动作。</td></tr>
+              <tr><td>value 排序错</td><td>advantage</td><td>top quantile 选错样本。</td><td>正样本包含坏动作。</td></tr>
+              <tr><td>阈值过宽</td><td>CFG training</td><td>conditional 分布变脏。</td><td>RECAP 与 SFT 差别不清。</td></tr>
+              <tr><td>guidance 过强</td><td>推理</td><td>放大 conditional-unconditional 差分。</td><td>动作激进、抖动、越界。</td></tr>
+            </tbody>
+          </table>
+          <p>因此 RECAP 的正确工作方式应该是“每一步都设停止条件”。如果 Step 2 价值排序没过线，不进入 Step 3；如果 Step 3 可视化不合理，不进入 Step 4；如果 Step 4 仿真 scale 扫描不稳定，不上真机。</p>
+        </section>
+
+        <section id="symptoms">
+          <div class="kicker">Failure symptoms</div>
+          <h2>6. 失败症状：这些现象说明 RECAP 不该继续硬跑</h2>
+          <table>
+            <thead><tr><th>症状</th><th>说明</th><th>应该怎么做</th></tr></thead>
+            <tbody>
+              <tr><td><span class="danger">Value Spearman 接近 0</span></td><td>价值模型没有学到排序。</td><td>暂停 CFG，检查数据和 reward。</td></tr>
+              <tr><td><span class="danger">Advantage 分布极端单峰</span></td><td>标签没有区分度。</td><td>调整 failure_reward、N 或重训 value。</td></tr>
+              <tr><td><span class="warn-text">正样本集中在少数 episode</span></td><td>阈值被数据源或任务偏差主导。</td><td>按任务/数据集分层统计。</td></tr>
+              <tr><td><span class="warn-text">RECAP loss 降但 eval 不升</span></td><td>模型拟合标签，但标签无效。</td><td>回看 advantage 视频，不继续加训。</td></tr>
+              <tr><td><span class="danger">scale 一提高动作就抖</span></td><td>CFG 差分方向不稳定。</td><td>降低 scale，检查 conditional 数据质量。</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section id="threshold">
+          <div class="kicker">Go / no-go criteria</div>
+          <h2>7. 什么时候值得上 RECAP：给一个硬判断标准</h2>
+          <div class="grid-2">
+            <div class="card">
+              <span class="tag">值得上</span>
+              <h3>满足这些条件再做</h3>
+              <ul>
+                <li>已有稳定 SFT baseline 和部署闭环。</li>
+                <li>有足够 rollout，且包含成功、失败、近成功。</li>
+                <li>value model 的排序指标稳定为正。</li>
+                <li>advantage 可视化显示高优势帧合理。</li>
+                <li>有 GPU 预算做多轮 value/threshold/CFG 试验。</li>
+              </ul>
+            </div>
+            <div class="card">
+              <span class="tag">不值得上</span>
+              <h3>这些情况先别做</h3>
+              <ul>
+                <li>只有几十条成功演示，没有失败 rollout。</li>
+                <li>observation/action schema 还没校准。</li>
+                <li>Isaac 或真机部署还在抽搐阶段。</li>
+                <li>没有独立 eval 集或 rollout 评估流程。</li>
+                <li>显存只够勉强微调，无法反复训练 value。</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section id="alternatives">
+          <div class="kicker">Alternatives</div>
+          <h2>8. 更现实的替代路线：先把便宜收益拿完</h2>
+          <table>
+            <thead><tr><th>路线</th><th>适合场景</th><th>优先级</th><th>原因</th></tr></thead>
+            <tbody>
+              <tr><td>高质量 SFT / LoRA</td><td>小数据、单任务、部署未稳定。</td><td>最高</td><td>闭环短，问题容易定位。</td></tr>
+              <tr><td>数据清洗与重采样</td><td>轨迹质量参差、prompt/schema 不一致。</td><td>最高</td><td>直接改善所有后续训练。</td></tr>
+              <tr><td>部署校准</td><td>机械臂抽搐、动作不稳定。</td><td>最高</td><td>坐标错时任何 RL 都没意义。</td></tr>
+              <tr><td>只训练 value 做诊断</td><td>想评估 RECAP 可行性。</td><td>中高</td><td>便于判断是否值得进入 CFG。</td></tr>
+              <tr><td>RECAP 全流程</td><td>已有大规模混合数据和算力。</td><td>最后</td><td>收益潜力高，但成本和风险也最高。</td></tr>
+            </tbody>
+          </table>
+          <div class="callout ok">
+            <strong>推荐顺序：</strong>SFT baseline → 部署闭环 → 采 rollout → value-only 诊断 → advantage 可视化 → CFG 小规模试验 → scale 扫描 → 真机受控上线。
+          </div>
+        </section>
+
+        <section id="checklist">
+          <div class="kicker">Checklist</div>
+          <h2>9. RECAP 开工检查表：任何一项不满足都可能白跑</h2>
+          <table>
+            <thead><tr><th>检查项</th><th>通过标准</th><th>不通过就做什么</th></tr></thead>
+            <tbody>
+              <tr><td>Baseline</td><td>SFT/LoRA 已有可复现成功率。</td><td>先训 baseline，不做 RECAP。</td></tr>
+              <tr><td>数据规模</td><td>成功、失败、近成功样本都足够。</td><td>先采 rollout。</td></tr>
+              <tr><td>数据对齐</td><td>frame/action/prompt/outcome 无错位。</td><td>先写数据验证脚本。</td></tr>
+              <tr><td>Value 指标</td><td>Spearman 稳定为正，分任务不过度偏置。</td><td>重看 reward 和数据分布。</td></tr>
+              <tr><td>Advantage 可视化</td><td>高优势帧出现在合理动作阶段。</td><td>调 N、quantile 或重训 value。</td></tr>
+              <tr><td>算力预算</td><td>能承受至少 2-3 轮 value/CFG 试错。</td><td>降级为 SFT 或 value-only。</td></tr>
+              <tr><td>部署验证</td><td>仿真/真机能稳定执行 baseline。</td><td>先修 observation/action adapter。</td></tr>
+            </tbody>
+          </table>
+          <p class="muted">结论：你的判断“RECAP 对数据与算量要求明显高，而且难收敛”不是保守，而是实际工程里最应该先写在白板上的风险。RECAP 值得研究，但不应该在基础 SFT、数据闭环和部署校准尚未稳定前作为主路线。</p>
+        </section>
+      </main>
+    </div>
+  </div>
+</body>
+</html>

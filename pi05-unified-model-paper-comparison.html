@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>三篇论文对比：统一 pi0.5 模型视角</title>
+  <style>
+    :root {
+      --bg: #f7f9fb;
+      --card: #ffffff;
+      --ink: #102a43;
+      --muted: #52616b;
+      --line: #d7dee8;
+      --blue: #2f6fed;
+      --soft-blue: #eaf1ff;
+      --soft-gray: #f1f5f9;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "Microsoft YaHei", "Noto Sans CJK SC", Arial, sans-serif;
+      line-height: 1.55;
+    }
+    .wrap {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 36px 24px 64px;
+    }
+    header {
+      padding: 32px 36px;
+      border-radius: 22px;
+      background: linear-gradient(135deg, #ffffff 0%, #edf4ff 100%);
+      border: 1px solid var(--line);
+      box-shadow: 0 18px 45px rgba(16, 42, 67, 0.08);
+      margin-bottom: 26px;
+    }
+    h1 {
+      margin: 0 0 10px;
+      font-size: 34px;
+      letter-spacing: -0.02em;
+    }
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+      font-size: 17px;
+    }
+    section {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 24px;
+      margin: 22px 0;
+      box-shadow: 0 12px 30px rgba(16, 42, 67, 0.06);
+    }
+    h2 {
+      margin: 0 0 16px;
+      font-size: 22px;
+      color: var(--ink);
+    }
+    .hint {
+      margin: -6px 0 16px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      overflow: hidden;
+      border-radius: 12px;
+    }
+    th, td {
+      border: 1px solid var(--line);
+      padding: 12px 14px;
+      vertical-align: top;
+      word-break: break-word;
+    }
+    th {
+      background: var(--blue);
+      color: #fff;
+      font-weight: 700;
+      text-align: left;
+    }
+    td:first-child {
+      font-weight: 700;
+      color: var(--ink);
+      background: var(--soft-blue);
+    }
+    tr:nth-child(even) td:not(:first-child) { background: var(--soft-gray); }
+    .narrow td:first-child { width: 22%; }
+    .note {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 14px;
+    }
+    @media print {
+      body { background: #fff; }
+      .wrap { max-width: none; padding: 0; }
+      header, section { box-shadow: none; break-inside: avoid; }
+    }
+  </style>
+
+
+
+<style id="blog-family-style">
+  :root {
+    --blog-bg: #f5f8f8;
+    --blog-bg-soft: #edf4f4;
+    --blog-surface: rgba(255, 255, 255, .92);
+    --blog-surface-strong: #ffffff;
+    --blog-border: rgba(28, 78, 88, .18);
+    --blog-text: #18333b;
+    --blog-muted: #465f68;
+    --blog-subtle: #596f77;
+    --blog-accent: #0b8f87;
+    --blog-accent-2: #6aaed6;
+    --blog-warm: #b7791f;
+    --blog-radius: 18px;
+    --blog-shadow: 0 18px 48px rgba(23, 74, 83, .10);
+  }
+  html { scroll-behavior: smooth; }
+  body {
+    background:
+      radial-gradient(circle at 8% -10%, color-mix(in srgb, var(--blog-accent) 16%, transparent), transparent 34%),
+      radial-gradient(circle at 88% 2%, color-mix(in srgb, var(--blog-accent-2) 13%, transparent), transparent 30%),
+      linear-gradient(180deg, #f7faf9 0%, #eef5f5 52%, #f8faf9 100%) !important;
+    color: var(--blog-text) !important;
+    font-family: "Avenir Next", "Inter", "SF Pro Text", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif !important;
+    letter-spacing: .005em;
+    text-rendering: optimizeLegibility;
+  }
+  h1 {
+    color: #102f38 !important;
+    font-family: "Iowan Old Style", "LXGW WenKai Screen", "霞鹜文楷", "Noto Serif SC", "Source Han Serif SC", "Songti SC", Georgia, serif !important;
+    letter-spacing: -.035em;
+    font-weight: 760;
+  }
+  h2, .section-header h2, .section-head h2 {
+    color: #173943 !important;
+    font-family: "Optima", "Avenir Next", "Noto Serif SC", "Noto Sans SC", system-ui, sans-serif !important;
+    letter-spacing: -.025em;
+    font-weight: 720;
+  }
+  h3, .title, .tl-title {
+    color: #1c4049 !important;
+    font-family: "Avenir Next", "Noto Sans SC", "PingFang SC", system-ui, sans-serif !important;
+    letter-spacing: -.01em;
+  }
+  .hero, .cover, header, .page-hero {
+    background:
+      linear-gradient(135deg, rgba(0, 140, 149, .12), rgba(255, 255, 255, .80) 44%, rgba(58, 167, 176, .10)),
+      linear-gradient(180deg, #fbfefe, #eef7f7) !important;
+    border-bottom: 1px solid var(--blog-border) !important;
+    color: var(--blog-text) !important;
+  }
+  .hero p, .cover .subtitle, header .subtitle, header .meta, .cover .meta {
+    color: var(--blog-muted) !important;
+  }
+  .wrap, .container, main {
+    max-width: min(1120px, calc(100vw - 32px));
+  }
+  .card, .panel, .callout, .note, .metric, .section, article, table, pre {
+    border-color: var(--blog-border) !important;
+  }
+  .card, .panel, .metric, .note {
+    background: var(--blog-surface) !important;
+    border-radius: var(--blog-radius) !important;
+    box-shadow: var(--blog-shadow);
+  }
+  .callout {
+    background: color-mix(in srgb, var(--blog-accent) 8%, #ffffff) !important;
+    border-left-color: var(--blog-accent) !important;
+    border-radius: 14px !important;
+    color: var(--blog-muted) !important;
+  }
+  a, .eyebrow, .accent { color: #006f78 !important; }
+  code {
+    color: #005f68 !important;
+    background: color-mix(in srgb, var(--blog-accent) 10%, #ffffff) !important;
+    border: 1px solid color-mix(in srgb, var(--blog-accent) 24%, #ffffff);
+    border-radius: 6px !important;
+    font-family: "JetBrains Mono", "SFMono-Regular", Consolas, "Liberation Mono", monospace !important;
+  }
+  pre {
+    background: #eef6f6 !important;
+    color: #25464e !important;
+    border-radius: 16px !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.72);
+  }
+  pre code { background: transparent !important; border: 0; color: inherit !important; }
+  table {
+    background: rgba(255, 255, 255, .86) !important;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  th {
+    background: color-mix(in srgb, var(--blog-accent) 11%, #f7fbfb) !important;
+    color: #173943 !important;
+  }
+  td, p, li { color: var(--blog-muted) !important; }
+  strong, b { color: #173943 !important; }
+  .tag, .badge, .step-count {
+    background: color-mix(in srgb, var(--blog-accent) 8%, #ffffff) !important;
+    border-color: color-mix(in srgb, var(--blog-accent) 24%, #ffffff) !important;
+    color: #31545d !important;
+  }
+  nav {
+    background: rgba(248, 252, 252, .86) !important;
+    border-bottom: 1px solid var(--blog-border) !important;
+    backdrop-filter: blur(18px);
+  }
+  nav a { color: #46616a !important; }
+  nav a:hover {
+    color: #12333c !important;
+    background: color-mix(in srgb, var(--blog-accent) 10%, #ffffff) !important;
+    border-color: color-mix(in srgb, var(--blog-accent) 32%, #ffffff) !important;
+  }
+  footer {
+    color: var(--blog-subtle) !important;
+    border-top-color: var(--blog-border) !important;
+  }
+  ::selection { background: color-mix(in srgb, var(--blog-accent) 24%, #ffffff); color: #0f2d35; }
+  @media (max-width: 720px) {
+    body { letter-spacing: 0; }
+    .hero, .cover, header { padding-left: 18px !important; padding-right: 18px !important; }
+  }
+</style>
+
+</head>
+<body>
+  <main class="wrap">
+    <header>
+      <h1>三篇论文对比：统一 pi0.5 模型视角</h1>
+      <p class="subtitle">GASE / SimFoundry / VLK：数据到手后的训练-评测 pipeline 表格版。固定模型，比较数据、监督、训练、评测与创新点。</p>
+    </header>
+
+    <section>
+      <h2>1. 统一假设：只比较 pipeline，不比较模型能力</h2>
+      <table class="narrow">
+        <thead><tr><th>维度</th><th>统一设定</th></tr></thead>
+        <tbody>
+          <tr><td>下游模型</td><td>统一视为 pi0.5 / pi0.5-style VLA；忽略原论文中不同策略架构差异。</td></tr>
+          <tr><td>比较对象</td><td>不是谁的 backbone 更强，而是谁给 pi0.5 提供更好的数据、任务分布和评测闭环。</td></tr>
+          <tr><td>输入侧</td><td>统一考虑 image + language + robot state；差异在场景来源和监督信号构造。</td></tr>
+          <tr><td>输出侧</td><td>统一讨论 pi0.5 如何被适配到动作、轨迹或 kinematics，而不是只看原始 action head。</td></tr>
+          <tr><td>研讨重点</td><td>得到数据后：如何生成样本、如何 fine-tune、如何评测、创新点在哪里。</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>2. 总览表：三篇论文在统一 pi0.5 pipeline 中的位置</h2>
+      <table>
+        <thead><tr><th>论文</th><th>pipeline 角色</th><th>给 pi0.5 的核心价值</th><th>主要短板</th></tr></thead>
+        <tbody>
+          <tr><td>GASE</td><td>高保真 real-to-sim 场景源。</td><td>提供低 sim-to-real gap 的训练/测试环境。</td><td>不负责大规模任务扩增；不定义 VLA 数据格式。</td></tr>
+          <tr><td>SimFoundry</td><td>digital twin/cousins 数据平台。</td><td>把单场景扩成 object/scene/task 分布，并提供 sim eval proxy。</td><td>更偏系统平台；pi0.5 action schema 仍需适配。</td></tr>
+          <tr><td>VLK</td><td>FT pi0.5 的监督数据与部署闭环。</td><td>把 synthetic interaction 转成 image-language-state-future-kinematics 数据。</td><td>任务范围集中在 humanoid loco-manipulation。</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>3. 数据产物对比：得到数据/场景后到底有什么</h2>
+      <table>
+        <thead><tr><th>论文</th><th>直接产物</th><th>可转成 pi0.5 样本吗？</th><th>需要补的模块</th></tr></thead>
+        <tbody>
+          <tr><td>GASE</td><td>3DGS 背景 + 物体资产 + Isaac Sim 场景。</td><td>可以，但需要额外收集 demos / rollouts。</td><td>任务生成、示教生成、VLA action 标注。</td></tr>
+          <tr><td>SimFoundry</td><td>digital twin + object/scene/task cousins + sim-ready assets。</td><td>更适合，可以批量生成多样任务轨迹。</td><td>统一成 pi0.5 数据格式和动作空间。</td></tr>
+          <tr><td>VLK</td><td>egocentric image + instruction + G1 state + future kinematics + contact label。</td><td>最直接，论文就是从 pi0.5 初始化微调。</td><td>若换机械臂/移动底盘，需要重定义 kinematic/action schema。</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>4. 训练 pipeline 对比：统一 pi0.5 后怎么 FT</h2>
+      <table>
+        <thead><tr><th>论文</th><th>pi0.5 输入</th><th>pi0.5 输出/监督</th><th>训练方式</th></tr></thead>
+        <tbody>
+          <tr><td>GASE</td><td>sim/real RGB + language + robot state。</td><td>原论文偏任务 action；统一视角下需构造成 pi0.5 action chunk。</td><td>在 GASE 场景中采样 demos 后做行为克隆/FT。</td></tr>
+          <tr><td>SimFoundry</td><td>cousins 中的多场景 RGB + language + state。</td><td>可定义 end-effector action / joint action / trajectory chunk。</td><td>用 object/scene/task cousins 做多分布 FT 或 sim+real co-training。</td></tr>
+          <tr><td>VLK</td><td>egocentric RGB + instruction + G1 kinematic state。</td><td>未来 1 秒 whole-body kinematic trajectory + contact label。</td><td>从 pi0.5 初始化，flow matching / x0 prediction 微调。</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>5. 评测 pipeline 对比：统一 pi0.5 后怎么证明有效</h2>
+      <table>
+        <thead><tr><th>论文</th><th>sim 评测</th><th>real 评测</th><th>最适合报告的指标</th></tr></thead>
+        <tbody>
+          <tr><td>GASE</td><td>pi0.5 在 reconstructed Isaac Sim 场景成功率。</td><td>同任务真机成功率；对比 real-data FT。</td><td>sim2real gap；sim2sim / sim2real / real2real success rate。</td></tr>
+          <tr><td>SimFoundry</td><td>pi0.5 在 twin/cousins 上批量评测和排序。</td><td>少量真机验证策略排序是否一致。</td><td>Pearson correlation；rank violation；cousins 带来的提升。</td></tr>
+          <tr><td>VLK</td><td>pi0.5-style VLK 在 3DGS replica 内闭环执行。</td><td>Unitree G1 真机导航/搬运/长程任务。</td><td>任务成功率；数据量 ablation；domain randomization ablation。</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>6. 创新点对比：固定 pi0.5 后，创新还剩什么</h2>
+      <table>
+        <thead><tr><th>论文</th><th>不是模型创新，而是...</th><th>对 FT VLA 的可复用点</th></tr></thead>
+        <tbody>
+          <tr><td>GASE</td><td>高保真、可交互、低 gap 的 real-to-sim 场景构造。</td><td>用真实重建场景替代廉价但失真的仿真场景。</td></tr>
+          <tr><td>SimFoundry</td><td>从 twin 到 cousins 的数据分布扩增 + sim eval 可信度。</td><td>为 pi0.5 构造 object/scene/task 泛化 curriculum。</td></tr>
+          <tr><td>VLK</td><td>把合成交互组织成 pi0.5 可学的 kinematic supervision。</td><td>重定义 VLA action space：future trajectory 而非 low-level command。</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>7. 如果做自己的 pi0.5 FT pipeline：三篇怎么组合</h2>
+      <table>
+        <thead><tr><th>阶段</th><th>借鉴论文</th><th>具体做法</th></tr></thead>
+        <tbody>
+          <tr><td>场景来源</td><td>GASE</td><td>用 2D segmentation + inpainting + 3DGS 得到低 gap Isaac Sim 场景。</td></tr>
+          <tr><td>数据扩增</td><td>SimFoundry</td><td>围绕同一 affordance 生成 object/scene/task cousins，避免 pi0.5 过拟合单场景。</td></tr>
+          <tr><td>监督格式</td><td>VLK</td><td>把 rollout 转成 image + language + state + future trajectory/contact 的 paired data。</td></tr>
+          <tr><td>模型训练</td><td>VLK + pi0.5</td><td>从 pi0.5 初始化，替换/适配 action head，FT 到目标 embodiment。</td></tr>
+          <tr><td>评测闭环</td><td>SimFoundry + GASE</td><td>先看 sim-real correlation，再做真机 success rate 与 gap 分析。</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>8. 主持讨论问题：表格化推进</h2>
+      <table>
+        <thead><tr><th>讨论点</th><th>可追问的问题</th></tr></thead>
+        <tbody>
+          <tr><td>数据</td><td>pi0.5 更缺 high-fidelity scenes，还是 diverse cousins？</td></tr>
+          <tr><td>监督</td><td>未来 trajectory chunk 是否比原始 action 更适合 VLA FT？</td></tr>
+          <tr><td>模型</td><td>统一 pi0.5 后，三篇的差距是否主要来自数据 pipeline？</td></tr>
+          <tr><td>评测</td><td>sim-real correlation 能否成为 pi0.5 checkpoint selection 标准？</td></tr>
+          <tr><td>复现</td><td>最小可行系统应先做 GASE 场景、SimFoundry cousins，还是 VLK 数据格式？</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>9. 结论表：统一 pi0.5 视角下的最终判断</h2>
+      <table>
+        <thead><tr><th>论文</th><th>一句话 takeaway</th></tr></thead>
+        <tbody>
+          <tr><td>GASE</td><td>pi0.5 需要可信训练场：GASE 解决 sim 是否足够像 real。</td></tr>
+          <tr><td>SimFoundry</td><td>pi0.5 需要泛化分布和评测代理：SimFoundry 解决数据是否足够多样、评测是否可信。</td></tr>
+          <tr><td>VLK</td><td>pi0.5 需要合适监督格式：VLK 解决 synthetic interaction 如何变成可微调、可部署的 VLA 数据。</td></tr>
+          <tr><td>总判断</td><td>固定模型后，创新点主要转移到 data pipeline、action representation 和 evaluation loop。</td></tr>
+        </tbody>
+      </table>
+      <p class="note">参考：GASE arXiv:2606.17520；SimFoundry arXiv:2606.28276；VLK arXiv:2606.30645。</p>
+    </section>
+  </main>
+</body>
+</html>
