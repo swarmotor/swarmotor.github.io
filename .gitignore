@@ -1,0 +1,13 @@
+# 运行时调试日志（cosine/aorta 中间件，曾被误写入工作区根目录）
+*.INFO
+*.log.INFO.*
+
+# AI 工具本地数据（不入库）
+.opencode/
+.reasonix/
+.codegraph/
+.playwright-mcp/
+.omo/
+
+# 日志回收目录（shell 可用后执行 rm -rf .trash-logs 彻底删除）
+.trash-logs/

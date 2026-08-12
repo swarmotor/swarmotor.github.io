@@ -1,0 +1,2326 @@
+<!DOCTYPE html>
+<!-- saved from url=(0038)https://swarmotor.github.io/index.html -->
+<html lang="zh-CN" data-immersive-translate-page-theme="light"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SWARMOTOR - 简历</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com/">
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
+    <link href="./SWARMOTOR - 简历_files/css2" rel="stylesheet">
+    <style>
+        /* Game of Life Background Canvas */
+        #game-of-life {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.15;
+            pointer-events: auto;
+        }
+
+        :root {
+            --bg-primary: #fafaf9;
+            --bg-secondary: #ffffff;
+            --text-primary: #1a1a1a;
+            --text-secondary: #525252;
+            --text-muted: #737373;
+            --accent: #0f4c5c;
+            --accent-light: #e8f4f6;
+            --border: #e5e5e5;
+            --shadow: rgba(0, 0, 0, 0.04);
+            --section-gap: 2.5rem;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'DM Sans', 'Noto Sans SC', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.7;
+            font-size: 15px;
+            min-height: 100vh;
+        }
+
+        .lang-toggle {
+            position: fixed;
+            top: 1.5rem;
+            right: 1.5rem;
+            z-index: 1000;
+            display: flex;
+            gap: 0.25rem;
+            background: var(--bg-secondary);
+            padding: 0.25rem;
+            border-radius: 2rem;
+            box-shadow: 0 2px 12px var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .lang-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            border-radius: 1.5rem;
+            transition: all 0.25s ease;
+            color: var(--text-muted);
+        }
+
+        .lang-btn.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        .lang-btn:hover:not(.active) {
+            color: var(--text-primary);
+        }
+
+        .game-toggle {
+            position: fixed;
+            top: 50%;
+            right: 1.5rem;
+            transform: translateY(-50%);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 0.15rem;
+            background: var(--bg-secondary);
+            padding: 0.25rem;
+            border-radius: 2rem;
+            box-shadow: 0 2px 12px var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .game-btn {
+            width: 2rem;
+            height: 2rem;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 1rem;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .game-btn:hover {
+            background: var(--accent-light);
+            transform: scale(1.1);
+        }
+
+        .game-btn.active {
+            background: var(--accent);
+        }
+
+        .page-nav {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .page-btn {
+            padding: 0.5rem;
+            width: 2.5rem;
+            height: 2.5rem;
+            border: 1px solid var(--border);
+            background: var(--bg-secondary);
+            cursor: pointer;
+            font-size: 1.2rem;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px var(--shadow);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .page-btn:hover {
+            background: var(--accent-light);
+        }
+
+        .page-btn.active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+        }
+
+        header {
+            text-align: left;
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        h1 {
+            font-family: 'Crimson Pro', serif;
+            font-size: 2.75rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .contact-info {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem 2rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .contact-item a {
+            color: var(--accent);
+            text-decoration: none;
+            transition: opacity 0.2s;
+        }
+
+        .contact-item a:hover {
+            opacity: 0.7;
+        }
+
+        section {
+            margin-bottom: var(--section-gap);
+        }
+
+        h2 {
+            font-family: 'Crimson Pro', serif;
+            font-size: 1.35rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        h2::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(to right, var(--border), transparent);
+        }
+
+        .section-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .research-interests {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+
+        .entry {
+            margin-bottom: 1.5rem;
+        }
+
+        .entry-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 0.5rem;
+        }
+
+        .entry-title {
+            font-weight: 600;
+            font-size: 1rem;
+            color: var(--text-primary);
+        }
+
+        .entry-meta {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-align: right;
+            min-width: 180px;
+        }
+
+        .entry-subtitle {
+            font-size: 0.9rem;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .entry-details {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            padding-left: 0;
+            list-style: none;
+        }
+
+        .entry-details li {
+            position: relative;
+            padding-left: 1rem;
+            margin-bottom: 0.35rem;
+        }
+
+        .entry-details li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+            font-size: 0.7rem;
+        }
+
+        .pub-item {
+            margin-bottom: 1rem;
+            padding: 0.75rem 1rem;
+            background: var(--bg-secondary);
+            border-left: 3px solid var(--accent);
+            border-radius: 0 6px 6px 0;
+        }
+
+        .pub-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .pub-meta {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .pub-meta .venue {
+            color: var(--accent);
+            font-weight: 500;
+        }
+
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .skill-category {
+            background: var(--bg-secondary);
+            padding: 1rem 1.25rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .skill-category-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--accent);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .skill-list {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .award-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .award-item:last-child {
+            border-bottom: none;
+        }
+
+        .award-name {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .award-year {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        /* Language toggle for bilingual content */
+        [data-lang="en"] {
+            display: none;
+        }
+
+        [data-lang="zh"] {
+            display: block;
+        }
+
+        body.lang-en [data-lang="zh"] {
+            display: none;
+        }
+
+        body.lang-en [data-lang="en"] {
+            display: block;
+        }
+
+        /* ==================== Scroll Animations ==================== */
+
+        /* Base animation state */
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+            will-change: opacity, transform;
+        }
+
+        .animate-on-scroll.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Staggered delay for list items */
+        .entry-details li.animate-on-scroll {
+            transition-delay: 0.1s;
+        }
+
+        .pub-item.animate-on-scroll {
+            transition-delay: 0.15s;
+        }
+
+        .skill-category.animate-on-scroll {
+            transition-delay: calc(var(--skill-index, 0) * 0.1s);
+        }
+
+        .award-item.animate-on-scroll {
+            transition-delay: calc(var(--award-index, 0) * 0.15s);
+        }
+
+        /* Section animations */
+        section.animate-on-scroll {
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+
+        /* Header animation */
+        header.animate-on-scroll {
+            transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+        }
+
+        header.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Hover effects for interactive elements */
+        .pub-item {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .pub-item:hover {
+            transform: translateX(8px);
+            box-shadow: 0 4px 20px rgba(15, 76, 92, 0.12);
+        }
+
+        .skill-category {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .skill-category:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(15, 76, 92, 0.1);
+        }
+
+        .award-item {
+            transition: background-color 0.3s ease, padding-left 0.3s ease;
+        }
+
+        .award-item:hover {
+            background-color: var(--accent-light);
+            padding-left: 0.5rem;
+        }
+
+        /* Smooth anchor scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Loading animation */
+        .page-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        .page-loader.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .loader-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Print styles */
+        @media print {
+
+            .lang-toggle,
+            .page-loader {
+                display: none;
+            }
+
+            body {
+                background: white;
+            }
+
+            .container {
+                max-width: 100%;
+                padding: 1rem;
+            }
+
+            .pub-item {
+                box-shadow: none;
+                border: 1px solid #eee;
+            }
+
+            .animate-on-scroll {
+                opacity: 1;
+                transform: none;
+            }
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 600px) {
+            .container {
+                padding: 1.5rem 1rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .entry-header {
+                flex-direction: column;
+                gap: 0.25rem;
+            }
+
+            .entry-meta {
+                text-align: left;
+            }
+
+            .skills-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .contact-info {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .award-item {
+                flex-direction: column;
+                gap: 0.25rem;
+            }
+
+            .award-year {
+                text-align: left;
+            }
+
+            .game-toggle {
+                top: 1.5rem;
+                right: 1rem;
+                transform: scale(0.85);
+            }
+        }
+    </style>
+<style type="text/css">@font-face {
+  font-family: "xm-iconfont";
+  src: url('//at.alicdn.com/t/font_792691_ptvyboo0bno.eot?t=1574048839056');
+  /* IE9 */
+  src: url('//at.alicdn.com/t/font_792691_ptvyboo0bno.eot?t=1574048839056#iefix') format('embedded-opentype'), /* IE6-IE8 */ url('data:application/x-font-woff2;charset=utf-8;base64,d09GMgABAAAAAAksAAsAAAAAEYAAAAjeAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHEIGVgCEUgqTXI8lATYCJAM0CxwABCAFhG0HgTwbZQ4jEbaCkVIj+4sD3sS6BFAp9ka91ulVG4leTC/+h+3V+zyRYCTyREKkcZ+D5/u137lPdveLGJBMunoiNPOQPBMq0/FQtEKIkMRDZng69d+hOiQumAr7bJdBOEzMTU77s78mhbI58aCg7ebCs4LBTgCk+cD/4ZqWUHebipp7al3tyKOjwCV/hVyw9PdzaktxI7IMQs26/1N8gV4DI0bVut3UhCaflGGgwM3oTXg1IfRMbCsmrEnriJVeYM2eXHII4KdMMzL4OoACHgZBCTasITcReDUBE8kWPLMTCGoQaDV+eKpUPQI49r8vP6BTPIDCaiBSml3oOQX0voNPebv/u2P0AUfP1w0s5EADzYBZsNdByylo2eVq/NtRdgFpovQR5x2CIwmIZeik6/u0T/m/A7RJP00sCmmyksj/kwc+LC5BFBqDEMDDjwPiANDB9MpJTXwHmsO3YyBwWDA4OFwwJLRcRgAOBUYMDg0mHRwGTAYozsV0AgWYruDwwExDHfzwKWf4OurQ9jzQDtoF+wpistfBfluQ5bQiiJa4ZQoKhShLiMayBbyg05AIkYBoIBJEEApQy/FwYv4HchADIUBXl61dW6mpwIgyp7p8PrHddieSjhY9oqTxyPB/FGNYDklpfYh8VtaoqSgb0bKoGB17CuVUp9Ll2nS2UpNGMSw9hyirA7C6+QLyByIQS0sSSmxvArC5odZmYZMxZSiBR5OkQl0uiufxMH5eL8t3u0d4XKyuq6EMdcpNe2+oXA8p9yPa+4T1PM7+A54tc7tpl2vcAHAftnhZj2chy1CyaCRFsyMqQ5nkNnskEt2yxxZinPsOZjFm4+XWvKqLkfCGS1k4MNP82isxSMf7ZsGYvQVCNAeSSVtzWCxRdXGxyZlA2CvCEevuO7y9M2z2NWH8icydzq/qAJSp1lGvDWFp6Nw3xChJowPD+76nU+upQk6Kw9jI0Rgym9Ct8VlxMI3CSIaDCZja5tDYt0/EYra4tn0Kp3v8Rdezk8svcy1mKhoSvNcZz3LKlUe777Gmval0s7bzAc0k13LGk896V9DuvNn34N0ebKgItkQgOomuJtgQPChNI4cwa7CEWCvfk5QjJFlem6i3SfVShWi5LTFRG+JwdCNpSqbpRFwrtb1TbcRkJi/AbJJQOmfCdnswLNGVM7qqSRO1zO0Q0j5Vr3cYQ07HB0MX6KoIZhx+D9Djs2C5bXtVwvbgJHtSCIL7hjFJme4sZDdS5IlJdKUO1Qt8opn0trBafz3AX933kmCRgyMEWGZjMAkRKhwmIHJGR4ruwFCdWKYzrap2R/mvd2UKajzRAZu88pGAD90Y+02kTFCKrBSXwGGJ3wRcPCdIppTxSmHOfESRwIli0S5J/8AYDCxTGh4XZua4xvfvGx320rDK2qA8g5FlS7pWNLx71+BwgA/KZ5I0aeKmNeCNoNPl8qNHu8uHHzqaKc86fHi4vPuRI4ny+I/vjxw+clh4HXVCFvVnVFx07EHZwVhSRliTTMWSEi0h6YuS6DxCRmiin0B3L4ry6cvR0ijYexFdBL3wGQM0YOrUAZCBkLOBBtQ+xdk7omfgUv+u++admyUeXduyxLM+r/+49rPfhgEZor6GymToNYksNsZyC7ntwAH0928UpgMpxpF0ydNlsMMBw7QsxTCmu0Hf3F+/+vb99Yumhb+e9R0LBNm+4O+hu7lQ5bGjI9j5G88qQ5SLFyuEC7cwd25xoYo2j4eA4bhpM7TZhPtmc+uhVEVSMYXLWh0bfjI8dvUpvDUocPZmU4kwwOfc83wB5wPehrpD3waApbwW+fgRrZXcxw+mB/3woZT+8JFMYwRMIy2k/18qhqcKpjYeYSnIACaUoRDu0e3kQFh98R5fiI8oJqwwGZSJDSbehLzZs7zIeWTQ4UGOIs2c4j2/Q/tn7n7j9juO33On6WhURCT/wO6Y3QdmWFY0Ef6JUeGRggO7ZbtaZlh5RYKWXbLPBLc3l/5h4A0mu3ZXTZ+u6t6VHMAzZhxak50T+24NnRuaOmehRkXlqVR5lIpuwezUUDUdCuJysv8Z/0/8uNE1s7jIJIubFWnI/x7g4nAZx79yYpFoAOU3a9iwT1O/GxUxPY0ljVPv9EukI3qNrl/So2YfzasqHCroNjS0+w0tlPlsYfC6v/01ixquizJH1Kd/VK+OS3iS3rTJWmqsMPdU3B3oFyC9RSumWE/0gG36IjTysfH51IJ/5oOgNYu6p4yb5Fdufhr/Kjtu0oSyYP/WJQrz35aNFnMhtFcwb55NlNnH8Wdu1b+XZA9zqlZrhdPo/V3uBhiUlQ66h0LhbAmFYIncdFOpVMh6Fl7peqy5Z2ZdQBITO2x1Asj1dRFjIBMC3hbuUh8Ooc4W03EjAdo8UL/t0oUfyU8630bmMcw/vqDNAsC9BQD4OqCgH+ljy0UhJB8AAJA+8EmArxk5gnRLik90AElf8rBm+IMvBTWnucb3+0o0ARk+r0ZBv8sU01nnSmP45/H8Dp8C8X+iE9e+ZvXymK/sQJ5/DuqhYKebPnKmPqLYuDcIMWS2/Rjxp2s8Do821LVn6A/xMK1RKvBLK5gyDsZ5uQ6bYusmx2yqLFe4lECHDPcFhojmckuAbnCI6Cn308RI6AAJdtCICQLQyBHKhSgX5YowN6BBPIEB8VxuSfNncpAuutzPnCSiDHDEo+DsKQBPoJi4MpRktepIs2zjO5h84IEMM3ffECKSZU1ZHxfewEI4h494MuuUNNOBjuw18QKHAzEXaAcylS3m3baq9MpnKenYmfEUgCdbXTHEtTVKsvruNGv9/DuYfOAhcuKu9TeEiA9nNJTUDOUbbVkn3sv2eDJrEnVrpvcHOjJeqRsOcpYYLuxoBzKVtCOm3ZaKbtJcurw+e/zN6c7Pd6r4gqUo0WLEiiOueOITvwQkKCEJM9nO3F60y5HkqLhdqUyXZtK3lqwReQ+G40O92UhOt0x/KmKM+u7LTPMzoEBOCYtiUPfSjODiuFXjSDm2idzAoc4Tj9bs2eJYDOU7HQA=') format('woff2'), url('//at.alicdn.com/t/font_792691_ptvyboo0bno.woff?t=1574048839056') format('woff'), url('//at.alicdn.com/t/font_792691_ptvyboo0bno.ttf?t=1574048839056') format('truetype'), /* chrome, firefox, opera, Safari, Android, iOS 4.2+ */ url('//at.alicdn.com/t/font_792691_ptvyboo0bno.svg?t=1574048839056#iconfont') format('svg');
+  /* iOS 4.1- */
+}
+.xm-iconfont {
+  font-family: "xm-iconfont" !important;
+  font-size: 16px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+.xm-icon-quanxuan:before {
+  content: "\e62c";
+}
+.xm-icon-caidan:before {
+  content: "\e610";
+}
+.xm-icon-fanxuan:before {
+  content: "\e837";
+}
+.xm-icon-pifu:before {
+  content: "\e668";
+}
+.xm-icon-qingkong:before {
+  content: "\e63e";
+}
+.xm-icon-sousuo:before {
+  content: "\e600";
+}
+.xm-icon-danx:before {
+  content: "\e62b";
+}
+.xm-icon-duox:before {
+  content: "\e613";
+}
+.xm-icon-close:before {
+  content: "\e601";
+}
+.xm-icon-expand:before {
+  content: "\e641";
+}
+.xm-icon-banxuan:before {
+  content: "\e60d";
+}
+</style><style type="text/css">@-webkit-keyframes xm-upbit {
+  from {
+    -webkit-transform: translate3d(0, 30px, 0);
+    opacity: 0.3;
+  }
+  to {
+    -webkit-transform: translate3d(0, 0, 0);
+    opacity: 1;
+  }
+}
+@keyframes xm-upbit {
+  from {
+    transform: translate3d(0, 30px, 0);
+    opacity: 0.3;
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+  }
+}
+@-webkit-keyframes loader {
+  0% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+@keyframes loader {
+  0% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+xm-select {
+  background-color: #FFF;
+  position: relative;
+  border: 1px solid #E6E6E6;
+  border-radius: 2px;
+  display: block;
+  width: 100%;
+  cursor: pointer;
+  outline: none;
+}
+xm-select * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-size: 14px;
+  font-weight: 400;
+  text-overflow: ellipsis;
+  user-select: none;
+  -ms-user-select: none;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+}
+xm-select:hover,
+xm-select:focus {
+  border-color: #C0C4CC;
+}
+xm-select > .xm-tips {
+  color: #999999;
+  padding: 0 10px;
+  position: absolute;
+  display: flex;
+  height: 100%;
+  align-items: center;
+}
+xm-select > .xm-icon {
+  display: inline-block;
+  overflow: hidden;
+  position: absolute;
+  width: 0;
+  height: 0;
+  right: 10px;
+  top: 50%;
+  margin-top: -3px;
+  cursor: pointer;
+  border: 6px dashed transparent;
+  border-top-color: #C2C2C2;
+  border-top-style: solid;
+  transition: all 0.3s;
+  -webkit-transition: all 0.3s;
+}
+xm-select > .xm-icon-expand {
+  margin-top: -9px;
+  transform: rotate(180deg);
+}
+xm-select > .xm-label.single-row {
+  position: absolute;
+  top: 0;
+  bottom: 0px;
+  left: 0px;
+  right: 30px;
+  overflow: auto hidden;
+}
+xm-select > .xm-label.single-row .scroll {
+  overflow-y: hidden;
+}
+xm-select > .xm-label.single-row .label-content {
+  flex-wrap: nowrap;
+  white-space: nowrap;
+}
+xm-select > .xm-label.auto-row .label-content {
+  flex-wrap: wrap;
+  padding-right: 30px !important;
+}
+xm-select > .xm-label.auto-row .xm-label-block > span {
+  white-space: unset;
+  height: 100%;
+}
+xm-select > .xm-label .scroll .label-content {
+  display: flex;
+  padding: 3px 10px;
+}
+xm-select > .xm-label .xm-label-block {
+  display: flex;
+  position: relative;
+  padding: 0px 5px;
+  margin: 2px 5px 2px 0;
+  border-radius: 3px;
+  align-items: baseline;
+  color: #FFF;
+}
+xm-select > .xm-label .xm-label-block > span {
+  display: flex;
+  color: #FFF;
+  white-space: nowrap;
+}
+xm-select > .xm-label .xm-label-block > i {
+  color: #FFF;
+  margin-left: 8px;
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+}
+xm-select > .xm-label .xm-label-block.disabled {
+  background-color: #C2C2C2 !important;
+  cursor: no-drop !important;
+}
+xm-select > .xm-label .xm-label-block.disabled > i {
+  cursor: no-drop !important;
+}
+xm-select > .xm-body {
+  position: absolute;
+  left: 0;
+  top: 42px;
+  padding: 5px 0;
+  z-index: 999;
+  width: 100%;
+  min-width: fit-content;
+  border: 1px solid #E6E6E6;
+  background-color: #fff;
+  border-radius: 2px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
+  animation-name: xm-upbit;
+  animation-duration: 0.3s;
+  animation-fill-mode: both;
+}
+xm-select > .xm-body .scroll-body {
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+xm-select > .xm-body .scroll-body::-webkit-scrollbar {
+  width: 8px;
+}
+xm-select > .xm-body .scroll-body::-webkit-scrollbar-track {
+  -webkit-border-radius: 2em;
+  -moz-border-radius: 2em;
+  -ms-border-radius: 2em;
+  border-radius: 2em;
+  background-color: #FFF;
+}
+xm-select > .xm-body .scroll-body::-webkit-scrollbar-thumb {
+  -webkit-border-radius: 2em;
+  -moz-border-radius: 2em;
+  -ms-border-radius: 2em;
+  border-radius: 2em;
+  background-color: #C2C2C2;
+}
+xm-select > .xm-body.up {
+  top: auto;
+  bottom: 42px;
+}
+xm-select > .xm-body.relative {
+  position: relative;
+  display: block !important;
+  top: 0;
+  box-shadow: none;
+  border: none;
+  animation-name: none;
+  animation-duration: 0;
+  min-width: 100%;
+}
+xm-select > .xm-body .xm-group {
+  cursor: default;
+}
+xm-select > .xm-body .xm-group-item {
+  display: inline-block;
+  cursor: pointer;
+  padding: 0 10px;
+  color: #999;
+  font-size: 12px;
+}
+xm-select > .xm-body .xm-option {
+  display: flex;
+  align-items: center;
+  position: relative;
+  padding: 0 10px;
+  cursor: pointer;
+}
+xm-select > .xm-body .xm-option-icon {
+  color: transparent;
+  display: flex;
+  border: 1px solid #E6E6E6;
+  border-radius: 3px;
+  justify-content: center;
+  align-items: center;
+}
+xm-select > .xm-body .xm-option-icon.xm-custom-icon {
+  color: unset;
+  border: unset;
+}
+xm-select > .xm-body .xm-option-icon-hidden {
+  margin-right: -10px;
+}
+xm-select > .xm-body .xm-option-icon.xm-icon-danx {
+  border-radius: 100%;
+}
+xm-select > .xm-body .xm-option-content {
+  display: flex;
+  position: relative;
+  padding-left: 15px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  ;
+  width: calc(100% - 20px);
+}
+xm-select > .xm-body .xm-option.hide-icon .xm-option-content {
+  padding-left: 0;
+}
+xm-select > .xm-body .xm-option.selected.hide-icon .xm-option-content {
+  color: #FFF !important;
+}
+xm-select > .xm-body .xm-option .loader {
+  width: 0.8em;
+  height: 0.8em;
+  margin-right: 6px;
+  color: #C2C2C2;
+}
+xm-select > .xm-body .xm-select-empty {
+  text-align: center;
+  color: #999;
+}
+xm-select > .xm-body .disabled {
+  cursor: no-drop;
+}
+xm-select > .xm-body .disabled:hover {
+  background-color: #FFF;
+}
+xm-select > .xm-body .disabled .xm-option-icon {
+  border-color: #C2C2C2 !important;
+}
+xm-select > .xm-body .disabled .xm-option-content {
+  color: #C2C2C2 !important;
+}
+xm-select > .xm-body .disabled.selected > .xm-option-icon {
+  color: #C2C2C2 !important;
+}
+xm-select > .xm-body .xm-search {
+  background-color: #FFF !important;
+  position: relative;
+  padding: 0 10px;
+  margin-bottom: 5px;
+  cursor: pointer;
+}
+xm-select > .xm-body .xm-search > i {
+  position: absolute;
+  color: ;
+}
+xm-select > .xm-body .xm-search-input {
+  border: none;
+  border-bottom: 1px solid #E6E6E6;
+  padding-left: 27px;
+  cursor: text;
+}
+xm-select > .xm-body .xm-paging {
+  padding: 0 10px;
+  display: flex;
+  margin-top: 5px;
+}
+xm-select > .xm-body .xm-paging > span:first-child {
+  border-radius: 2px 0 0 2px;
+}
+xm-select > .xm-body .xm-paging > span:last-child {
+  border-radius: 0 2px 2px 0;
+}
+xm-select > .xm-body .xm-paging > span {
+  display: flex;
+  flex: auto;
+  justify-content: center;
+  vertical-align: middle;
+  margin: 0 -1px 0 0;
+  background-color: #fff;
+  color: #333;
+  font-size: 12px;
+  border: 1px solid #e2e2e2;
+  flex-wrap: nowrap;
+  width: 100%;
+  overflow: hidden;
+  min-width: 50px;
+}
+xm-select > .xm-body .xm-toolbar {
+  padding: 0 10px;
+  display: flex;
+  margin: -3px 0;
+  cursor: default;
+}
+xm-select > .xm-body .xm-toolbar .toolbar-tag {
+  cursor: pointer;
+  display: flex;
+  margin-right: 20px;
+  color: ;
+  align-items: baseline;
+}
+xm-select > .xm-body .xm-toolbar .toolbar-tag:hover {
+  opacity: 0.8;
+}
+xm-select > .xm-body .xm-toolbar .toolbar-tag:active {
+  opacity: 1;
+}
+xm-select > .xm-body .xm-toolbar .toolbar-tag > i {
+  margin-right: 2px;
+  font-size: 14px;
+}
+xm-select > .xm-body .xm-toolbar .toolbar-tag:last-child {
+  margin-right: 0;
+}
+xm-select > .xm-body .xm-body-custom {
+  line-height: initial;
+  cursor: default;
+}
+xm-select > .xm-body .xm-body-custom * {
+  box-sizing: initial;
+}
+xm-select > .xm-body .xm-tree {
+  position: relative;
+}
+xm-select > .xm-body .xm-tree-icon {
+  display: inline-block;
+  margin-right: 3px;
+  cursor: pointer;
+  border: 6px dashed transparent;
+  border-left-color: #C2C2C2;
+  border-left-style: solid;
+  transition: all 0.3s;
+  -webkit-transition: all 0.3s;
+  z-index: 2;
+  visibility: hidden;
+}
+xm-select > .xm-body .xm-tree-icon.expand {
+  margin-top: 3px;
+  margin-right: 5px;
+  margin-left: -2px;
+  transform: rotate(90deg);
+}
+xm-select > .xm-body .xm-tree-icon.xm-visible {
+  visibility: visible;
+}
+xm-select > .xm-body .xm-tree .left-line {
+  position: absolute;
+  left: 13px;
+  width: 0;
+  z-index: 1;
+  border-left: 1px dotted #c0c4cc !important;
+}
+xm-select > .xm-body .xm-tree .top-line {
+  position: absolute;
+  left: 13px;
+  height: 0;
+  z-index: 1;
+  border-top: 1px dotted #c0c4cc !important;
+}
+xm-select > .xm-body .xm-tree .xm-tree-icon + .top-line {
+  margin-left: 1px;
+}
+xm-select > .xm-body .scroll-body > .xm-tree > .xm-option > .top-line,
+xm-select > .xm-body .scroll-body > .xm-option > .top-line {
+  width: 0 !important;
+}
+xm-select > .xm-body .xm-cascader-box {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  padding: 5px 0;
+  border: 1px solid #E6E6E6;
+  background-color: #fff;
+  border-radius: 2px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
+  margin: -1px;
+}
+xm-select > .xm-body .xm-cascader-box::before {
+  content: ' ';
+  position: absolute;
+  width: 0;
+  height: 0;
+  border: 6px solid transparent;
+  border-right-color: #E6E6E6;
+  top: 10px;
+  left: -12px;
+}
+xm-select > .xm-body .xm-cascader-box::after {
+  content: ' ';
+  position: absolute;
+  width: 0;
+  height: 0;
+  border: 6px solid transparent;
+  border-right-color: #fff;
+  top: 10px;
+  left: -11px;
+}
+xm-select > .xm-body .xm-cascader-scroll {
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+xm-select > .xm-body.cascader {
+  width: unset;
+  min-width: unset;
+}
+xm-select > .xm-body.cascader .xm-option-content {
+  padding-left: 8px;
+}
+xm-select > .xm-body.cascader .disabled .xm-right-arrow {
+  color: #C2C2C2 !important;
+}
+xm-select > .xm-body.cascader .hide-icon.disabled .xm-right-arrow {
+  color: #999 !important;
+}
+xm-select .xm-input {
+  cursor: pointer;
+  border-radius: 2px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: #E6E6E6;
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  background-color: #FFF;
+  line-height: 1.3;
+  padding-left: 10px;
+  outline: 0;
+  user-select: text;
+  -ms-user-select: text;
+  -moz-user-select: text;
+  -webkit-user-select: text;
+}
+xm-select .dis {
+  display: none;
+}
+xm-select .loading {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+xm-select .loader {
+  border: 0.2em dotted currentcolor;
+  border-radius: 50%;
+  -webkit-animation: 1s loader linear infinite;
+  animation: 1s loader linear infinite;
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  color: inherit;
+  vertical-align: middle;
+  pointer-events: none;
+}
+xm-select .xm-select-default {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border: none;
+  visibility: hidden;
+}
+xm-select .xm-select-disabled {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  cursor: no-drop;
+  z-index: 2;
+  opacity: 0.3;
+  background-color: #FFF;
+}
+xm-select .item--divided {
+  border-top: 1px solid #ebeef5;
+  width: calc(100% - 20px);
+  cursor: initial;
+}
+xm-select .xm-right-arrow {
+  position: absolute;
+  color: ;
+  right: 5px;
+  top: -1px;
+  font-weight: 700;
+  transform: scale(0.6, 1);
+}
+xm-select .xm-right-arrow::after {
+  content: '>';
+}
+xm-select[size='large'] {
+  min-height: 40px;
+  line-height: 40px;
+}
+xm-select[size='large'] .xm-input {
+  height: 40px;
+}
+xm-select[size='large'] .xm-label .scroll .label-content {
+  line-height: 34px;
+}
+xm-select[size='large'] .xm-label .xm-label-block {
+  height: 30px;
+  line-height: 30px;
+}
+xm-select[size='large'] .xm-body .xm-option .xm-option-icon {
+  height: 20px;
+  width: 20px;
+  font-size: 20px;
+}
+xm-select[size='large'] .xm-paging > span {
+  height: 34px;
+  line-height: 34px;
+}
+xm-select[size='large'] .xm-tree .left-line {
+  height: 100%;
+  bottom: 20px;
+}
+xm-select[size='large'] .xm-tree .left-line-group {
+  height: calc(100% - 40px);
+}
+xm-select[size='large'] .xm-tree .xm-tree-icon.xm-hidden + .top-line {
+  top: 19px;
+}
+xm-select[size='large'] .item--divided {
+  margin: 10px;
+}
+xm-select {
+  min-height: 36px;
+  line-height: 36px;
+}
+xm-select .xm-input {
+  height: 36px;
+}
+xm-select .xm-label .scroll .label-content {
+  line-height: 30px;
+}
+xm-select .xm-label .xm-label-block {
+  height: 26px;
+  line-height: 26px;
+}
+xm-select .xm-body .xm-option .xm-option-icon {
+  height: 18px;
+  width: 18px;
+  font-size: 18px;
+}
+xm-select .xm-paging > span {
+  height: 30px;
+  line-height: 30px;
+}
+xm-select .xm-tree .left-line {
+  height: 100%;
+  bottom: 18px;
+}
+xm-select .xm-tree .left-line-group {
+  height: calc(100% - 36px);
+}
+xm-select .xm-tree .xm-tree-icon.xm-hidden + .top-line {
+  top: 17px;
+}
+xm-select .item--divided {
+  margin: 9px;
+}
+xm-select[size='small'] {
+  min-height: 32px;
+  line-height: 32px;
+}
+xm-select[size='small'] .xm-input {
+  height: 32px;
+}
+xm-select[size='small'] .xm-label .scroll .label-content {
+  line-height: 26px;
+}
+xm-select[size='small'] .xm-label .xm-label-block {
+  height: 22px;
+  line-height: 22px;
+}
+xm-select[size='small'] .xm-body .xm-option .xm-option-icon {
+  height: 16px;
+  width: 16px;
+  font-size: 16px;
+}
+xm-select[size='small'] .xm-paging > span {
+  height: 26px;
+  line-height: 26px;
+}
+xm-select[size='small'] .xm-tree .left-line {
+  height: 100%;
+  bottom: 16px;
+}
+xm-select[size='small'] .xm-tree .left-line-group {
+  height: calc(100% - 32px);
+}
+xm-select[size='small'] .xm-tree .xm-tree-icon.xm-hidden + .top-line {
+  top: 15px;
+}
+xm-select[size='small'] .item--divided {
+  margin: 8px;
+}
+xm-select[size='mini'] {
+  min-height: 28px;
+  line-height: 28px;
+}
+xm-select[size='mini'] .xm-input {
+  height: 28px;
+}
+xm-select[size='mini'] .xm-label .scroll .label-content {
+  line-height: 22px;
+}
+xm-select[size='mini'] .xm-label .xm-label-block {
+  height: 18px;
+  line-height: 18px;
+}
+xm-select[size='mini'] .xm-body .xm-option .xm-option-icon {
+  height: 14px;
+  width: 14px;
+  font-size: 14px;
+}
+xm-select[size='mini'] .xm-paging > span {
+  height: 22px;
+  line-height: 22px;
+}
+xm-select[size='mini'] .xm-tree .left-line {
+  height: 100%;
+  bottom: 14px;
+}
+xm-select[size='mini'] .xm-tree .left-line-group {
+  height: calc(100% - 28px);
+}
+xm-select[size='mini'] .xm-tree .xm-tree-icon.xm-hidden + .top-line {
+  top: 13px;
+}
+xm-select[size='mini'] .item--divided {
+  margin: 7px;
+}
+.layui-form-pane xm-select {
+  margin: -1px -1px -1px 0;
+}
+</style></head>
+
+<body>
+    <!-- Page Loader -->
+    <div class="page-loader hidden" id="pageLoader">
+        <div class="loader-spinner"></div>
+    </div>
+
+    <!-- Game of Life Background -->
+    <canvas id="game-of-life" width="1152" height="1312"></canvas>
+
+    <!-- Language Toggle -->
+    <div class="lang-toggle">
+        <button class="lang-btn active" onclick="setLang(&#39;zh&#39;)">中文</button>
+        <button class="lang-btn" onclick="setLang(&#39;en&#39;)">EN</button>
+    </div>
+
+    <!-- Game Toggle -->
+    <div class="game-toggle">
+        <button class="game-btn active" onclick="setGame(&#39;flocking&#39;, this)" title="Flocking">🦎</button>
+        <button class="game-btn" onclick="setGame(&#39;pursuit&#39;, this)" title="Pursuit-Evasion">🎯</button>
+        <button class="game-btn" onclick="setGame(&#39;rps&#39;, this)" title="Rock-Paper-Scissors">✊</button>
+        <button class="game-btn" onclick="setGame(&#39;sweep&#39;, this)" title="Particle Sweep">💨</button>
+        <button class="game-btn" onclick="setGame(&#39;ant&#39;, this)" title="Ant Colony">🐜</button>
+        <button class="game-btn" onclick="setGame(&#39;life&#39;, this)" title="Game of Life">🎲</button>
+    </div>
+
+    <!-- Page Nav -->
+    <div class="page-nav">
+        <button class="page-btn active" onclick="location.href=&#39;index.html&#39;" title="简历">📄</button>
+        <button class="page-btn" onclick="location.href=&#39;share.html&#39;" title="分享">📁</button>
+        <button class="page-btn" onclick="location.href=&#39;posts.html&#39;" title="帖子">📝</button>
+    </div>
+
+    <div class="container page-content" id="page-resume">
+
+
+        <section class="animate-on-scroll visible">
+            <h2><span class="section-title" data-lang="zh">技术技能</span><span class="section-title" data-lang="en">Technical Skills</span></h2>
+
+            <div class="skills-grid">
+                <div class="skill-category animate-on-scroll visible" style="--skill-index: 0;">
+                    <div class="skill-category-title" data-lang="zh">编程语言</div>
+                    <div class="skill-category-title" data-lang="en">Languages</div>
+                    <div class="skill-list">Python, C/C++, MATLAB, Java, etc.</div>
+                </div>
+                <div class="skill-category animate-on-scroll visible" style="--skill-index: 1;">
+                    <div class="skill-category-title" data-lang="zh">人工智能与机器人</div>
+                    <div class="skill-category-title" data-lang="en">AI &amp; Robotics</div>
+                    <div class="skill-list">OpenPI, LeRobot, VLA Fine-tuning, LoRA, ROS2, PyTorch, TensorRT, OpenCV</div>
+                </div>
+                <div class="skill-category animate-on-scroll visible" style="--skill-index: 2;">
+                    <div class="skill-category-title" data-lang="zh">仿真工具</div>
+                    <div class="skill-category-title" data-lang="en">Simulation</div>
+                    <div class="skill-list">Isaac Sim, Isaac Lab, Genesis, Gazebo</div>
+                </div>
+                <div class="skill-category animate-on-scroll visible" style="--skill-index: 3;">
+                    <div class="skill-category-title" data-lang="zh">理论基础</div>
+                    <div class="skill-category-title" data-lang="en">Theory</div>
+                    <div class="skill-list">Distributed Optimization, Graph Theory, Lyapunov Stability, MARL</div>
+                </div>
+            </div>
+        </section>
+
+
+
+        <section class="animate-on-scroll visible">
+            <h2><span class="section-title" data-lang="zh">发表论文</span><span class="section-title" data-lang="en">Publications</span></h2>
+
+            <div class="pub-item">
+                <div class="pub-title">Instantaneous Strong Connectivity: A Novel Perceptual Paradigm for Swarm Guidance
+                    in Communication-Denied Environments</div>
+                <div class="pub-meta">
+                    <span data-lang="zh">第一作者</span><span data-lang="en">First Author</span> |
+                    <span class="venue">IEEE Transactions on Control of Network Systems</span> (Under Review) | 2026
+                </div>
+            </div>
+
+
+            <div class="pub-item">
+                <div class="pub-title">Adaptive Encirclement Control Strategy for Swarm Robots Based on Multi-Sensor
+                    Dynamic Fusion</div>
+                <div class="pub-meta">
+                    <span data-lang="zh">本科生第一作者</span><span data-lang="en">Undergraduate First Author</span> |
+                    <span class="venue">Control Engineering of China</span> (Accepted) | 2026
+                </div>
+            </div>
+
+            <div class="pub-item">
+                <div class="pub-title">Multi-robot Capture Strategy for Observation-Limited Scenarios</div>
+                <div class="pub-meta">
+                    <span data-lang="zh">本科生第一作者</span><span data-lang="en">Undergraduate First Author</span> |
+                    <span class="venue">ROBOMECH</span> (Accepted) | 2026
+                </div>
+            </div>
+
+            <div class="pub-item">
+                <div class="pub-title">
+                    <a href="https://www.sciencedirect.com/science/article/pii/S2405896325020579" target="_blank" style="color: inherit; text-decoration: none;">
+                        Bio-inspired Neighbor Selection Mechanism and Performance Evaluation for UAV Swarms ↗
+                    </a>
+                </div>
+                <div class="pub-meta">
+                    <span data-lang="zh">第一作者</span><span data-lang="en">First Author</span> |
+                    <span class="venue">IFAC-ACA 2025</span> (Published)
+                </div>
+            </div>
+        </section>
+
+        <section class="animate-on-scroll visible">
+            <h2><span class="section-title" data-lang="zh">科研与项目经验</span><span class="section-title" data-lang="en">Research &amp; Project Experience</span></h2>
+
+            <div class="pub-item">
+                <div class="pub-title" data-lang="zh">VLA 后训练与 Isaac Sim 闭环评测</div>
+                <div class="pub-title" data-lang="en">VLA Post-Training and Closed-Loop Evaluation in Isaac Sim</div>
+                <div class="pub-meta">2026 | OpenPI / pi0.5 | Isaac Sim | LeRobot | LoRA / Full FT</div>
+                <ul class="entry-details">
+                    <li data-lang="zh">构建从真实场景重建资产、Isaac Sim 可交互世界、动作数据到 VLA 微调与评测的数据闭环</li>
+                    <li data-lang="zh">联通 OpenPI/pi0.5 policy server 与 Isaac Sim 第一人称观测，校验相机、状态、动作空间与归一化统计</li>
+                    <li data-lang="zh">设计 LoRA 小规模验证、全参数微调、rollout feedback 与 DAgger 纠正数据回流的分阶段路线</li>
+                    <li data-lang="zh">研究 VLM 语义评价、World Model 动力学评价与 RECAP-style 数据过滤在自动评测中的组合</li>
+                    <li data-lang="en">Built a data loop from reconstructed real-scene assets and interactive Isaac Sim worlds to action data, VLA fine-tuning, and evaluation</li>
+                    <li data-lang="en">Connected an OpenPI/pi0.5 policy server to first-person Isaac Sim observations while aligning cameras, states, action spaces, and normalization statistics</li>
+                    <li data-lang="en">Designed a staged path from LoRA smoke tests to full fine-tuning, rollout feedback, and DAgger-based corrective data collection</li>
+                    <li data-lang="en">Investigated hybrid evaluation with VLM semantic critics, World Model dynamics critics, and RECAP-style data filtering</li>
+                </ul>
+            </div>
+
+            <div class="pub-item">
+                <div class="pub-title" data-lang="zh">拓扑保持的群体感知研究</div>
+                <div class="pub-title" data-lang="en">Spotlight: Topology-Preserving Swarm Perception</div>
+                <div class="pub-meta">SUPMICROTECH–ENSMM | FEMTO-ST Laboratory | 2025--Present</div>
+                <ul class="entry-details">
+                    <li data-lang="zh">提出了保证动态交互图中即时强连通性的拓扑保持感知范式</li>
+                    <li data-lang="zh">建立了通信约束下结构信息传播的理论保证，防止网络分裂</li>
+                    <li data-lang="zh">通过Lyapunov分析方法证明了收敛性和稳定性</li>
+                    <li data-lang="zh">展示了相对于传统KNN拓扑策略的鲁棒性优势</li>
+                    <li data-lang="en">Formulated a topology-preserving perceptual paradigm guaranteeing instantaneous
+                        strong connectivity in dynamic interaction graphs</li>
+                    <li data-lang="en">Established structural information propagation guarantees preventing network
+                        fragmentation under communication constraints</li>
+                    <li data-lang="en">Proved convergence and stability properties via Lyapunov-based analysis</li>
+                    <li data-lang="en">Demonstrated robustness superiority over conventional KNN-based topology
+                        strategies</li>
+                </ul>
+            </div>
+
+            <div class="pub-item">
+                <div class="pub-title" data-lang="zh">分布式无人机群体轨迹优化</div>
+                <div class="pub-title" data-lang="en">Distributed UAV Swarm Trajectory Optimization</div>
+                <div class="pub-meta" data-lang="zh">项目负责人 | 导师: 张良教授 | 2023--2025</div>
+                <div class="pub-meta" data-lang="en">Project Leader | Supervisor: Prof. Zhang Liang | 2023--2025</div>
+                <ul class="entry-details">
+                    <li data-lang="zh">开发了基于CMA-ES的轨迹优化框架，实现去中心化多智能体协调</li>
+                    <li data-lang="zh">设计了通信约束下的拓扑感知协调机制</li>
+                    <li data-lang="zh">建立了定量连接性和鲁棒性评估指标</li>
+                    <li data-lang="en">Developed a CMA-ES-based trajectory optimization framework for decentralized
+                        multi-agent coordination</li>
+                    <li data-lang="en">Designed topology-aware coordination mechanisms under communication constraints
+                    </li>
+                    <li data-lang="en">Established quantitative connectivity and robustness evaluation metrics</li>
+                </ul>
+            </div>
+
+            <div class="pub-item">
+                <div class="pub-title" data-lang="zh">基于Genesis的无人机端到端强化学习</div>
+                <div class="pub-title" data-lang="en">End-to-End RL for UAV Navigation via Genesis</div>
+                <div class="pub-meta">2024--Present | Isaac Sim | Genesis | PyTorch | GAIL | CUDA</div>
+                <ul class="entry-details">
+                    <li data-lang="zh">基于 Genesis 实现无人机从感知到决策的端到端训练</li>
+                    <li data-lang="zh">设计了在通信受限环境下通过构建感知拓扑，支持去中心化群体协调</li>
+                    <li data-lang="zh">开发了通信约束多智能体系统的去中心化强化学习框架</li>
+                    <li data-lang="zh">在大规模仿真中评估了可扩展性和收敛稳定性</li>
+                    <li data-lang="en">Built physics-based Isaac Sim + Genesis simulation for end-to-end UAV training
+                        from perception to decision-making</li>
+                    <li data-lang="en">Designed attention-based policy network for decentralized swarm coordination
+                        under communication constraints</li>
+                    <li data-lang="en">Developed decentralized RL framework for communication-constrained multi-agent
+                        systems</li>
+                    <li data-lang="en">Evaluated scalability and convergence stability in large-scale simulations</li>
+                </ul>
+            </div>
+
+            <div class="pub-item">
+                <div class="pub-title" data-lang="zh">基于GNN的自组织无人机群拓扑强化学习框架</div>
+                <div class="pub-title" data-lang="en">GNN-Based Self-Organizing Swarm Topology Reinforcement Learning
+                </div>
+                <div class="pub-meta">2024--Present | PyTorch | PyG | PettingZoo | MAPPO | CUDA</div>
+                <ul class="entry-details">
+                    <li data-lang="zh">提出基于图神经网络(GNN)的动态拓扑表示学习方法，实现通信拓扑的自适应优化</li>
+                    <li data-lang="zh">结合拓扑感知注意力机制，设计图强化学习框架，支持可扩展的群体协同</li>
+                    <li data-lang="en">Proposed GNN-based dynamic topology representation for adaptive communication
+                        topology optimization</li>
+                    <li data-lang="en">Designed graph reinforcement learning framework with topology-aware attention for
+                        scalable swarm coordination</li>
+                </ul>
+            </div>
+
+            <div class="pub-item">
+                <div class="pub-title" data-lang="zh">IsaacLab轮足机器人Curriculum Learning</div>
+                <div class="pub-title" data-lang="en">IsaacLab Wheeled-Legged Robot Curriculum Learning</div>
+                <div class="pub-meta">2026 | Isaac Lab | PyTorch | CUDA | MARL</div>
+                <ul class="entry-details">
+                    <li data-lang="zh">轮足机器人运动学建模与步态规划理论，基于优化方法的落脚点选择与身体姿态协调策略</li>
+                    <li data-lang="zh">地形适应性与能耗最优的混合步态切换机制</li>
+                    <li data-lang="zh">课程学习(Curriculum Learning)范式，渐进式训练在机器人技能习得中的应用</li>
+                    <li data-lang="zh">Isaac Lab仿真平台架构，基于GPU的大规模并行仿真与训练流程</li>
+                    <li data-lang="zh">多智能体强化学习(MARL)在群体机器人中的应用，课程学习在多智能体场景的任务难度渐进</li>
+                    <li data-lang="en">Kinematic modeling and gait planning, foothold selection and body posture coordination</li>
+                    <li data-lang="en">Terrain adaptability and energy-efficient hybrid gait switching</li>
+                    <li data-lang="en">Curriculum Learning paradigms for progressive robot skill acquisition</li>
+                    <li data-lang="en">Isaac Lab simulation platform, GPU-based parallel training pipeline</li>
+                    <li data-lang="en">MARL for swarm robotics, Curriculum Learning for multi-agent task progression</li>
+                </ul>
+            </div>
+
+            <div class="pub-item">
+                <div class="pub-title" data-lang="zh">基于视觉的抗风无人机稳定控制</div>
+                <div class="pub-title" data-lang="en">Vision-Based Wind-Resistant UAV Stabilization</div>
+                <div class="pub-meta">2024--2025</div>
+                <ul class="entry-details">
+                    <li data-lang="zh">设计了抗扰动无人机的视觉状态估计算法</li>
+                    <li data-lang="zh">量化了气动扰动下的稳定性性能</li>
+                    <li data-lang="en">Designed visual state-estimation algorithms for disturbance-resilient UAV control
+                    </li>
+                    <li data-lang="en">Quantified stability performance under aerodynamic perturbations</li>
+                </ul>
+            </div>
+
+            <div class="pub-item">
+                <div class="pub-title" data-lang="zh">自主感知与导航 (RoboMaster 2025)</div>
+                <div class="pub-title" data-lang="en">Autonomous Perception &amp; Navigation (RoboMaster 2025)</div>
+                <div class="pub-meta">2023--2025</div>
+                <ul class="entry-details">
+                    <li data-lang="zh">实现了实时视觉检测和基于LiDAR的导航系统（MID-360 + FAST-LIO2）</li>
+                    <li data-lang="zh">通过TensorRT优化将推理效率从40 FPS提升至90 FPS</li>
+                    <li data-lang="en">Implemented real-time visual detection and LiDAR-based navigation system（MID-360
+                        + FAST-LIO2）</li>
+                    <li data-lang="en">Improved inference efficiency from 40 FPS to 90 FPS via TensorRT optimization
+                    </li>
+                </ul>
+            </div>
+
+        </section>
+        <section class="animate-on-scroll">
+            <h2><span class="section-title" data-lang="zh">教育背景</span><span class="section-title" data-lang="en">Education</span></h2>
+
+            <div class="entry">
+                <div class="entry-header">
+                    <span class="entry-title">SUPMICROTECH--ENSMM</span>
+                    <span class="entry-meta" data-lang="zh">2025 -- 2026</span>
+                    <span class="entry-meta" data-lang="en">2025 -- 2026</span>
+                    <span class="entry-title">安徽大学</span>
+                    <span class="entry-meta" data-lang="zh">2023 -- 2025</span>
+                    <span class="entry-meta" data-lang="en">2023 -- 2025</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="animate-on-scroll">
+            <h2><span class="section-title" data-lang="zh">获奖荣誉</span><span class="section-title" data-lang="en">Awards</span></h2>
+
+            <div class="award-item animate-on-scroll" style="--award-index: 0;">
+                <span class="award-name" data-lang="zh"> RoboMaster机甲大师赛全国三等奖</span>
+                <span class="award-name" data-lang="en">Third National Prize, RoboMaster University League</span>
+                <span class="award-year">2025.04</span>
+            </div>
+            <div class="award-item animate-on-scroll" style="--award-index: 1;">
+                <span class="award-name" data-lang="zh"> 蓝桥杯程序设计竞赛 (C++ A组) 省级三等奖</span>
+                <span class="award-name" data-lang="en">Third Regional Prize, Blue Bridge Cup Programming Contest (C++,
+                    Group A)</span>
+                <span class="award-year">2024.04</span>
+            </div>
+        </section>
+
+        <header class="animate-on-scroll">
+
+            <h2><span class="section-title" data-lang="zh">联系方式</span><span class="section-title" data-lang="en">Contact</span></h2>
+
+            <div class="contact-info">
+                <span class="contact-item">
+                    <a href="mailto:jzhang1@supmicrotech.fr">jzhang1@supmicrotech.fr</a>
+                </span>
+                <span class="contact-item">+33 07 43 55 91 27</span>
+                <span class="contact-item">+86 158 0095 2694</span>
+                <span class="contact-item">WeChat: Astrofutur</span>
+            </div>
+        </header>
+    </div>
+
+    <script>
+        // ==================== Language Toggle ====================
+        function setLang(lang) {
+            localStorage.setItem('swarmotor-lang', lang);
+            document.body.classList.remove('lang-en');
+            if (lang === 'en') {
+                document.body.classList.add('lang-en');
+            }
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if ((btn.textContent === 'EN' && lang === 'en') ||
+                    (btn.textContent === '中文' && lang === 'zh')) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+
+        // 初始化语言状态
+        (function initLang() {
+            const saved = localStorage.getItem('swarmotor-lang');
+            if (saved) setLang(saved);
+        })();
+
+        // ==================== Page Loader ====================
+        window.addEventListener('load', function () {
+            const loader = document.getElementById('pageLoader');
+            setTimeout(() => {
+                loader.classList.add('hidden');
+            }, 800);
+        });
+
+        // ==================== Scroll Animation Observer ====================
+        function initScrollAnimations() {
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.1
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        // Optionally stop observing after animation
+                        // observer.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+
+            // Observe all animated elements
+            document.querySelectorAll('.animate-on-scroll').forEach(el => {
+                observer.observe(el);
+            });
+        }
+
+        // Initialize animations when DOM is ready
+        document.addEventListener('DOMContentLoaded', initScrollAnimations);
+
+        // ==================== Smooth Scroll for Anchor Links ====================
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // ==================== Game System ====================
+        let currentGame = 'flocking';
+
+        function setGame(game, btn) {
+            currentGame = game;
+            document.querySelectorAll('.game-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        }
+
+        // Flocking Simulation
+        (function initFlocking() {
+            const canvas = document.getElementById('game-of-life');
+            const ctx = canvas.getContext('2d');
+            let agents = [], width, height;
+
+            function resize() {
+                width = window.innerWidth;
+                height = window.innerHeight;
+                canvas.width = width;
+                canvas.height = height;
+            }
+
+            function initAgents(count = 60) {
+                agents = [];
+                for (let i = 0; i < count; i++) {
+                    agents.push({
+                        x: Math.random() * width,
+                        y: Math.random() * height,
+                        vx: (Math.random() - 0.5) * 3,
+                        vy: (Math.random() - 0.5) * 3,
+                        hue: 180 + Math.random() * 40
+                    });
+                }
+            }
+
+            function update() {
+                const perceptionRadius = 80;
+                const separationDist = 25;
+
+                for (let i = 0; i < agents.length; i++) {
+                    let avgX = 0, avgY = 0, avgVX = 0, avgVY = 0, sepX = 0, sepY = 0, count = 0;
+
+                    for (let j = 0; j < agents.length; j++) {
+                        if (i === j) continue;
+                        const dx = agents[j].x - agents[i].x;
+                        const dy = agents[j].y - agents[i].y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+
+                        if (dist < perceptionRadius) {
+                            avgX += agents[j].x;
+                            avgY += agents[j].y;
+                            avgVX += agents[j].vx;
+                            avgVY += agents[j].vy;
+                            count++;
+
+                            if (dist < separationDist) {
+                                sepX -= dx / dist;
+                                sepY -= dy / dist;
+                            }
+                        }
+                    }
+
+                    if (count > 0) {
+                        avgX /= count;
+                        avgY /= count;
+                        avgVX /= count;
+                        avgVY /= count;
+                        agents[i].vx += (avgX - agents[i].x) * 0.005 + (avgVX - agents[i].vx) * 0.05;
+                        agents[i].vy += (avgY - agents[i].y) * 0.005 + (avgVY - agents[i].vy) * 0.05;
+                    }
+                    agents[i].vx += sepX * 0.15;
+                    agents[i].vy += sepY * 0.15;
+
+                    // Boundary avoidance
+                    const margin = 50;
+                    if (agents[i].x < margin) agents[i].vx += 0.5;
+                    if (agents[i].x > width - margin) agents[i].vx -= 0.5;
+                    if (agents[i].y < margin) agents[i].vy += 0.5;
+                    if (agents[i].y > height - margin) agents[i].vy -= 0.5;
+
+                    // Speed limit
+                    const speed = Math.sqrt(agents[i].vx ** 2 + agents[i].vy ** 2);
+                    if (speed > 4) {
+                        agents[i].vx = (agents[i].vx / speed) * 4;
+                        agents[i].vy = (agents[i].vy / speed) * 4;
+                    }
+
+                    agents[i].x += agents[i].vx;
+                    agents[i].y += agents[i].vy;
+                }
+            }
+
+            function draw() {
+                ctx.fillStyle = '#fafaf9';
+                ctx.fillRect(0, 0, width, height);
+
+                for (const a of agents) {
+                    const angle = Math.atan2(a.vy, a.vx);
+                    ctx.save();
+                    ctx.translate(a.x, a.y);
+                    ctx.rotate(angle);
+                    ctx.beginPath();
+                    ctx.moveTo(8, 0);
+                    ctx.lineTo(-4, -4);
+                    ctx.lineTo(-4, 4);
+                    ctx.closePath();
+                    ctx.fillStyle = `hsl(${a.hue}, 60%, 35%)`;
+                    ctx.fill();
+                    ctx.restore();
+                }
+            }
+
+            let animId;
+            function animate() {
+                if (currentGame === 'flocking') { update(); draw(); }
+                animId = requestAnimationFrame(animate);
+            }
+
+            canvas.addEventListener('contextmenu', e => {
+                e.preventDefault();
+                const rect = canvas.getBoundingClientRect();
+                agents.push({
+                    x: e.clientX - rect.left,
+                    y: e.clientY - rect.top,
+                    vx: (Math.random() - 0.5) * 3,
+                    vy: (Math.random() - 0.5) * 3,
+                    hue: 180 + Math.random() * 40
+                });
+            });
+
+            resize();
+            initAgents();
+            animate();
+        })();
+
+        // Pursuit-Evasion Game
+        (function initPursuit() {
+            const canvas = document.getElementById('game-of-life');
+            const ctx = canvas.getContext('2d');
+            let pursuers = [], targets = [], width, height;
+
+            function resize() {
+                width = window.innerWidth;
+                height = window.innerHeight;
+                canvas.width = width;
+                canvas.height = height;
+            }
+
+            function init() {
+                pursuers = [{ x: width / 2, y: height / 2, vx: 0, vy: 0 }];
+                targets = [];
+                for (let i = 0; i < 5; i++) {
+                    targets.push({
+                        x: Math.random() * width,
+                        y: Math.random() * height,
+                        vx: (Math.random() - 0.5) * 2,
+                        vy: (Math.random() - 0.5) * 2
+                    });
+                }
+            }
+
+            function update() {
+                // Pursuer pursues closest target
+                let closest = 0, minDist = Infinity;
+                for (let i = 0; i < targets.length; i++) {
+                    const d = (targets[i].x - pursuers[0].x) ** 2 + (targets[i].y - pursuers[0].y) ** 2;
+                    if (d < minDist) { minDist = d; closest = i; }
+                }
+                const t = targets[closest];
+                pursuers[0].vx += (t.x - pursuers[0].x) * 0.02;
+                pursuers[0].vy += (t.y - pursuers[0].y) * 0.02;
+
+                // Targets flee from pursuer
+                for (const target of targets) {
+                    const dx = target.x - pursuers[0].x;
+                    const dy = target.y - pursuers[0].y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < 150) {
+                        target.vx += (dx / dist) * 0.3;
+                        target.vy += (dy / dist) * 0.3;
+                    }
+                    // Wander
+                    target.vx += (Math.random() - 0.5) * 0.5;
+                    target.vy += (Math.random() - 0.5) * 0.5;
+
+                    // Bounce off walls
+                    if (target.x < 0 || target.x > width) target.vx *= -1;
+                    if (target.y < 0 || target.y > height) target.vy *= -1;
+
+                    const speed = Math.sqrt(target.vx ** 2 + target.vy ** 2);
+                    if (speed > 3) {
+                        target.vx = (target.vx / speed) * 3;
+                        target.vy = (target.vy / speed) * 3;
+                    }
+                    target.x += target.vx;
+                    target.y += target.vy;
+                }
+
+                // Pursuer speed limit
+                const pSpeed = Math.sqrt(pursuers[0].vx ** 2 + pursuers[0].vy ** 2);
+                if (pSpeed > 4) {
+                    pursuers[0].vx = (pursuers[0].vx / pSpeed) * 4;
+                    pursuers[0].vy = (pursuers[0].vy / pSpeed) * 4;
+                }
+                pursuers[0].x += pursuers[0].vx;
+                pursuers[0].y += pursuers[0].vy;
+            }
+
+            function draw() {
+                ctx.fillStyle = '#fafaf9';
+                ctx.fillRect(0, 0, width, height);
+
+                // Draw targets
+                for (const t of targets) {
+                    ctx.beginPath();
+                    ctx.arc(t.x, t.y, 6, 0, Math.PI * 2);
+                    ctx.fillStyle = '#e74c3c';
+                    ctx.fill();
+                }
+
+                // Draw pursuer
+                const p = pursuers[0];
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, 10, 0, Math.PI * 2);
+                ctx.fillStyle = '#0f4c5c';
+                ctx.fill();
+            }
+
+            function animate() {
+                if (currentGame === 'pursuit') { update(); draw(); }
+                requestAnimationFrame(animate);
+            }
+
+            resize();
+            init();
+            animate();
+        })();
+
+        // Rock-Paper-Scissors
+        (function initRPS() {
+            const canvas = document.getElementById('game-of-life');
+            const ctx = canvas.getContext('2d');
+            let cells = [], width, height, cellSize = 12, cols, rows;
+
+            function resize() {
+                width = window.innerWidth;
+                height = window.innerHeight;
+                canvas.width = width;
+                canvas.height = height;
+                cols = Math.ceil(width / cellSize);
+                rows = Math.ceil(height / cellSize);
+            }
+
+            function init() {
+                cells = [];
+                for (let i = 0; i < cols * rows; i++) {
+                    cells.push(Math.floor(Math.random() * 3));
+                }
+            }
+
+            function update() {
+                const newCells = [...cells];
+
+                for (let y = 0; y < rows; y++) {
+                    for (let x = 0; x < cols; x++) {
+                        const idx = y * cols + x;
+
+                        for (let dy = -1; dy <= 1; dy++) {
+                            for (let dx = -1; dx <= 1; dx++) {
+                                if (dx === 0 && dy === 0) continue;
+                                const nx = (x + dx + cols) % cols;
+                                const ny = (y + dy + rows) % rows;
+                                const nidx = ny * cols + nx;
+                                const current = cells[idx];
+                                const neighbor = cells[nidx];
+                                // Rock(0) beats Scissors(2), Scissors(2) beats Paper(1), Paper(1) beats Rock(0)
+                                if ((current === 0 && neighbor === 2) ||
+                                    (current === 2 && neighbor === 1) ||
+                                    (current === 1 && neighbor === 0)) {
+                                    if (Math.random() < 0.05) newCells[nidx] = current;
+                                }
+                            }
+                        }
+                    }
+                }
+                cells = newCells;
+            }
+
+            function draw() {
+                ctx.fillStyle = '#fafaf9';
+                ctx.fillRect(0, 0, width, height);
+
+                for (let y = 0; y < rows; y++) {
+                    for (let x = 0; x < cols; x++) {
+                        const idx = y * cols + x;
+                        if (cells[idx] === 0) ctx.fillStyle = '#e74c3c';
+                        else if (cells[idx] === 1) ctx.fillStyle = '#3498db';
+                        else ctx.fillStyle = '#2ecc71';
+                        ctx.fillRect(x * cellSize, y * cellSize, cellSize - 1, cellSize - 1);
+                    }
+                }
+            }
+
+            function animate() {
+                if (currentGame === 'rps') { update(); draw(); }
+                requestAnimationFrame(animate);
+            }
+
+            resize();
+            init();
+            animate();
+        })();
+
+        // Particle Sweep
+        (function initSweep() {
+            const canvas = document.getElementById('game-of-life');
+            const ctx = canvas.getContext('2d');
+            let particles = [], width, height;
+
+            function resize() {
+                width = window.innerWidth;
+                height = window.innerHeight;
+                canvas.width = width;
+                canvas.height = height;
+            }
+
+            function init() {
+                particles = [];
+                for (let i = 0; i < 80; i++) {
+                    particles.push({
+                        x: Math.random() * width,
+                        y: Math.random() * height,
+                        vx: (Math.random() - 0.5) * 2,
+                        vy: (Math.random() - 0.5) * 2
+                    });
+                }
+            }
+
+            function update() {
+                for (const p of particles) {
+                    // Cohere with neighbors
+                    let avgX = 0, avgY = 0, count = 0;
+                    for (const other of particles) {
+                        if (p === other) continue;
+                        const dx = other.x - p.x;
+                        const dy = other.y - p.y;
+                        const d = Math.sqrt(dx * dx + dy * dy);
+                        if (d < 60) {
+                            avgX += other.x;
+                            avgY += other.y;
+                            count++;
+                        }
+                    }
+                    if (count > 0) {
+                        avgX /= count;
+                        avgY /= count;
+                        p.vx += (avgX - p.x) * 0.003;
+                        p.vy += (avgY - p.y) * 0.003;
+                    }
+
+                    // Spread apart if too close
+                    for (const other of particles) {
+                        if (p === other) continue;
+                        const dx = p.x - other.x;
+                        const dy = p.y - other.y;
+                        const d = Math.sqrt(dx * dx + dy * dy);
+                        if (d < 15) {
+                            p.vx += dx / d * 0.1;
+                            p.vy += dy / d * 0.1;
+                        }
+                    }
+
+                    // Move toward mouse
+                    if (mouseX > 0) {
+                        const dx = mouseX - p.x;
+                        const dy = mouseY - p.y;
+                        const d = Math.sqrt(dx * dx + dy * dy);
+                        if (d > 80) {
+                            p.vx += dx / d * 0.05;
+                            p.vy += dy / d * 0.05;
+                        }
+                    }
+
+                    const speed = Math.sqrt(p.vx ** 2 + p.vy ** 2);
+                    if (speed > 3) {
+                        p.vx = (p.vx / speed) * 3;
+                        p.vy = (p.vy / speed) * 3;
+                    }
+                    p.x += p.vx;
+                    p.y += p.vy;
+
+                    if (p.x < 0) p.x = width;
+                    if (p.x > width) p.x = 0;
+                    if (p.y < 0) p.y = height;
+                    if (p.y > height) p.y = 0;
+                }
+            }
+
+            function draw() {
+                ctx.fillStyle = '#fafaf9';
+                ctx.fillRect(0, 0, width, height);
+
+                for (const p of particles) {
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+                    ctx.fillStyle = 'rgba(15, 76, 92, 0.7)';
+                    ctx.fill();
+                }
+            }
+
+            let mouseX = 0, mouseY = 0;
+            canvas.addEventListener('mousemove', e => {
+                const rect = canvas.getBoundingClientRect();
+                mouseX = e.clientX - rect.left;
+                mouseY = e.clientY - rect.top;
+            });
+
+            function animate() {
+                if (currentGame === 'sweep') { update(); draw(); }
+                requestAnimationFrame(animate);
+            }
+
+            resize();
+            init();
+            animate();
+        })();
+
+        // Ant Colony
+        (function initAnt() {
+            const canvas = document.getElementById('game-of-life');
+            const ctx = canvas.getContext('2d');
+            let ants = [], food = [], trails = [], width, height;
+
+            function resize() {
+                width = window.innerWidth;
+                height = window.innerHeight;
+                canvas.width = width;
+                canvas.height = height;
+            }
+
+            function init() {
+                ants = [];
+                food = [];
+                trails = [];
+                const cols = Math.ceil(width / 10);
+                const rows = Math.ceil(height / 10);
+
+                for (let i = 0; i < 40; i++) {
+                    ants.push({
+                        x: width / 2,
+                        y: height / 2,
+                        angle: Math.random() * Math.PI * 2,
+                        hasFood: false
+                    });
+                }
+
+                for (let i = 0; i < 30; i++) {
+                    food.push({
+                        x: Math.random() * width,
+                        y: Math.random() * height
+                    });
+                }
+            }
+
+            function update() {
+                for (const ant of ants) {
+                    // Sense food
+                    let closestFood = null, minDist = 30;
+                    for (let f of food) {
+                        const d = Math.sqrt((ant.x - f.x) ** 2 + (ant.y - f.y) ** 2);
+                        if (d < minDist) { minDist = d; closestFood = f; }
+                    }
+
+                    if (closestFood && !ant.hasFood) {
+                        ant.angle = Math.atan2(closestFood.y - ant.y, closestFood.x - ant.x);
+                        if (minDist < 10) {
+                            ant.hasFood = true;
+                            const idx = food.indexOf(closestFood);
+                            if (idx > -1) food.splice(idx, 1);
+                        }
+                    } else if (ant.hasFood) {
+                        // Return to nest
+                        const dx = width / 2 - ant.x;
+                        const dy = height / 2 - ant.y;
+                        const d = Math.sqrt(dx * dx + dy * dy);
+                        ant.angle = Math.atan2(dy, dx);
+                        if (d < 15) ant.hasFood = false;
+                    } else {
+                        // Random wander with trail following
+                        ant.angle += (Math.random() - 0.5) * 0.5;
+                    }
+
+                    // Add trail
+                    const tx = Math.floor(ant.x / 10);
+                    const ty = Math.floor(ant.y / 10);
+                    if (tx >= 0 && tx < width / 10 && ty >= 0 && ty < height / 10) {
+                        trails.push({ x: tx, y: ty, strength: 1 });
+                    }
+
+                    ant.x += Math.cos(ant.angle) * 2;
+                    ant.y += Math.sin(ant.angle) * 2;
+
+                    // Bounce
+                    if (ant.x < 0 || ant.x > width) ant.angle = Math.PI - ant.angle;
+                    if (ant.y < 0 || ant.y > height) ant.angle = -ant.angle;
+                    ant.x = Math.max(0, Math.min(width, ant.x));
+                    ant.y = Math.max(0, Math.min(height, ant.y));
+                }
+
+                // Fade trails
+                for (const t of trails) t.strength -= 0.005;
+                trails = trails.filter(t => t.strength > 0);
+
+                // Respawn food
+                if (food.length < 30 && Math.random() < 0.1) {
+                    food.push({
+                        x: Math.random() * width,
+                        y: Math.random() * height
+                    });
+                }
+            }
+
+            function draw() {
+                ctx.fillStyle = '#fafaf9';
+                ctx.fillRect(0, 0, width, height);
+
+                // Draw trails
+                for (const t of trails) {
+                    ctx.fillStyle = `rgba(139, 195, 74, ${t.strength * 0.3})`;
+                    ctx.fillRect(t.x * 10, t.y * 10, 10, 10);
+                }
+
+                // Draw food
+                for (const f of food) {
+                    ctx.beginPath();
+                    ctx.arc(f.x, f.y, 4, 0, Math.PI * 2);
+                    ctx.fillStyle = '#27ae60';
+                    ctx.fill();
+                }
+
+                // Draw ants
+                for (const ant of ants) {
+                    ctx.beginPath();
+                    ctx.arc(ant.x, ant.y, 3, 0, Math.PI * 2);
+                    ctx.fillStyle = ant.hasFood ? '#e74c3c' : '#0f4c5c';
+                    ctx.fill();
+                }
+
+                // Draw nest
+                ctx.beginPath();
+                ctx.arc(width / 2, height / 2, 15, 0, Math.PI * 2);
+                ctx.strokeStyle = '#0f4c5c';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            }
+
+            function animate() {
+                if (currentGame === 'ant') { update(); draw(); }
+                requestAnimationFrame(animate);
+            }
+
+            resize();
+            init();
+            animate();
+        })();
+
+        // Game of Life (original)
+        (function initGameOfLife() {
+            const canvas = document.getElementById('game-of-life');
+            const ctx = canvas.getContext('2d');
+
+            let width, height;
+            let cells, nextCells;
+            const cellSize = 8;
+
+            function resize() {
+                width = Math.ceil(window.innerWidth / cellSize);
+                height = Math.ceil(window.innerHeight / cellSize);
+                canvas.width = width * cellSize;
+                canvas.height = height * cellSize;
+                initCells();
+            }
+
+            function initCells() {
+                cells = [];
+                for (let y = 0; y < height; y++) {
+                    cells[y] = [];
+                    for (let x = 0; x < width; x++) {
+                        cells[y][x] = Math.random() < 0.3 ? 1 : 0;
+                    }
+                }
+                nextCells = [];
+            }
+
+            function countNeighbors(x, y) {
+                let count = 0;
+                for (let dy = -1; dy <= 1; dy++) {
+                    for (let dx = -1; dx <= 1; dx++) {
+                        if (dx === 0 && dy === 0) continue;
+                        const nx = (x + dx + width) % width;
+                        const ny = (y + dy + height) % height;
+                        count += cells[ny][nx];
+                    }
+                }
+                return count;
+            }
+
+            function update() {
+                for (let y = 0; y < height; y++) {
+                    nextCells[y] = [];
+                    for (let x = 0; x < width; x++) {
+                        const neighbors = countNeighbors(x, y);
+                        if (cells[y][x] === 1) {
+                            nextCells[y][x] = (neighbors === 2 || neighbors === 3) ? 1 : 0;
+                        } else {
+                            nextCells[y][x] = neighbors === 3 ? 1 : 0;
+                        }
+                    }
+                }
+                [cells, nextCells] = [nextCells, cells];
+            }
+
+            function draw() {
+                ctx.fillStyle = '#fafaf9';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                ctx.fillStyle = 'rgba(15, 76, 92, 0.55)';
+                for (let y = 0; y < height; y++) {
+                    for (let x = 0; x < width; x++) {
+                        if (cells[y][x] === 1) {
+                            ctx.beginPath();
+                            ctx.arc(x * cellSize + cellSize / 2, y * cellSize + cellSize / 2, cellSize / 3, 0, Math.PI * 2);
+                            ctx.fill();
+                        }
+                    }
+                }
+            }
+
+            function animate() {
+                if (currentGame === 'life') { update(); draw(); }
+                requestAnimationFrame(animate);
+            }
+
+            resize();
+            animate();
+        })();
+
+        // ==================== Keyboard Navigation ====================
+        document.addEventListener('keydown', function (e) {
+            // Arrow keys for section navigation
+            if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+                const sections = Array.from(document.querySelectorAll('section, header'));
+                const currentSection = sections.find(section => {
+                    const rect = section.getBoundingClientRect();
+                    return rect.top <= 100 && rect.bottom > 100;
+                });
+
+                if (currentSection) {
+                    const currentIndex = sections.indexOf(currentSection);
+                    const nextIndex = e.key === 'ArrowDown'
+                        ? Math.min(currentIndex + 1, sections.length - 1)
+                        : Math.max(currentIndex - 1, 0);
+
+                    sections[nextIndex].scrollIntoView({ behavior: 'smooth' });
+                }
+            }
+        });
+    </script>
+
+
+
+</body><div id="immersive-translate-popup" style="all: initial"><template shadowrootmode="open"><div id="mount" style="display: block;"><div class="imt-fb-container right imt-notranslate  " data-theme="light" style="z-index: 2147483637; pointer-events: none; right: 0px; top: 335px; display: flex;"><div class="btn-animate" style="transform: translateX(-5px); opacity: 0; pointer-events: none; filter: blur(1px); transition: opacity 110ms cubic-bezier(0.4, 0, 1, 1), filter 110ms cubic-bezier(0.4, 0, 1, 1); will-change: opacity, filter;"><div class="imt-fb-btn imt-fb-more-button imt-fb-side" style="pointer-events: none;"><div class=" btn-animate" style="position: relative; pointer-events: all; display: inline-block;"><div><svg class="imt-fb-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M9.65332 13.3477C10.4097 13.4245 11 14.0632 11 14.8398V18.8398L10.9922 18.9932C10.9205 19.6992 10.3593 20.2604 9.65332 20.332L9.5 20.3398H5.5C4.72334 20.3398 4.08461 19.7496 4.00781 18.9932L4 18.8398V14.8398C4 14.0114 4.67157 13.3398 5.5 13.3398H9.5L9.65332 13.3477ZM18.6533 13.3477C19.4097 13.4245 20 14.0632 20 14.8398V18.8398L19.9922 18.9932C19.9205 19.6992 19.3593 20.2604 18.6533 20.332L18.5 20.3398H14.5C13.7233 20.3398 13.0846 19.7496 13.0078 18.9932L13 18.8398V14.8398C13 14.0114 13.6716 13.3398 14.5 13.3398H18.5L18.6533 13.3477ZM5.5 14.3398C5.22386 14.3398 5 14.5637 5 14.8398V18.8398C5 19.116 5.22386 19.3398 5.5 19.3398H9.5C9.77614 19.3398 10 19.116 10 18.8398V14.8398C10 14.5637 9.77614 14.3398 9.5 14.3398H5.5ZM14.5 14.3398C14.2239 14.3398 14 14.5637 14 14.8398V18.8398C14 19.116 14.2239 19.3398 14.5 19.3398H18.5C18.7761 19.3398 19 19.116 19 18.8398V14.8398C19 14.5637 18.7761 14.3398 18.5 14.3398H14.5ZM9.65332 4.34766C10.4097 4.42445 11 5.06318 11 5.83984V9.83984L10.9922 9.99316C10.9205 10.6992 10.3593 11.2604 9.65332 11.332L9.5 11.3398H5.5C4.72334 11.3398 4.08461 10.7496 4.00781 9.99316L4 9.83984V5.83984C4 5.01142 4.67157 4.33984 5.5 4.33984H9.5L9.65332 4.34766ZM16.1484 3.18848C16.2521 2.83834 16.7479 2.83834 16.8516 3.18848L17.3281 4.79785C17.5079 5.40507 17.9648 5.89104 18.5596 6.1084L20.0576 6.65625C20.3786 6.77361 20.3785 7.22732 20.0576 7.34473L18.5596 7.89258C17.9648 8.10991 17.5079 8.59598 17.3281 9.20312L16.8516 10.8125C16.7479 11.1626 16.2521 11.1626 16.1484 10.8125L15.6719 9.20312C15.4921 8.59598 15.0352 8.10991 14.4404 7.89258L12.9424 7.34473C12.6215 7.22732 12.6214 6.77361 12.9424 6.65625L14.4404 6.1084C15.0352 5.89104 15.4921 5.40507 15.6719 4.79785L16.1484 3.18848ZM5.5 5.33984C5.22386 5.33984 5 5.5637 5 5.83984V9.83984C5 10.116 5.22386 10.3398 5.5 10.3398H9.5C9.77614 10.3398 10 10.116 10 9.83984V5.83984C10 5.5637 9.77614 5.33984 9.5 5.33984H5.5Z" fill="#ED6D8F"></path></svg><svg class="imt-fb-pin-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="7" fill="#B1B1B166"></circle><g transform="translate(2, 2)"><mask id="mask0_39788_745" maskUnits="userSpaceOnUse" x="0" y="0" width="10" height="10" style="mask-type: alpha;"><rect width="10" height="10" fill="#D9D9D9"></rect></mask><g mask="url(#mask0_39788_745)"><path d="M6.23958 3.76042C6.28819 3.80903 6.35243 3.88194 6.43229 3.97917C6.51215 4.07639 6.59722 4.18056 6.6875 4.29167C6.6875 4.44444 6.63646 4.57292 6.53438 4.67708C6.43222 4.78125 6.30618 4.83333 6.15625 4.83333C6.00056 4.83333 5.86962 4.78125 5.76344 4.67708C5.65726 4.57292 5.60417 4.44444 5.60417 4.29167C5.59722 4.28472 5.59201 4.28646 5.58854 4.29688C5.58507 4.30729 5.58333 4.31076 5.58333 4.30729C5.58333 4.30382 5.59028 4.30382 5.60417 4.30729C5.61806 4.31076 5.62153 4.30903 5.61458 4.30208C5.47569 4.30208 5.3559 4.25104 5.25521 4.14896C5.15451 4.04681 5.10417 3.92771 5.10417 3.79167C5.10417 3.65278 5.15451 3.53299 5.25521 3.43229C5.3559 3.3316 5.47569 3.28125 5.61458 3.28125C5.74653 3.35764 5.86111 3.43403 5.95833 3.51042C6.05556 3.58681 6.14931 3.67014 6.23958 3.76042ZM5 2.75C4.94667 2.75 4.89465 2.75017 4.84396 2.75052C4.79326 2.75087 4.74083 2.75035 4.68667 2.74896C4.54139 2.7566 4.39931 2.72049 4.26042 2.64062C4.12153 2.56076 4.03472 2.44618 4 2.29688C3.96528 2.14757 3.98611 2.01389 4.0625 1.89583C4.13889 1.77778 4.25267 1.71094 4.40385 1.69531C4.50962 1.6901 4.61059 1.68576 4.70677 1.68229C4.80295 1.67882 4.90069 1.67708 5 1.67708C5.97917 1.67708 6.88368 1.93056 7.71354 2.4375C8.5434 2.94444 9.17059 3.64625 9.5951 4.54292C9.62892 4.61847 9.65451 4.69451 9.67188 4.77104C9.68924 4.84757 9.69792 4.92389 9.69792 5C9.69792 5.07611 9.69097 5.15417 9.67708 5.23417C9.66319 5.31417 9.64236 5.39236 9.61458 5.46875C9.49826 5.68972 9.36504 5.89948 9.2149 6.09802C9.06469 6.29656 8.90278 6.49306 8.72917 6.6875C8.63194 6.79861 8.51042 6.85069 8.36458 6.84375C8.21875 6.83681 8.09375 6.78069 7.98958 6.67542C7.88542 6.57007 7.83681 6.44507 7.84375 6.30042C7.85069 6.15569 7.90278 6.02431 8 5.90625C8.13194 5.76736 8.25125 5.62153 8.35792 5.46875C8.46465 5.31597 8.5641 5.15972 8.65625 5C8.30208 4.30556 7.79861 3.75694 7.14583 3.35417C6.49306 2.95139 5.77778 2.75 5 2.75ZM5 8.32292C4.04861 8.32292 3.1684 8.07465 2.35938 7.57812C1.55035 7.0816 0.919896 6.40906 0.468021 5.56052C0.419896 5.46462 0.387153 5.37142 0.369792 5.28094C0.352431 5.19052 0.34375 5.09677 0.34375 4.99969C0.34375 4.90267 0.352431 4.80556 0.369792 4.70833C0.387153 4.61111 0.420139 4.51736 0.46875 4.42708C0.614583 4.13542 0.787361 3.86813 0.987083 3.62521C1.18688 3.38229 1.40646 3.15306 1.64583 2.9375L0.96875 2.27083C0.871528 2.18056 0.821181 2.07812 0.817708 1.96354C0.814236 1.84896 0.861111 1.74306 0.958333 1.64583C1.05556 1.54861 1.16319 1.5 1.28125 1.5C1.39931 1.5 1.50694 1.54861 1.60417 1.64583L8.19792 8.23958C8.29514 8.33681 8.34201 8.44271 8.33854 8.55729C8.33507 8.67188 8.28819 8.77431 8.19792 8.86458C8.10069 8.96181 7.99479 9.01042 7.88021 9.01042C7.76562 9.01042 7.65972 8.96181 7.5625 8.86458L6.70833 8.01042C6.43472 8.12153 6.15382 8.20139 5.86562 8.25C5.57743 8.29861 5.28889 8.32292 5 8.32292ZM2.41667 3.6875C2.20139 3.88194 2.00347 4.08507 1.82292 4.29688C1.64236 4.50868 1.48611 4.74306 1.35417 5C1.69444 5.70139 2.19271 6.25174 2.84896 6.65104C3.50521 7.05035 4.22222 7.25 5 7.25C5.14729 7.25 5.29347 7.24132 5.43854 7.22396C5.58368 7.2066 5.72569 7.18056 5.86458 7.14583L5.39583 6.67708C5.33333 6.70486 5.26736 6.72396 5.19792 6.73438C5.12847 6.74479 5.0625 6.75 5 6.75C4.51389 6.75 4.10069 6.57986 3.76042 6.23958C3.42014 5.89931 3.25 5.48611 3.25 5C3.25 4.9375 3.25694 4.87153 3.27083 4.80208C3.28472 4.73264 3.29514 4.66667 3.30208 4.60417L2.41667 3.6875Z" fill="white"></path></g></g></svg></div></div></div></div><div hidden="" class="imt-no-events " id="manga-button" style="position: relative; opacity: 0.7;"><div class="imt-manga-button btn-animate" style="transform: translateX(2px);"><div style="position: relative;"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none" style="vertical-align: middle;"><path d="M14.8853 4.92364C14.8853 4.92364 16.3905 10.4362 22.6668 4C22.6668 4 20.3381 10.8907 25.3364 10.0843C25.3364 10.0843 22.0563 15.6994 29 18.0599C29 18.0599 22.9934 19.306 21.1617 28C21.1617 28 17.7679 24.54 14.8853 27.3549C14.8853 27.3549 13.3233 23.5724 7.33097 26.27C7.33097 26.27 10.1141 20.6549 4.83179 21.0507C4.83179 21.0507 7.16057 18.8955 3 15.9047C3 15.9047 7.50137 16.1833 6.33697 11.7117C6.33697 11.7117 10.0005 12.3421 8.66576 6.82957C8.65156 6.81491 12.4855 9.80574 14.8853 4.92364Z" fill="#ED6D8F"></path><path d="M20.8599 13.7022C20.885 13.1361 20.9543 12.5713 20.9959 12.0052C21.0337 11.568 20.8107 11.2794 20.3876 11.18C20.0759 11.1013 19.7508 11.0867 19.433 11.137C19.1951 11.1945 18.9542 11.2396 18.7113 11.2721C18.2403 11.3028 17.9973 11.5275 17.9796 11.988C17.977 12.0833 17.9596 12.1777 17.928 12.268C17.3034 13.9102 16.6774 15.5499 16.0503 17.1873C16.0301 17.2401 16.0062 17.2904 15.9671 17.3776C15.7291 16.8975 15.4281 16.4898 15.2745 15.9986C14.8073 14.5152 14.3186 13.033 13.8312 11.5594C13.6826 11.1112 13.3489 10.9344 12.8754 11.0216C12.7889 11.0365 12.7008 11.0398 12.6134 11.0314C12.2241 10.9938 11.8311 11.0404 11.4623 11.1677C11.0946 11.2991 10.9498 11.557 11.0152 11.9254C11.0428 12.0371 11.0643 12.1503 11.0795 12.2643C11.1223 13.1902 11.1777 14.1087 11.2054 15.0321C11.257 16.7992 11.2117 18.5651 11.0858 20.3284C11.0644 20.6354 11.0304 20.9424 11.0228 21.2494C11.0115 21.6092 11.1613 21.7811 11.5266 21.8143C11.9976 21.8573 12.4711 21.8708 12.9421 21.9088C13.0309 21.9201 13.121 21.9003 13.1962 21.8528C13.2714 21.8053 13.3268 21.7334 13.3527 21.6497C13.3996 21.5394 13.4252 21.4216 13.4282 21.3022C13.4295 20.8258 13.4207 20.3493 13.4081 19.8741C13.393 19.3264 13.3917 18.7763 13.3438 18.231C13.2857 17.5839 13.266 16.934 13.2847 16.2847C13.2847 16.2466 13.291 16.2073 13.2985 16.1312C13.3338 16.2024 13.3514 16.2356 13.3665 16.2712C13.9017 17.5228 14.3617 18.8037 14.7443 20.1074C14.7928 20.2421 14.7928 20.3889 14.7443 20.5237C14.6322 20.8196 14.7141 21.037 14.9659 21.1377C15.4445 21.3268 15.9331 21.4926 16.4155 21.6731C16.4865 21.7033 16.566 21.7091 16.6408 21.6895C16.7157 21.6698 16.7815 21.6259 16.8273 21.565C16.9085 21.4643 16.9743 21.3526 17.0225 21.2335C17.0537 21.1374 17.0798 21.0399 17.1006 20.9412C17.3185 20.2425 17.5653 19.5499 17.7517 18.8438C17.9785 17.9723 18.2624 17.1158 18.6018 16.2798C18.6201 16.2439 18.6411 16.2094 18.6647 16.1766C18.6761 16.2319 18.6761 16.254 18.6761 16.2761C18.6345 17.59 18.5955 18.8978 18.5501 20.2056C18.5363 20.5949 18.491 20.9829 18.4809 21.3722C18.4721 21.705 18.6207 21.8708 18.9557 21.9002C19.4355 21.9432 19.9191 21.9592 20.4002 21.9973C20.4888 22.0079 20.5784 21.9875 20.653 21.9399C20.7277 21.8922 20.7827 21.8203 20.8082 21.7369C20.8531 21.6305 20.8766 21.5167 20.8775 21.4017C20.88 20.7668 20.8674 20.132 20.8674 19.4971C20.8662 19.2846 20.8687 19.0722 20.8523 18.8622C20.8158 18.3968 20.7264 17.9314 20.7339 17.4685C20.7515 16.2122 20.8044 14.9572 20.8599 13.7022Z" fill="white"></path></svg></div></div></div><div style="display: flex; align-items: center; flex-direction: row; gap: 8px;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none" style="display: block; opacity: 0;"><g clip-path="url(#clip0_38845_9816)"><path d="M7 14C5.14348 14 3.36301 13.2625 2.05025 11.9497C0.737498 10.637 0 8.85652 0 7C0 5.14348 0.737498 3.36301 2.05025 2.05025C3.36301 0.737498 5.14348 0 7 0C8.85652 0 10.637 0.737498 11.9497 2.05025C13.2625 3.36301 14 5.14348 14 7C14 8.85652 13.2625 10.637 11.9497 11.9497C10.637 13.2625 8.85652 14 7 14Z" fill="#B1B1B1" fill-opacity="0.4"></path><path d="M6.11754 7.00052L4.18254 5.06452C4.06786 4.94725 4.00406 4.78948 4.00498 4.62546C4.00589 4.46144 4.07145 4.3044 4.18744 4.18841C4.30342 4.07243 4.46046 4.00687 4.62448 4.00595C4.7885 4.00503 4.94627 4.06884 5.06354 4.18352L6.99954 6.11852L8.93554 4.18352C8.99315 4.1246 9.06188 4.07771 9.13774 4.04554C9.2136 4.01337 9.29508 3.99656 9.37748 3.9961C9.45988 3.99564 9.54155 4.01153 9.61777 4.04285C9.69398 4.07417 9.76323 4.1203 9.82149 4.17857C9.87976 4.23683 9.92589 4.30608 9.95721 4.38229C9.98853 4.45851 10.0044 4.54018 10.004 4.62258C10.0035 4.70497 9.98669 4.78646 9.95452 4.86232C9.92235 4.93818 9.87545 5.00691 9.81654 5.06452L7.88154 7.00052L9.81654 8.93652C9.93122 9.05379 9.99502 9.21155 9.99411 9.37557C9.99319 9.5396 9.92763 9.69664 9.81164 9.81262C9.69566 9.9286 9.53862 9.99417 9.3746 9.99508C9.21058 9.996 9.05281 9.9322 8.93554 9.81752L6.99954 7.88252L5.06354 9.81752C5.00593 9.87643 4.93721 9.92333 4.86135 9.9555C4.78549 9.98767 4.704 10.0045 4.6216 10.0049C4.5392 10.0054 4.45753 9.9895 4.38131 9.95818C4.3051 9.92686 4.23585 9.88073 4.17759 9.82247C4.11932 9.7642 4.0732 9.69496 4.04188 9.61874C4.01056 9.54253 3.99467 9.46086 3.99513 9.37846C3.99559 9.29606 4.01239 9.21457 4.04456 9.13871C4.07673 9.06285 4.12363 8.99413 4.18254 8.93652L6.11754 7.00052Z" fill="white"></path></g><defs><clippath id="clip0_38845_9816"><rect width="14" height="14" fill="white"></rect></clippath></defs></svg><div style="position: relative;"><div class="imt-fb-btn right btn-animate  " dir="ltr" style="opacity: 0.7;"><div class=" " style="position: relative; pointer-events: all; display: inline-block;"><div><div class="imt-fb-btn-content"><svg class="imt-fb-logo-img imt-fb-logo-img-big-bg" width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 14C0 6.26801 6.26801 0 14 0C21.732 0 28 6.26801 28 14C28 21.732 21.732 28 14 28C6.26801 28 0 21.732 0 14Z" fill="#ED6D8F"></path><path d="M7.30921 15.6381C7.53044 15.6381 7.70979 15.8175 7.70979 16.0387V19.0088C7.70979 19.934 8.45993 20.684 9.38526 20.684H11.7557C11.9769 20.684 12.1562 20.8634 12.1562 21.0846V22.152C12.1562 22.3732 11.9769 22.5526 11.7557 22.5526H9.38526C7.42782 22.5526 5.84099 20.966 5.84099 19.0088V16.0387C5.84099 15.8175 6.02034 15.6381 6.24157 15.6381H7.30921ZM18.9876 12.6944C19.1515 12.6944 19.2989 12.7943 19.3597 12.9466L22.9711 22.0036C23.076 22.2667 22.8822 22.5526 22.599 22.5526H21.4672C21.3016 22.5526 21.153 22.4506 21.0934 22.2961L20.2724 20.1673C20.2128 20.0128 20.0643 19.9108 19.8986 19.9108H16.7508C16.5852 19.9108 16.4366 20.0128 16.377 20.1673L15.556 22.2961C15.4964 22.4506 15.3478 22.5526 15.1822 22.5526H14.0504C13.7672 22.5526 13.5734 22.2667 13.6783 22.0036L17.2897 12.9466C17.3505 12.7943 17.4979 12.6944 17.6618 12.6944H18.9876ZM18.5116 15.6017C18.4456 15.4308 18.2038 15.4308 18.1378 15.6017L17.3016 17.7699C17.251 17.9011 17.3478 18.0423 17.4885 18.0423H19.1609C19.3016 18.0423 19.3984 17.9012 19.3478 17.7699L18.5116 15.6017ZM9.69589 5.30028C9.79943 4.8999 10.368 4.89991 10.4715 5.30028L11.1086 7.76368C11.3244 8.59845 11.9396 9.27221 12.7513 9.56299L14.9019 10.3334C15.2559 10.4602 15.2559 10.9608 14.9019 11.0876L12.7513 11.8581C11.9396 12.1489 11.3244 12.8226 11.1086 13.6574L10.4715 16.1208C10.368 16.5212 9.79943 16.5212 9.69589 16.1208L9.05884 13.6574C8.84297 12.8226 8.22786 12.1489 7.41615 11.8581L5.26548 11.0876C4.91151 10.9608 4.91151 10.4602 5.26548 10.3334L7.41615 9.56299C8.22786 9.27221 8.84297 8.59844 9.05884 7.76368L9.69589 5.30028ZM18.0064 6.20485C19.9639 6.20485 21.5507 7.79145 21.5507 9.74861V11.281C21.5507 11.5022 21.3713 11.6816 21.1501 11.6816H20.0825C19.8612 11.6816 19.6819 11.5022 19.6819 11.281V9.74861C19.6819 8.82341 18.9318 8.07338 18.0064 8.07338H14.4343C14.2131 8.07338 14.0337 7.89403 14.0337 7.6728V6.60543C14.0337 6.3842 14.2131 6.20486 14.4343 6.20485H18.0064Z" fill="white"></path></svg></div></div></div></div><div title="Close Floating Button" class="imt-fb-close-button btn-animate" style="opacity: 0; pointer-events: none; filter: blur(1px); transition: opacity 110ms cubic-bezier(0.4, 0, 1, 1), filter 110ms cubic-bezier(0.4, 0, 1, 1); will-change: opacity, filter;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none"><g clip-path="url(#clip0_38845_9816)"><path d="M7 14C5.14348 14 3.36301 13.2625 2.05025 11.9497C0.737498 10.637 0 8.85652 0 7C0 5.14348 0.737498 3.36301 2.05025 2.05025C3.36301 0.737498 5.14348 0 7 0C8.85652 0 10.637 0.737498 11.9497 2.05025C13.2625 3.36301 14 5.14348 14 7C14 8.85652 13.2625 10.637 11.9497 11.9497C10.637 13.2625 8.85652 14 7 14Z" fill="#B1B1B1" fill-opacity="0.4"></path><path d="M6.11754 7.00052L4.18254 5.06452C4.06786 4.94725 4.00406 4.78948 4.00498 4.62546C4.00589 4.46144 4.07145 4.3044 4.18744 4.18841C4.30342 4.07243 4.46046 4.00687 4.62448 4.00595C4.7885 4.00503 4.94627 4.06884 5.06354 4.18352L6.99954 6.11852L8.93554 4.18352C8.99315 4.1246 9.06188 4.07771 9.13774 4.04554C9.2136 4.01337 9.29508 3.99656 9.37748 3.9961C9.45988 3.99564 9.54155 4.01153 9.61777 4.04285C9.69398 4.07417 9.76323 4.1203 9.82149 4.17857C9.87976 4.23683 9.92589 4.30608 9.95721 4.38229C9.98853 4.45851 10.0044 4.54018 10.004 4.62258C10.0035 4.70497 9.98669 4.78646 9.95452 4.86232C9.92235 4.93818 9.87545 5.00691 9.81654 5.06452L7.88154 7.00052L9.81654 8.93652C9.93122 9.05379 9.99502 9.21155 9.99411 9.37557C9.99319 9.5396 9.92763 9.69664 9.81164 9.81262C9.69566 9.9286 9.53862 9.99417 9.3746 9.99508C9.21058 9.996 9.05281 9.9322 8.93554 9.81752L6.99954 7.88252L5.06354 9.81752C5.00593 9.87643 4.93721 9.92333 4.86135 9.9555C4.78549 9.98767 4.704 10.0045 4.6216 10.0049C4.5392 10.0054 4.45753 9.9895 4.38131 9.95818C4.3051 9.92686 4.23585 9.88073 4.17759 9.82247C4.11932 9.7642 4.0732 9.69496 4.04188 9.61874C4.01056 9.54253 3.99467 9.46086 3.99513 9.37846C3.99559 9.29606 4.01239 9.21457 4.04456 9.13871C4.07673 9.06285 4.12363 8.99413 4.18254 8.93652L6.11754 7.00052Z" fill="white"></path></g><defs><clippath id="clip0_38845_9816"><rect width="14" height="14" fill="white"></rect></clippath></defs></svg></div></div><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none" style="display: none; opacity: 0;"><g clip-path="url(#clip0_38845_9816)"><path d="M7 14C5.14348 14 3.36301 13.2625 2.05025 11.9497C0.737498 10.637 0 8.85652 0 7C0 5.14348 0.737498 3.36301 2.05025 2.05025C3.36301 0.737498 5.14348 0 7 0C8.85652 0 10.637 0.737498 11.9497 2.05025C13.2625 3.36301 14 5.14348 14 7C14 8.85652 13.2625 10.637 11.9497 11.9497C10.637 13.2625 8.85652 14 7 14Z" fill="#B1B1B1" fill-opacity="0.4"></path><path d="M6.11754 7.00052L4.18254 5.06452C4.06786 4.94725 4.00406 4.78948 4.00498 4.62546C4.00589 4.46144 4.07145 4.3044 4.18744 4.18841C4.30342 4.07243 4.46046 4.00687 4.62448 4.00595C4.7885 4.00503 4.94627 4.06884 5.06354 4.18352L6.99954 6.11852L8.93554 4.18352C8.99315 4.1246 9.06188 4.07771 9.13774 4.04554C9.2136 4.01337 9.29508 3.99656 9.37748 3.9961C9.45988 3.99564 9.54155 4.01153 9.61777 4.04285C9.69398 4.07417 9.76323 4.1203 9.82149 4.17857C9.87976 4.23683 9.92589 4.30608 9.95721 4.38229C9.98853 4.45851 10.0044 4.54018 10.004 4.62258C10.0035 4.70497 9.98669 4.78646 9.95452 4.86232C9.92235 4.93818 9.87545 5.00691 9.81654 5.06452L7.88154 7.00052L9.81654 8.93652C9.93122 9.05379 9.99502 9.21155 9.99411 9.37557C9.99319 9.5396 9.92763 9.69664 9.81164 9.81262C9.69566 9.9286 9.53862 9.99417 9.3746 9.99508C9.21058 9.996 9.05281 9.9322 8.93554 9.81752L6.99954 7.88252L5.06354 9.81752C5.00593 9.87643 4.93721 9.92333 4.86135 9.9555C4.78549 9.98767 4.704 10.0045 4.6216 10.0049C4.5392 10.0054 4.45753 9.9895 4.38131 9.95818C4.3051 9.92686 4.23585 9.88073 4.17759 9.82247C4.11932 9.7642 4.0732 9.69496 4.04188 9.61874C4.01056 9.54253 3.99467 9.46086 3.99513 9.37846C3.99559 9.29606 4.01239 9.21457 4.04456 9.13871C4.07673 9.06285 4.12363 8.99413 4.18254 8.93652L6.11754 7.00052Z" fill="white"></path></g><defs><clippath id="clip0_38845_9816"><rect width="14" height="14" fill="white"></rect></clippath></defs></svg></div><div class="btn-animate" style="margin-top: 10px; transform: translateX(-5px); opacity: 0; pointer-events: none; filter: blur(1px); transition: opacity 110ms cubic-bezier(0.4, 0, 1, 1), filter 110ms cubic-bezier(0.4, 0, 1, 1); will-change: opacity, filter;"><div class=" btn-animate" style="position: relative; pointer-events: none; display: inline-block;"><div><div class="imt-fb-round-button"><svg class="imt-fb-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" style="width: 24px; height: 24px;"><path d="M17 8.66797H11.375" stroke="#ED6D8F" stroke-linecap="round" stroke-linejoin="round"></path><path d="M12.625 15.332L7 15.332" stroke="#ED6D8F" stroke-linecap="round" stroke-linejoin="round"></path><path d="M15.125 17C16.1605 17 17 16.1605 17 15.125C17 14.0895 16.1605 13.25 15.125 13.25C14.0895 13.25 13.25 14.0895 13.25 15.125C13.25 16.1605 14.0895 17 15.125 17Z" stroke="#ED6D8F" stroke-linecap="round" stroke-linejoin="round"></path><path d="M8.875 10.75C9.91053 10.75 10.75 9.91053 10.75 8.875C10.75 7.83947 9.91053 7 8.875 7C7.83947 7 7 7.83947 7 8.875C7 9.91053 7.83947 10.75 8.875 10.75Z" stroke="#ED6D8F" stroke-linecap="round" stroke-linejoin="round"></path><rect x="3" y="4" width="18" height="16" rx="1.66667" stroke="#ED6D8F"></rect></svg></div></div></div></div><div class="btn-animate" style="margin-top: 10px; transform: translateX(-5px); opacity: 0; pointer-events: none; filter: blur(1px); transition: opacity 110ms cubic-bezier(0.4, 0, 1, 1), filter 110ms cubic-bezier(0.4, 0, 1, 1); will-change: opacity, filter;"><div class=" btn-animate" style="position: relative; pointer-events: none; display: inline-block;"><div><div class="imt-fb-round-button"><svg class="imt-fb-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none"><mask id="mask0_43829_2633" maskUnits="userSpaceOnUse" x="0" y="0" width="20" height="20" style="mask-type: alpha;"><rect width="20" height="20" fill="#D9D9D9"></rect></mask><g mask="url(#mask0_43829_2633)"><path d="M9.99546 12.2609C10.1639 12.2609 10.305 12.2055 10.4188 12.0946C10.5327 11.9838 10.5896 11.8441 10.5896 11.6755C10.5896 11.507 10.5342 11.3659 10.4234 11.2521C10.3124 11.1384 10.1727 11.0815 10.0042 11.0815C9.83574 11.0815 9.69463 11.1369 9.58088 11.2478C9.46699 11.3586 9.41005 11.4982 9.41005 11.6667C9.41005 11.8353 9.46546 11.9765 9.5763 12.0903C9.68727 12.204 9.82699 12.2609 9.99546 12.2609ZM9.99546 10.1936C10.148 10.1936 10.2771 10.1418 10.3828 10.0382C10.4886 9.93443 10.5415 9.80568 10.5415 9.65193V5.20318C10.5415 5.04943 10.49 4.92075 10.3871 4.81713C10.2844 4.71338 10.1567 4.66151 10.0042 4.66151C9.85171 4.66151 9.72261 4.71338 9.61692 4.81713C9.51109 4.92075 9.45817 5.04943 9.45817 5.20318V9.65193C9.45817 9.80568 9.50963 9.93443 9.61255 10.0382C9.71532 10.1418 9.84296 10.1936 9.99546 10.1936ZM5.03192 14.5846L3.55359 16.063C3.34262 16.2739 3.10032 16.3221 2.82671 16.2076C2.55324 16.093 2.4165 15.8864 2.4165 15.5878V3.75776C2.4165 3.38262 2.54602 3.06554 2.80505 2.80651C3.06407 2.54748 3.38116 2.41797 3.7563 2.41797H16.2434C16.6185 2.41797 16.9356 2.54748 17.1946 2.80651C17.4537 3.06554 17.5832 3.38262 17.5832 3.75776V13.2448C17.5832 13.62 17.4537 13.9371 17.1946 14.1961C16.9356 14.4551 16.6185 14.5846 16.2434 14.5846H5.03192ZM4.58317 13.5013H16.2434C16.3075 13.5013 16.3663 13.4746 16.4196 13.4211C16.4731 13.3678 16.4998 13.309 16.4998 13.2448V3.75776C16.4998 3.69359 16.4731 3.63484 16.4196 3.58151C16.3663 3.52804 16.3075 3.5013 16.2434 3.5013H3.7563C3.69213 3.5013 3.63338 3.52804 3.58005 3.58151C3.52657 3.63484 3.49984 3.69359 3.49984 3.75776V14.5928L4.58317 13.5013Z" fill="#ED6D8F"></path></g></svg></div></div></div></div><div hidden="" id="immersive-translate-popup-overlay" class="immersive-translate-popup-overlay"><div class="immersive-translate-popup-wrapper" style="position: fixed; top: 335px; right: 65px;"></div></div></div></div></template></div></html>

@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="机器人学与具身智能知识骨架：从机体、控制、运动学、强化学习运动控制，到 VLA、WAM、数据采集与任务编排。">
+  <meta property="og:title" content="机器人学与具身智能知识骨架">
+  <meta property="og:description" content="以百科定义、经典教材、支柱论文和厂商一手资料搭建的研究地图。">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://swarmotor.github.io/robotics-embodied-intelligence-wiki.html">
+  <link rel="canonical" href="https://swarmotor.github.io/robotics-embodied-intelligence-wiki.html">
+  <link rel="icon" href="data:,">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@500;600&amp;family=DM+Sans:wght@400;500;600;700&amp;family=Noto+Sans+SC:wght@300;400;500;700&amp;display=swap" rel="stylesheet">
+  <title>机器人学与具身智能知识骨架 | SWARMOTOR</title>
+  <style>
+    :root {
+      --bg-primary: #fafaf9;
+      --bg-secondary: #ffffff;
+      --surface-soft: rgba(255, 255, 255, 0.88);
+      --text-primary: #1a1a1a;
+      --text-secondary: #525252;
+      --text-muted: #737373;
+      --accent: #0f4c5c;
+      --accent-light: #e8f4f6;
+      --accent-line: rgba(15, 76, 92, 0.18);
+      --border: #e5e5e5;
+      --shadow: rgba(15, 76, 92, 0.08);
+      --radius-large: 24px;
+      --radius-medium: 16px;
+      --radius-small: 8px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at 8% 0%, rgba(15, 76, 92, 0.07), transparent 28rem),
+        var(--bg-primary);
+      color: var(--text-primary);
+      font-family: "DM Sans", "Noto Sans SC", sans-serif;
+      font-size: 15px;
+      line-height: 1.8;
+      text-rendering: optimizeLegibility;
+    }
+
+    a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 0.18em; }
+    a:hover { text-decoration-thickness: 2px; }
+    a:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; border-radius: 3px; }
+    .skip-link {
+      position: fixed;
+      top: 0.75rem;
+      left: 0.75rem;
+      z-index: 20;
+      padding: 0.55rem 0.8rem;
+      border-radius: var(--radius-small);
+      background: var(--accent);
+      color: var(--bg-secondary);
+      transform: translateY(-180%);
+    }
+    .skip-link:focus { transform: translateY(0); }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      border-bottom: 1px solid var(--border);
+      background: rgba(250, 250, 249, 0.92);
+      backdrop-filter: blur(14px);
+    }
+    .topbar-inner {
+      width: min(1120px, calc(100vw - 2rem));
+      min-height: 64px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+    .brand { color: var(--text-primary); font-weight: 700; letter-spacing: 0.04em; text-decoration: none; }
+    .toplinks { display: flex; gap: 1rem; }
+    .toplinks a { color: var(--text-secondary); font-weight: 600; text-decoration: none; }
+
+    .hero {
+      width: min(1120px, calc(100vw - 2rem));
+      margin: 2rem auto 1.5rem;
+      padding: clamp(2rem, 5vw, 4rem);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-large);
+      background:
+        linear-gradient(135deg, rgba(232, 244, 246, 0.9), rgba(255, 255, 255, 0.94) 54%, rgba(232, 244, 246, 0.52));
+      box-shadow: 0 20px 54px var(--shadow);
+    }
+    .kicker { margin: 0 0 0.75rem; color: var(--accent); font-size: 0.78rem; font-weight: 700; letter-spacing: 0.1em; }
+    h1, h2 { font-family: "Crimson Pro", "Noto Sans SC", serif; letter-spacing: -0.025em; }
+    h1 { max-width: 760px; margin: 0; font-size: clamp(2.6rem, 7vw, 5.2rem); line-height: 1; font-weight: 600; }
+    h1 span { display: block; }
+    .lead { max-width: 760px; margin: 1.4rem 0 0; color: var(--text-secondary); font-size: 1.08rem; }
+    .meta-row { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1.5rem; }
+    .meta-row span {
+      padding: 0.35rem 0.7rem;
+      border: 1px solid var(--accent-line);
+      border-radius: 999px;
+      background: var(--surface-soft);
+      color: var(--text-secondary);
+      font-size: 0.82rem;
+      font-weight: 600;
+    }
+
+    .page-grid {
+      width: min(1120px, calc(100vw - 2rem));
+      margin: 0 auto 4rem;
+      display: grid;
+      grid-template-columns: 250px minmax(0, 1fr);
+      gap: 1.5rem;
+      align-items: start;
+    }
+    .toc {
+      position: sticky;
+      top: 88px;
+      padding: 1.25rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-medium);
+      background: var(--surface-soft);
+      box-shadow: 0 12px 32px var(--shadow);
+    }
+    .toc strong { display: block; margin-bottom: 0.7rem; color: var(--accent); }
+    .toc ol { margin: 0; padding-left: 1.35rem; }
+    .toc li { margin: 0.34rem 0; color: var(--text-muted); }
+    .toc a { color: var(--text-secondary); text-decoration: none; }
+    .toc a:hover { color: var(--accent); }
+
+    article { min-width: 0; }
+    .scope-note, section {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-large);
+      background: var(--surface-soft);
+      box-shadow: 0 16px 42px var(--shadow);
+    }
+    .scope-note { margin-bottom: 1.25rem; padding: 1.25rem 1.4rem; border-left: 4px solid var(--accent); }
+    .scope-note p { margin: 0; }
+    section {
+      margin: 0 0 1.25rem;
+      padding: clamp(1.4rem, 4vw, 2.25rem);
+      scroll-margin-top: 88px;
+    }
+    h2 { margin: 0 0 1rem; font-size: clamp(1.8rem, 4vw, 2.45rem); line-height: 1.15; text-wrap: balance; }
+    h3 { margin: 1.8rem 0 0.65rem; color: var(--accent); font-size: 1.08rem; text-wrap: balance; }
+    p { margin: 0.65rem 0; color: var(--text-secondary); text-wrap: pretty; }
+    strong { color: var(--text-primary); }
+    ul, ol { color: var(--text-secondary); padding-left: 1.35rem; }
+    li { margin: 0.32rem 0; text-wrap: pretty; }
+    .section-intro { max-width: 72ch; font-size: 1.02rem; }
+    .boundary {
+      margin: 1rem 0;
+      padding: 1rem 1.1rem;
+      border: 1px solid var(--accent-line);
+      border-radius: var(--radius-medium);
+      background: var(--accent-light);
+    }
+    .boundary p { margin: 0; color: var(--text-primary); }
+    .equation {
+      margin: 1rem 0;
+      padding: 1rem;
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-small);
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: "DM Mono", "Cascadia Code", monospace;
+      white-space: nowrap;
+    }
+    .table-wrap { width: 100%; margin: 1rem 0 1.35rem; overflow-x: auto; border-radius: var(--radius-medium); }
+    table { width: 100%; min-width: 720px; border-collapse: collapse; background: var(--bg-secondary); font-size: 0.87rem; }
+    th, td { padding: 0.75rem 0.85rem; border-bottom: 1px solid var(--border); text-align: left; vertical-align: top; }
+    th { background: var(--accent-light); color: var(--text-primary); font-weight: 700; }
+    tr:last-child td { border-bottom: 0; }
+    code { padding: 0.1rem 0.32rem; border-radius: 4px; background: var(--accent-light); color: var(--accent); }
+    sup a { font-weight: 700; text-decoration: none; }
+    .checklist { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.6rem 1rem; padding: 0; list-style: none; }
+    .checklist li { padding: 0.65rem 0.75rem; border-left: 3px solid var(--accent-line); background: var(--bg-primary); }
+    .refs { padding-left: 1.45rem; }
+    .refs li { margin: 0.58rem 0; padding-left: 0.2rem; }
+    .refs a { overflow-wrap: anywhere; }
+    .source-note { color: var(--text-muted); font-size: 0.84rem; }
+
+    footer {
+      width: min(1120px, calc(100vw - 2rem));
+      margin: 0 auto 2rem;
+      padding: 1.25rem 0;
+      border-top: 1px solid var(--border);
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    @media (max-width: 900px) {
+      .page-grid { grid-template-columns: 1fr; }
+      .toc { position: static; }
+      .toc ol { columns: 2; }
+    }
+    @media (max-width: 640px) {
+      .topbar-inner { min-height: 56px; }
+      .toplinks { gap: 0.65rem; font-size: 0.88rem; }
+      .hero { margin-top: 1rem; border-radius: 18px; }
+      .toc ol { columns: 1; }
+      section, .scope-note { border-radius: 18px; }
+      .checklist { grid-template-columns: 1fr; }
+      footer { flex-direction: column; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { transition-duration: 0.01ms !important; }
+    }
+    @media print {
+      .topbar, .toc, .skip-link { display: none; }
+      body { background: var(--bg-secondary); font-size: 11pt; }
+      .hero, .page-grid, footer { width: 100%; }
+      .page-grid { display: block; }
+      section, .scope-note, .hero { box-shadow: none; break-inside: avoid; }
+      a { color: var(--text-primary); }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#content">跳到正文</a>
+  <nav class="topbar" aria-label="站点导航">
+    <div class="topbar-inner">
+      <a class="brand" href="index.html">SWARMOTOR</a>
+      <div class="toplinks">
+        <a href="posts.html">学习笔记</a>
+        <a href="#references">参考文献</a>
+      </div>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <p class="kicker">ROBOTICS / EMBODIED AI</p>
+    <h1><span>机器人学与具身智能</span><span>知识骨架</span></h1>
+    <p class="lead">从机体、控制和运动学出发，连接学习控制、VLA、WAM、数据闭环与任务编排。本文先建立可持续扩写的目录和支柱文献。</p>
+    <div class="meta-row" aria-label="文章信息">
+      <span>初版骨架</span>
+      <span>复核日期 2026-07-29</span>
+      <span>Wiki 定义 + 原论文 + 一手产品页</span>
+    </div>
+  </header>
+
+  <main id="content" class="page-grid">
+    <aside class="toc" aria-label="文章目录">
+      <strong>目录</strong>
+      <ol>
+        <li><a href="#embodiment">机体与型号</a></li>
+        <li><a href="#control">控制</a></li>
+        <li><a href="#kinematics-ik">运动学与 IK</a></li>
+        <li><a href="#classical-control">传统控制方法</a></li>
+        <li><a href="#rl-control">RL 运动控制</a></li>
+        <li><a href="#vla">VLA</a></li>
+        <li><a href="#wam">WAM</a></li>
+        <li><a href="#data">数据与采集</a></li>
+        <li><a href="#orchestration">任务编排</a></li>
+      </ol>
+    </aside>
+
+    <article>
+      <div class="scope-note">
+        <p><strong>范围说明：</strong>这是一张研究地图，不是市场排名或完整产品目录。型号信息以厂商一手页面在复核日期的公开内容为准；营销性能不能替代独立基准。每一章先回答对象是什么、接口在哪里、方法如何分类、后续比较什么。</p>
+      </div>
+
+      <section id="embodiment">
+        <h2>1. 机体：主流厂商与型号</h2>
+        <p class="section-intro"><strong>机体</strong>不只是承载算法的外壳。自由度、传动、传感、末端执行器、实时接口和安全边界共同决定了可学习动作空间。比较机器人之前，应先按形态和用途分组。</p>
+        <div class="boundary"><p><strong>边界：</strong>本章描述物理平台和公开接口，不把演示视频中的能力直接视为可复现产品能力，也不把某个平台配套的数据集或策略模型等同于硬件本身。</p></div>
+
+        <h3>形态分类</h3>
+        <ul>
+          <li><strong>固定机械臂：</strong>工作空间受基座限制，但控制接口成熟，适合操作、力控和数据采集。</li>
+          <li><strong>移动操作机器人：</strong>把导航与机械臂工作空间合并，任务编排和状态估计更复杂。</li>
+          <li><strong>四足平台：</strong>以通过性和动态平衡为核心，可外挂机械臂形成移动操作系统。</li>
+          <li><strong>全尺寸人形：</strong>面向人类环境和双足全身操作，接触切换、功耗和安全是主要约束。</li>
+          <li><strong>紧凑型或开放研究人形：</strong>成本和开发接口优先，常用于 RL、足球和具身模型验证。</li>
+        </ul>
+
+        <h3>代表性人形产品族</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>厂商 / 产品族</th><th>形态与定位</th><th>公开技术路线</th><th>公开状态与来源</th></tr></thead>
+            <tbody>
+              <tr><td>Boston Dynamics Atlas</td><td>全尺寸工业人形</td><td>电驱、56 DoF、触觉与 360 度视觉；面向物料处理</td><td>早期客户导入路径<sup><a href="#ref-24">[24]</a></sup></td></tr>
+              <tr><td>Agility Robotics Digit</td><td>物流人形</td><td>围绕仓储搬运和人类工作空间设计</td><td>商业部署信息以厂商页为准<sup><a href="#ref-38">[38]</a></sup></td></tr>
+              <tr><td>Figure 系列</td><td>通用工业人形</td><td>整机与学习策略协同开发</td><td>型号迭代快，不在此抄录未核验参数<sup><a href="#ref-39">[39]</a></sup></td></tr>
+              <tr><td>Apptronik Apollo</td><td>工业通用人形</td><td>模块化机体，面向制造与物流</td><td>项目与合作阶段见官方页<sup><a href="#ref-40">[40]</a></sup></td></tr>
+              <tr><td>Tesla Optimus</td><td>制造场景人形</td><td>与视觉学习及工厂场景结合</td><td>按原型和试点理解，不推断量产能力<sup><a href="#ref-41">[41]</a></sup></td></tr>
+              <tr><td>Unitree H1 / H1-2 / G1 / H2 / R1</td><td>全尺寸与紧凑型开发平台</td><td>H 系列偏动态性能，G1 提供 23-43 关节配置和二次开发版本</td><td>产品族与参数见官方索引<sup><a href="#ref-25">[25]</a></sup><sup><a href="#ref-26">[26]</a></sup></td></tr>
+              <tr><td>UBTECH Walker S / S1 / S2，Walker C / X</td><td>工业与商业人形</td><td>Walker S 公布 41 个带力反馈关节、RGB-D 与语义导航</td><td>产品族见官方导航<sup><a href="#ref-28">[28]</a></sup></td></tr>
+              <tr><td>Fourier GR 系列</td><td>全尺寸人形与研究平台</td><td>康复机器人经验向通用人形延伸</td><td>型号与规格需逐页核验<sup><a href="#ref-42">[42]</a></sup></td></tr>
+              <tr><td>1X NEO</td><td>家庭人形</td><td>软体包覆、腱驱动、远程专家辅助数据闭环</td><td>开放预订和早期能力阶段<sup><a href="#ref-27">[27]</a></sup></td></tr>
+              <tr><td>PAL TALOS / KANGAROO</td><td>力控研究人形 / 动态双足</td><td>TALOS 提供关节力矩反馈、2 kHz 控制与 ROS 接口</td><td>研究平台<sup><a href="#ref-29">[29]</a></sup></td></tr>
+              <tr><td>AGIBOT A2 / X / G 系列</td><td>全尺寸、开源研究与轮式操作</td><td>A2、X1/X2、G1/G2 形成不同形态产品族</td><td>官方产品索引，非市场排名<sup><a href="#ref-30">[30]</a></sup></td></tr>
+              <tr><td>Booster K1 / T1 / T2</td><td>紧凑型开发与竞赛人形</td><td>开发工具、开源资源和 RoboCup 生态</td><td>可购开发平台<sup><a href="#ref-31">[31]</a></sup></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>操作研究常用平台</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>平台</th><th>形态 / 公开接口</th><th>为什么常见</th><th>不要混淆</th></tr></thead>
+            <tbody>
+              <tr><td>Franka Research 3</td><td>7 DoF 力敏机械臂，1 kHz FCI，ROS 2</td><td>低层力矩、位置、速度与模型接口完整<sup><a href="#ref-32">[32]</a></sup></td><td>平台不是 Panda 数据集的同义词</td></tr>
+              <tr><td>Universal Robots UR / e-Series</td><td>协作臂产品族</td><td>工业生态广，型号覆盖不同负载与臂展<sup><a href="#ref-33">[33]</a></sup></td><td>工业编程接口与研究低层接口不同</td></tr>
+              <tr><td>Kinova Gen3</td><td>7 DoF 研究与辅助操作机械臂</td><td>轻量、模块化、研究接口</td><td>具体配置随版本变化</td></tr>
+              <tr><td>ALOHA</td><td>双臂 leader-follower 低成本系统</td><td>把遥操作采集与 ACT 策略放在同一可复现实验中<sup><a href="#ref-20">[20]</a></sup></td><td>ALOHA 是系统，ACT 是策略方法</td></tr>
+              <tr><td>PAL TIAGo / Stretch / Spot+Arm</td><td>轮式或足式移动操作</td><td>覆盖导航、操作、HRI 与任务编排</td><td>移动底盘误差会进入手臂任务</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>选型时记录什么</h3>
+        <ul class="checklist">
+          <li>关节 DoF、限位、峰值与持续力矩</li><li>电驱、液压、腱驱或减速器路线</li>
+          <li>位置、速度、力矩和阻抗接口频率</li><li>手爪、灵巧手、触觉与腕部力传感</li>
+          <li>相机、深度、激光、IMU 和同步方式</li><li>负载、续航、散热、防护与安全认证</li>
+          <li>URDF / MJCF、SDK、ROS、仿真和许可证</li><li>原型、试点、研究可购或规模交付状态</li>
+        </ul>
+      </section>
+
+      <section id="control">
+        <h2>2. 控制</h2>
+        <p class="section-intro">控制研究如何根据参考目标和反馈，让物理系统产生期望行为。机械臂动力学常写成：</p>
+        <div class="equation" role="math" aria-label="机械臂动力学方程">M(q) qdd + C(q, qd) qd + g(q) + tau_f = tau + J(q)^T f_ext</div>
+        <p>其中 <code>q</code> 是关节位置，<code>M</code> 是惯性矩阵，<code>C</code> 是科氏与离心项，<code>g</code> 是重力项，<code>tau</code> 是驱动力矩，<code>f_ext</code> 是外部接触力。</p>
+        <div class="boundary"><p><strong>边界：</strong>估计器回答“当前状态是什么”，规划器回答“应走哪条轨迹”，控制器回答“如何稳定跟踪并响应扰动”，策略回答“给定观测应采取什么动作”，任务编排负责跨技能调度。</p></div>
+        <h3>典型层级</h3>
+        <ol>
+          <li><strong>驱动层：</strong>电流、力矩和电机换相。</li>
+          <li><strong>关节伺服：</strong>位置、速度、力矩闭环与前馈补偿。</li>
+          <li><strong>任务空间或全身控制：</strong>末端位姿、力、质心、接触和多任务约束。</li>
+          <li><strong>技能或策略：</strong>生成参考轨迹、目标位姿或动作块。</li>
+          <li><strong>任务编排：</strong>选择技能、检查前置条件、监控和恢复。</li>
+        </ol>
+        <h3>接口检查</h3>
+        <ul class="checklist">
+          <li>被控对象、状态、观测和参考量</li><li>控制频率、延迟与抖动</li>
+          <li>动作是力矩、关节目标还是末端增量</li><li>模型、估计器与坐标系依赖</li>
+          <li>接触、饱和、限位和安全监督</li><li>稳定性、鲁棒性和可复现实验条件</li>
+        </ul>
+        <p class="source-note">基础入口：Murray、Li、Sastry 的几何与控制教材<sup><a href="#ref-4">[4]</a></sup>，以及现代机器人学中的动力学与控制章节。</p>
+      </section>
+
+      <section id="kinematics-ik">
+        <h2>3. 运动学与 IK</h2>
+        <p class="section-intro">机器人运动学用几何关系描述关节变量与连杆位姿、速度和加速度的映射，不直接处理质量、惯性和力。正运动学从关节配置得到末端位姿，逆运动学从目标位姿寻找关节配置。<sup><a href="#ref-1">[1]</a></sup><sup><a href="#ref-2">[2]</a></sup></p>
+        <div class="equation" role="math" aria-label="正运动学与微分运动学">T_0^n(q) = T_0^1(q_1) ... T_(n-1)^n(q_n) ; xdot = J(q) qdot</div>
+        <h3>对象与表示</h3>
+        <ul>
+          <li><strong>构型空间 C-space：</strong>所有合法配置形成的空间，关节限位和闭链约束定义其可行子集。</li>
+          <li><strong>SO(3) 与 SE(3)：</strong>分别表示三维旋转和刚体位姿；DH 参数与指数积是两类常见链式表示。<sup><a href="#ref-4">[4]</a></sup></li>
+          <li><strong>Jacobian：</strong>把关节速度映射到任务空间速度，也通过虚功关系连接末端力与关节力矩。<sup><a href="#ref-1">[1]</a></sup></li>
+        </ul>
+        <h3>IK 方法谱系</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>方法</th><th>核心思想</th><th>适用</th><th>主要风险</th></tr></thead>
+            <tbody>
+              <tr><td>解析 / 几何 IK</td><td>利用特定机构几何求有限解集</td><td>固定结构、实时要求高</td><td>难泛化到冗余、闭链和复杂约束</td></tr>
+              <tr><td>Jacobian 转置</td><td>沿任务误差梯度更新</td><td>简单在线跟踪</td><td>收敛速度和尺度敏感</td></tr>
+              <tr><td>伪逆</td><td>求最小范数最小二乘速度</td><td>微分 IK、冗余系统</td><td>奇异附近关节速度放大</td></tr>
+              <tr><td>阻尼最小二乘</td><td>以阻尼换取奇异附近数值稳定</td><td>实时数值 IK</td><td>任务误差与阻尼选择的权衡<sup><a href="#ref-5">[5]</a></sup></td></tr>
+              <tr><td>优化 IK</td><td>把位姿、限位、碰撞和偏好写入目标与约束</td><td>复杂全身任务</td><td>局部极值、计算预算和可行性</td></tr>
+              <tr><td>零空间 / 任务优先级</td><td>低优先级任务投影到高优先级任务零空间</td><td>冗余臂与全身控制</td><td>优先级切换、奇异和约束冲突<sup><a href="#ref-6">[6]</a></sup></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <h3>实现时必须记录</h3>
+        <ul class="checklist">
+          <li>位姿误差定义和旋转表示</li><li>解的分支、初值与连续性</li>
+          <li>奇异值、阻尼和步长策略</li><li>关节限位、自碰撞与环境碰撞</li>
+          <li>冗余目标和任务优先级</li><li>离线求解时间与在线最坏延迟</li>
+        </ul>
+      </section>
+
+      <section id="classical-control">
+        <h2>4. 传统控制方法</h2>
+        <p class="section-intro">传统机器人栈不仅包含反馈控制器，也包含碰撞检测、路径规划、轨迹优化、时间参数化和轨迹执行。规划器决定如何从当前状态到达目标，控制器负责在扰动和模型误差下跟踪这条轨迹；两者通过状态估计、约束和安全监督闭环。</p>
+        <div class="boundary"><p><strong>边界：</strong>MoveIt 和 cuRobo 是运动生成与集成框架，不是单一规划算法，也不是电机力矩控制器。它们输出路径、带时间轨迹或滚动时域动作，再交给 Servo、MPC、关节轨迹控制器、阻抗控制器或驱动层执行。</p></div>
+
+        <h3>从目标到执行的结构</h3>
+        <ol>
+          <li><strong>机器人与世界状态：</strong>从 URDF / SRDF、关节状态、附着物和环境几何建立 RobotModel、PlanningScene 或 GPU world model。</li>
+          <li><strong>运动学与碰撞：</strong>计算 FK、IK、Jacobian、自碰撞和机器人与环境的离散或连续碰撞。</li>
+          <li><strong>全局几何规划：</strong>在构型空间搜索无碰路径，解决狭窄通道、障碍绕行和不同 IK 分支。</li>
+          <li><strong>轨迹优化与时间参数化：</strong>平滑路径，并满足速度、加速度、jerk、碰撞距离和任务空间目标。</li>
+          <li><strong>轨迹执行：</strong>校验起点和约束，把带时间关节轨迹发送给 ros2_control 或厂商控制器，并监控偏差与取消。</li>
+          <li><strong>在线闭环：</strong>MoveIt Servo、MPC 或局部优化器根据新目标和障碍滚动更新命令，底层伺服以更高频率执行。</li>
+        </ol>
+
+        <h3>规划与优化算法族</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>算法族</th><th>具体算法</th><th>求解对象与输出</th><th>优势与边界</th></tr></thead>
+            <tbody>
+              <tr><td>图搜索</td><td>Dijkstra、A*、D* Lite、Hybrid A*</td><td>离散状态格、足步图或移动底盘路径</td><td>可利用启发式和代价保证；高维机械臂离散化成本高</td></tr>
+              <tr><td>采样式规划</td><td>PRM、RRT、RRTConnect、RRT*、BIT*</td><td>构型空间中的无碰几何路径</td><td>适合高维和复杂障碍；原始路径通常不平滑且不含时间</td></tr>
+              <tr><td>工业确定性运动</td><td>Pilz PTP、LIN、CIRC</td><td>关节 PTP、笛卡尔直线或圆弧轨迹</td><td>行为可预测，适合工艺动作；不负责任意复杂障碍中的全局搜索</td></tr>
+              <tr><td>梯度轨迹优化</td><td>CHOMP、TrajOpt、SQP、iLQR / DDP</td><td>把平滑、碰撞、动力学和终端误差写成目标与约束</td><td>可生成高质量局部解；依赖初值并可能落入局部极值</td></tr>
+              <tr><td>随机轨迹优化</td><td>STOMP、MPPI、CEM</td><td>通过扰动 rollout 或采样分布更新整段轨迹</td><td>不必对所有代价求梯度；采样量和实时预算决定质量</td></tr>
+              <tr><td>时间参数化</td><td>IPTP、ISP、TOTG、Ruckig</td><td>给几何路径分配时间，限制速度、加速度和 jerk</td><td>不能修复错误的拓扑路径；必须与真实控制周期和硬件限位一致</td></tr>
+              <tr><td>腿式规划与控制</td><td>ZMP / LIPM、捕获点、足步规划、质心 MPC、全身 QP</td><td>接触序列、落足点、质心轨迹和全身力矩</td><td>显式处理平衡与接触；简化模型和接触切换会产生偏差</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>MoveIt 2 与 cuRobo 的结构和算法</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>框架</th><th>结构</th><th>具体求解链</th><th>输出与适用边界</th></tr></thead>
+            <tbody>
+              <tr><td>MoveIt 2</td><td><code>move_group</code> / MoveItCpp 接收请求；RobotModel 与 PlanningSceneMonitor 维护机器人、关节状态、附着物和碰撞世界；PlanningPipeline 通过插件与 request / response adapters 组合规划、校验和平滑；TrajectoryExecutionManager 对接控制器。<sup><a href="#ref-44">[44]</a></sup></td><td>OMPL 常用 RRTConnect、RRT*、PRM 等采样规划；Pilz 提供 PTP / LIN / CIRC；CHOMP 用函数梯度优化，STOMP 用带噪 rollout 和指数代价更新；TOTG 或 Ruckig 处理时间与 jerk；MoveIt Servo 把笛卡尔或关节速度命令在线变成连续控制指令。<sup><a href="#ref-45">[45]</a></sup><sup><a href="#ref-46">[46]</a></sup><sup><a href="#ref-47">[47]</a></sup></td><td>输出 RobotTrajectory 或在线关节命令。优势是 ROS 2 生态、插件化与执行管理；性能取决于所选插件、场景更新和控制器，并非“MoveIt 算法”的统一结果。</td></tr>
+              <tr><td>cuRobo</td><td>以 PyTorch、CUDA 和自定义 kernel 构建可微分机器人模型、球近似、自碰撞与 world signed distance；批量并行 FK / IK、碰撞、数值优化、几何规划和 MPC。<sup><a href="#ref-48">[48]</a></sup></td><td>MotionGen 先做多种子碰撞约束 IK，再以线性插值种子进行 TrajOpt；优化失败时调用并行几何图规划器产生无碰种子，再次优化和时间细化。核心求解器组合 MPPI 等粒子优化、并行 L-BFGS 与 noisy line search，并惩罚加速度和 jerk。<sup><a href="#ref-49">[49]</a></sup></td><td>输出无碰、平滑、带时间的关节轨迹，也提供滚动 MPC。优势是 GPU 批处理和多种子并行；需要 CUDA、适配的机器人与世界表示，结果仍须经硬件控制器和安全层执行。</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>低层与全身控制器</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>方法</th><th>控制目标</th><th>模型依赖</th><th>接触能力</th><th>典型弱点</th></tr></thead>
+            <tbody>
+              <tr><td>PID / 串级伺服</td><td>关节位置与速度</td><td>低</td><td>弱</td><td>强耦合和变负载下需要整定</td></tr>
+              <tr><td>前馈 / 计算力矩</td><td>轨迹跟踪</td><td>高</td><td>间接</td><td>模型误差进入补偿项</td></tr>
+              <tr><td>阻抗控制</td><td>位移与力之间的目标动力学</td><td>中</td><td>强</td><td>刚度、阻尼和环境稳定性权衡<sup><a href="#ref-7">[7]</a></sup></td></tr>
+              <tr><td>导纳控制</td><td>由测得外力生成运动参考</td><td>中</td><td>强</td><td>力传感质量和外环带宽限制</td></tr>
+              <tr><td>混合力 / 位置</td><td>在互补方向分别控力和位置</td><td>中</td><td>强</td><td>接触坐标系和约束选择敏感</td></tr>
+              <tr><td>操作空间控制</td><td>末端或任务坐标动力学</td><td>高</td><td>强</td><td>动力学、奇异和零空间耦合<sup><a href="#ref-8">[8]</a></sup></td></tr>
+              <tr><td>鲁棒 / 自适应 / 滑模</td><td>不确定系统跟踪</td><td>结构模型</td><td>可扩展</td><td>保守性、抖振或参数可辨识性</td></tr>
+              <tr><td>LQR / LQG</td><td>局部线性二次最优</td><td>线性化模型</td><td>有限</td><td>工作点外性能下降</td></tr>
+              <tr><td>MPC</td><td>有限时域约束优化</td><td>高</td><td>可显式建模</td><td>在线求解预算与模型偏差</td></tr>
+              <tr><td>全身 QP</td><td>多任务、接触和不等式约束</td><td>高</td><td>强</td><td>任务权重、可行性和接触切换</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="boundary"><p><strong>工程底线：</strong>任何控制器都依赖状态估计、时间同步、执行器饱和模型和安全监督。只报告控制律而不报告估计与接口，无法解释实机结果。</p></div>
+        <h3>实验比较项</h3>
+        <ul class="checklist">
+          <li>规划成功率、路径长度和最小碰撞距离</li><li>平滑、时间参数化和最坏规划延迟</li>
+          <li>跟踪误差、超调、稳态误差</li><li>重规划频率与动态障碍响应</li>
+          <li>接触力峰值和能量行为</li><li>状态、场景与控制器更新频率</li>
+          <li>饱和、限位、碰撞和急停路径</li><li>稳定性假设与适用工作区间</li>
+        </ul>
+      </section>
+
+      <section id="rl-control">
+        <h2>5. RL 运动控制</h2>
+        <p class="section-intro">强化学习从 Bellman 的最优性原理出发：一个序贯决策问题的最优剩余策略，只依赖当前状态及其后的最优子问题。机器人运动控制把动力学和接触写成 MDP 或 POMDP，并学习策略 <code>pi(a_t | o_&lt;=t)</code> 最大化长期回报，而不是只优化当前一步。<sup><a href="#ref-50">[50]</a></sup><sup><a href="#ref-51">[51]</a></sup></p>
+
+        <h3>Bellman 方程是起点</h3>
+        <p>MDP 可写成 <code>(S, A, P, r, gamma)</code>：状态 <code>s</code>、动作 <code>a</code>、转移分布 <code>P</code>、奖励 <code>r</code> 和折扣因子 <code>gamma</code>。回报、策略价值和最优动作价值满足递推关系：</p>
+        <div class="equation" role="math" aria-label="强化学习回报、Bellman 期望方程和最优性方程">G_t = sum_(k=0)^inf gamma^k r_(t+k) ; V^pi(s) = E_pi[r + gamma V^pi(s')] ; Q*(s,a) = E[r + gamma max_(a') Q*(s',a')]</div>
+        <ul>
+          <li><strong>Bellman 期望方程：</strong>固定策略后，当前价值等于一步奖励加下一状态价值的期望，可用迭代策略评估或采样估计。</li>
+          <li><strong>Bellman 最优性方程：</strong>在每一步选择后续价值最大的动作，导出 value iteration、Q-learning 和最优控制中的动态规划。</li>
+          <li><strong>POMDP：</strong>实机不能直接读取完整状态，策略需根据噪声观测、历史、RNN / Transformer 隐状态或显式估计器形成 belief。</li>
+          <li><strong>连续机器人控制：</strong>高维连续动作使逐动作取 <code>max</code> 困难，因此步态控制更常直接优化参数化策略并用 critic 估计价值。</li>
+        </ul>
+
+        <h3>从 Bellman 到深度连续控制</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>方法族</th><th>具体算法</th><th>如何使用 Bellman / 回报</th><th>在机器人中的位置</th></tr></thead>
+            <tbody>
+              <tr><td>动态规划</td><td>Policy Iteration、Value Iteration</td><td>已知转移模型时反复应用 Bellman backup</td><td>适合小型离散问题，也是后续价值方法的理论骨架</td></tr>
+              <tr><td>时序差分与价值学习</td><td>TD、SARSA、Q-learning、DQN</td><td>用采样转移构造一步或多步 bootstrap 目标</td><td>离散动作和高层决策常见；直接用于高自由度连续关节动作较困难</td></tr>
+              <tr><td>策略梯度</td><td>REINFORCE、TRPO、PPO</td><td>直接对期望回报求策略参数梯度；TRPO / PPO 约束更新幅度</td><td>PPO 因并行仿真下稳定、易扩展，成为学习步态最常见基线之一<sup><a href="#ref-52">[52]</a></sup></td></tr>
+              <tr><td>Actor-Critic</td><td>A2C / A3C、DDPG、TD3、SAC</td><td>actor 产生动作，critic 用 Bellman 目标估计 <code>V</code> 或 <code>Q</code></td><td>支持连续控制；SAC 复用 replay 并加入最大熵目标，样本效率高但实机稳定性仍依赖实现<sup><a href="#ref-53">[53]</a></sup></td></tr>
+              <tr><td>模型式 RL</td><td>Dyna、PETS、MBPO、Dreamer</td><td>学习转移模型，在模型 rollout 中做价值更新、策略学习或 MPC</td><td>减少真实交互，但接触和长时预测误差会造成 model bias</td></tr>
+              <tr><td>模仿与混合学习</td><td>BC、GAIL、DeepMimic、AMP、Residual RL</td><td>演示提供动作监督、判别器奖励、运动先验或参考轨迹，RL 再优化任务回报</td><td>适合自然步态、特技和已有控制器增强；上限受数据覆盖和参考质量影响<sup><a href="#ref-9">[9]</a></sup><sup><a href="#ref-56">[56]</a></sup></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="boundary"><p><strong>与传统步态控制的边界：</strong>ZMP / LIPM、CPG、足步规划、质心 MPC、全身 QP 和混合零动态可以独立构成模型式步态控制器。RL 可以替代其中某层、学习残差或调参，也可以端到端输出动作；“用了 RL”不代表系统没有模型、参考轨迹或 PD / MPC。</p></div>
+
+        <h3>步态策略实际控制什么</h3>
+        <ol>
+          <li><strong>命令与观测：</strong>目标线速度、角速度、步态参数，加上机身姿态与速度、关节状态、历史动作、接触和可选地形感知。</li>
+          <li><strong>策略动作：</strong>最常见是关节位置目标或参考残差，也可输出关节速度、力矩、足端目标、落足点或 MPC / WBC 的参数。</li>
+          <li><strong>执行接口：</strong>策略通常以 20-200 Hz 更新，PD、阻抗或力矩伺服以更高频率执行；动作缩放、滤波、限位和延迟属于策略定义的一部分。</li>
+          <li><strong>奖励与终止：</strong>命令跟踪、姿态、足端接触、能耗、平滑、冲击和存活共同塑造步态；奖励不是客观真理，而是设计的最优性标准。</li>
+        </ol>
+
+        <h3>步态学习的成熟流派</h3>
+        <p>下列路线可以叠加，并非互斥。当前四足和人形系统常用 PPO 作为优化器，真正区分流派的是参考来源、策略接口、训练信息和部署时的适应机制。<sup><a href="#ref-54">[54]</a></sup></p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>流派</th><th>结构与代表方法</th><th>获得的能力</th><th>主要代价</th></tr></thead>
+            <tbody>
+              <tr><td>参数化步态 / gait-bound</td><td>CPG、相位变量、预定义摆动轨迹或有限状态机给出步态骨架，RL 调频率、落足、增益或残差</td><td>步态可控、易加入先验、样本需求较低</td><td>动作空间受模板限制，跨形态和非周期技能扩展困难</td></tr>
+              <tr><td>无参考命令跟踪 / gait-free</td><td>以目标速度和转向为命令，PPO 从奖励中学习关节目标；并行仿真、课程和地形随机化已形成标准配方<sup><a href="#ref-55">[55]</a></sup></td><td>步态可自行涌现，可统一站立、行走、转向和恢复</td><td>奖励工程量大，可能产生不自然或利用仿真漏洞的动作</td></tr>
+              <tr><td>参考运动模仿</td><td>DeepMimic 用姿态、速度、末端和质心误差构造模仿奖励，并与任务奖励结合<sup><a href="#ref-9">[9]</a></sup></td><td>自然动作、特技和指定风格</td><td>依赖动作捕捉、重定向、相位和参考覆盖</td></tr>
+              <tr><td>对抗式运动先验</td><td>AMP 用判别器从演示学习风格奖励，不要求逐帧跟踪单一参考<sup><a href="#ref-56">[56]</a></sup></td><td>兼顾动作自然性、任务自由度和多技能</td><td>判别器稳定性、数据偏差与风格奖励权重需要调节</td></tr>
+              <tr><td>特权教师与非对称 Actor-Critic</td><td>训练期 critic 或 teacher 读取地形、接触、摩擦等真值，student 仅用实机可得本体感知和历史<sup><a href="#ref-57">[57]</a></sup></td><td>复杂地形学习更快，并把不可部署信息蒸馏到策略</td><td>教师信息未必能由部署观测辨识，蒸馏会产生信息缺口</td></tr>
+              <tr><td>系统辨识、随机化与零样本迁移</td><td>执行器网络或标定模型配合质量、摩擦、延迟、噪声、外扰和地形随机化<sup><a href="#ref-10">[10]</a></sup></td><td>从仿真直接部署到真实四足或人形</td><td>随机化过宽会保守，过窄会失配；硬件安全壳仍不可省略</td></tr>
+              <tr><td>在线隐式适应</td><td>RMA 用特权环境编码训练基础策略，再由近期状态动作历史估计低维 extrinsics<sup><a href="#ref-11">[11]</a></sup></td><td>适应载荷、摩擦、损伤和未知地形</td><td>历史中不可观测的因素无法可靠恢复，估计误差会传给策略</td></tr>
+              <tr><td>分层与模型混合</td><td>高层足步 / 速度 / 地形规划加低层 RL，或 MPC / WBC 生成参考、RL 学残差和接触反馈</td><td>兼顾长时规划、显式约束和学习鲁棒性</td><td>层间接口、时标、参考可行性和训练分布必须共同设计</td></tr>
+              <tr><td>人形全身统一控制</td><td>动作重定向或特权 teacher 生成全身参考，策略联合控制腿、躯干和手臂，并用历史网络适应 POMDP<sup><a href="#ref-58">[58]</a></sup></td><td>自然摆臂、抗扰、负载行走和 loco-manipulation 基础</td><td>高维接触、跌倒成本、数据重定向和硬件安全最困难</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>典型训练到部署管线</h3>
+        <ol>
+          <li>在并行物理仿真中建立机体、执行器、延迟与接触模型。</li>
+          <li>教师策略使用仿真特权状态，或用参考动作提供模仿目标。</li>
+          <li>随机化质量、摩擦、延迟、地形、传感噪声和外扰，缩小 sim-to-real 差距。<sup><a href="#ref-10">[10]</a></sup></li>
+          <li>学生策略仅使用实机可得观测，通过历史编码或适应模块估计隐变量。</li>
+          <li>实机以固定周期输出关节目标或力矩，底层伺服完成高频跟踪。</li>
+          <li>安全监控处理跌倒、过热、越界、通信丢失和恢复姿态。</li>
+        </ol>
+        <h3>论文复现必须比较</h3>
+        <ul class="checklist">
+          <li>MDP / POMDP 定义、状态与观测历史</li><li>Bellman 目标、GAE、bootstrap 和 horizon</li>
+          <li>on-policy / off-policy 与样本预算</li><li>力矩、关节目标或残差动作</li>
+          <li>奖励各项、尺度、课程和终止</li><li>随机化分布与实机辨识范围</li>
+          <li>策略频率和底层伺服频率</li><li>参考动作来源、相位与重定向</li>
+          <li>teacher / critic 的特权信息</li><li>安全壳、恢复、能耗和硬件磨损</li>
+        </ul>
+      </section>
+
+      <section id="vla">
+        <h2>6. VLA</h2>
+        <p class="section-intro">Vision-Language-Action 模型接收视觉观测、语言指令和可选机器人状态，直接生成可执行动作或动作块，可抽象为 <code>pi(a_t:t+H | o_&lt;=t, l)</code>。<sup><a href="#ref-3">[3]</a></sup></p>
+        <div class="boundary"><p><strong>边界：</strong>只输出文本计划的 VLM 不是低层 VLA；语言条件行为克隆可以是 VLA 的前身；VLA 输出仍通常由插值、IK、阻抗或关节伺服转换为安全的硬件命令。</p></div>
+        <h3>关键设计轴</h3>
+        <ul>
+          <li><strong>动作表示：</strong>离散动作 token、连续回归、扩散或 flow matching 动作块。</li>
+          <li><strong>时间结构：</strong>单步动作、固定 horizon action chunk、分层语义子任务加低层动作。</li>
+          <li><strong>数据范围：</strong>单平台、跨任务、跨机构或混合网页视觉语言数据。</li>
+          <li><strong>适配方式：</strong>从头训练、VLM 共训练、全量微调、LoRA 或动作专家适配。</li>
+        </ul>
+        <h3>代表性路线</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>工作</th><th>年份</th><th>骨架贡献</th><th>动作 / 开放性</th></tr></thead>
+            <tbody>
+              <tr><td>RT-1</td><td>2022</td><td>以 Transformer 在大规模真实机器人数据上研究任务和数据扩展<sup><a href="#ref-12">[12]</a></sup></td><td>离散化动作 token，闭源系统</td></tr>
+              <tr><td>RT-2</td><td>2023</td><td>把 VLM 与机器人轨迹共微调，并明确使用 VLA 名称<sup><a href="#ref-13">[13]</a></sup></td><td>动作表示为文本 token</td></tr>
+              <tr><td>Open X-Embodiment / RT-X</td><td>2023-2025</td><td>标准化 22 种机器人数据并验证跨机构正迁移<sup><a href="#ref-14">[14]</a></sup></td><td>数据开放程度因子数据集而异</td></tr>
+              <tr><td>Octo</td><td>2024</td><td>在 Open X 数据上训练可适配新观测和动作空间的开放通用策略<sup><a href="#ref-15">[15]</a></sup></td><td>开放模型与代码</td></tr>
+              <tr><td>OpenVLA</td><td>2024</td><td>7B 开放 VLA，融合 DINOv2、SigLIP 与 Llama 2，并研究高效适配<sup><a href="#ref-16">[16]</a></sup></td><td>离散动作 token，开放权重</td></tr>
+              <tr><td>pi0</td><td>2024-2026</td><td>在预训练 VLM 上加入 flow matching 动作专家，覆盖多种灵巧平台<sup><a href="#ref-17">[17]</a></sup></td><td>连续动作块，开放代码路径</td></tr>
+              <tr><td>pi0.5</td><td>2025</td><td>以异构共训练和高层语义预测增强新环境长时程泛化<sup><a href="#ref-18">[18]</a></sup></td><td>分层语义与连续控制结合</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <h3>评测时记录</h3>
+        <ul class="checklist">
+          <li>训练数据的平台、任务与许可</li><li>视觉和语言预训练来源</li>
+          <li>动作定义、归一化和 chunk horizon</li><li>闭环频率与端到端延迟</li>
+          <li>新物体、新场景、新任务和新机体拆分</li><li>失败恢复、人工接管和安全接口</li>
+        </ul>
+      </section>
+
+      <section id="wam">
+        <h2>7. WAM</h2>
+        <p class="section-intro"><strong>World Action Model</strong> 是 2025-2026 年快速形成的标签，用于描述把未来状态预测与动作生成耦合起来的具身模型。它尚不是历史稳定、边界完全统一的术语。2026 年综述把 WAM 组织为级联式与联合式两大类。<sup><a href="#ref-19">[19]</a></sup></p>
+        <div class="boundary"><p><strong>术语提醒：</strong>WAM 在其他机器人文献中也可能指 Whole-Arm Manipulation。本文只在本章使用 World Action Model，引用时必须写出全称。</p></div>
+        <div class="equation" role="math" aria-label="世界模型、VLA 与 WAM 的条件分布">World model: p(o' | o, a) ; VLA: p(a | o, l) ; WAM: p(o', a | o, l)</div>
+        <h3>谱系与结构</h3>
+        <ul>
+          <li><strong>模型式控制与 Dyna：</strong>学习或使用转移模型，在内部 rollout 中评估动作。</li>
+          <li><strong>潜变量世界模型：</strong>World Models、PlaNet、Dreamer 等在紧凑状态中预测并学习策略。</li>
+          <li><strong>动作条件视频模型：</strong>预测动作造成的图像或视频变化，可作为规划、数据生成或评测器。</li>
+          <li><strong>级联 WAM：</strong>先生成像素、几何或潜变量未来，再由逆动力学或动作解码器恢复动作。</li>
+          <li><strong>联合 WAM：</strong>共享模型同时生成未来表示与动作，使世界预测直接参与策略训练。</li>
+        </ul>
+        <h3>不能只看生成视频</h3>
+        <ul class="checklist">
+          <li>真实任务成功率与闭环稳定性</li><li>未来视觉保真度</li>
+          <li>接触、遮挡和物体恒常性的物理一致性</li><li>从预测未来恢复动作的可辨识性</li>
+          <li>规划跨度、滚动重规划与误差累积</li><li>视频生成和动作输出的闭环延迟</li>
+        </ul>
+        <p class="source-note">近期 WAM 论文大量仍是预印本。骨架应按预测载体、耦合方式、训练目标和测试时是否显式想象来组织，而不是按模型名称堆列表。<sup><a href="#ref-19">[19]</a></sup></p>
+      </section>
+
+      <section id="data">
+        <h2>8. 数据与采集</h2>
+        <p class="section-intro">具身数据是带时间结构的交互记录。最小单位通常是 episode，其中每个 step 对齐观测、状态、动作、时间戳和可选奖励、语言、成功或失败标签。数据质量首先是控制与测量问题，其次才是文件格式问题。</p>
+        <h3>采集方式</h3>
+        <ul>
+          <li><strong>示教：</strong>拖动示教和 kinesthetic teaching，直观但受机体可回驱性限制。</li>
+          <li><strong>遥操作：</strong>手柄、VR、动捕和 leader-follower；ALOHA 支持双臂采集。<sup><a href="#ref-20">[20]</a></sup></li>
+          <li><strong>自主 rollout：</strong>现有策略执行，人在失败前后干预，可采集恢复和负样本。</li>
+          <li><strong>仿真与合成：</strong>脚本、规划器、策略或生成模型产生轨迹，需记录随机化和 sim-to-real 偏差。</li>
+          <li><strong>人类视频：</strong>规模大但缺少机器人动作和精确状态，需要姿态、潜动作或逆动力学桥接。</li>
+        </ul>
+        <h3>数据集与生态</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>项目</th><th>主要价值</th><th>机体 / 采集</th><th>骨架中的位置</th></tr></thead>
+            <tbody>
+              <tr><td>RoboNet / BridgeData</td><td>早期多任务、多环境真实操作数据</td><td>多机构或多场景遥操作</td><td>跨场景预训练的前史</td></tr>
+              <tr><td>Open X-Embodiment</td><td>把多机构数据映射到标准格式，论文报告 22 种机器人、527 项技能<sup><a href="#ref-14">[14]</a></sup></td><td>21 个机构的数据集合</td><td>跨机体数据混合与 RT-X</td></tr>
+              <tr><td>DROID</td><td>分布式真实场景采集，论文报告 76k 演示、350 小时、564 个场景<sup><a href="#ref-21">[21]</a></sup></td><td>统一 Franka 硬件设置和多人采集</td><td>场景与采集者多样性</td></tr>
+              <tr><td>ALOHA / ACT</td><td>双臂精细操作、低成本 leader-follower 和 action chunking<sup><a href="#ref-20">[20]</a></sup></td><td>双臂遥操作</td><td>硬件、数据和策略协同设计</td></tr>
+              <tr><td>AgiBot World</td><td>企业级具身数据与工具生态</td><td>厂商多产品族</td><td>规模随版本变化，引用官方版本而非二手数字<sup><a href="#ref-30">[30]</a></sup></td></tr>
+              <tr><td>LeRobot</td><td>采集、可视化、训练、Hub 分发与统一数据 API</td><td>多种低成本与研究平台</td><td>当前开放工具链</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <h3>格式与契约</h3>
+        <p>RLDS 采用 episode 包含 step 的顺序决策模型，曾是 Open X-Embodiment 的重要格式基础；其官方仓库已于 2025-11-29 归档，应视为有影响力的标准而非持续更新的默认实现。<sup><a href="#ref-35">[35]</a></sup> LeRobotDataset v3 把低维高频信号存入 Parquet，把多相机视频存入 MP4，并用 JSON / Parquet 元数据维护 schema、统计量和 episode 边界。<sup><a href="#ref-34">[34]</a></sup></p>
+        <h3>采集质量清单</h3>
+        <ul class="checklist">
+          <li>统一时钟、硬件时间戳和控制周期</li><li>相机内外参、机器人基座和工具坐标系</li>
+          <li>丢帧、编码延迟和状态插值策略</li><li>动作是绝对、增量、关节还是末端命令</li>
+          <li>episode 边界、reset 和终止原因</li><li>成功、失败、干预和恢复标签</li>
+          <li>原始数据、派生数据和归一化版本</li><li>隐私、人员入镜、许可和可删除性</li>
+        </ul>
+      </section>
+
+      <section id="orchestration">
+        <h2>9. 任务编排</h2>
+        <p class="section-intro">任务编排位于技能和控制器之上，负责把目标拆成可执行步骤，检查前置条件，调度技能，监控结果，并在失败后恢复或重规划。它不替代低层控制，也不等于单次自然语言规划。</p>
+        <h3>主要范式</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>范式</th><th>表达能力</th><th>优势</th><th>主要风险</th></tr></thead>
+            <tbody>
+              <tr><td>有限状态机</td><td>显式状态与转移</td><td>简单、可审计、实时</td><td>状态和异常组合膨胀</td></tr>
+              <tr><td>行为树</td><td>序列、选择、并行、装饰节点</td><td>模块化、反应式、易监控；BehaviorTree.CPP 支持异步动作和 ROS 2<sup><a href="#ref-36">[36]</a></sup></td><td>共享状态和复杂恢复仍需设计</td></tr>
+              <tr><td>PDDL / HTN</td><td>符号动作、前置条件、效果或任务层级</td><td>可搜索和验证</td><td>世界状态与技能效果的建模成本</td></tr>
+              <tr><td>TAMP / MoveIt Task Constructor</td><td>任务离散决策和连续运动约束联合</td><td>把复杂任务分成 generator、propagator、connector stages<sup><a href="#ref-37">[37]</a></sup></td><td>组合搜索和接触可行性</td></tr>
+              <tr><td>技能图 / Options</td><td>可重用闭环技能及其终止条件</td><td>连接学习策略与长时程任务</td><td>技能接口和分布外失败</td></tr>
+              <tr><td>LLM / VLM 规划器</td><td>自然语言分解、代码或技能选择</td><td>语义泛化和快速组合</td><td>幻觉、状态不一致和不可执行计划</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <h3>最小闭环</h3>
+        <ol>
+          <li>解析目标并绑定对象、地点和约束。</li>
+          <li>从感知与世界状态中建立可查询的 grounded state。</li>
+          <li>选择技能或分解子任务，并检查前置条件。</li>
+          <li>通过 typed skill API 下发目标、超时和安全边界。</li>
+          <li>监控执行反馈、成功判据和环境变化。</li>
+          <li>失败时重试、换技能、回退到安全状态、重规划或请求人工。</li>
+          <li>记录结果，用于评测、数据回流和技能模型更新。</li>
+        </ol>
+        <h3>语言模型进入编排层</h3>
+        <ul>
+          <li><strong>SayCan：</strong>用语言模型评估语义相关性，用技能价值函数约束可执行性。<sup><a href="#ref-22">[22]</a></sup></li>
+          <li><strong>Code as Policies：</strong>让代码模型组合感知和控制 API，生成可执行策略程序。<sup><a href="#ref-23">[23]</a></sup></li>
+          <li><strong>Inner Monologue：</strong>把成功检测、场景描述和人类反馈重新送回规划上下文。<sup><a href="#ref-43">[43]</a></sup></li>
+        </ul>
+        <div class="boundary"><p><strong>安全约束：</strong>LLM 输出必须通过技能白名单、类型检查、前置条件 / 效果、几何与动力学可行性、安全门和超时机制。自然语言合理不代表机器人可执行。</p></div>
+        <h3>系统评测项</h3>
+        <ul class="checklist">
+          <li>任务完成率和平均重规划次数</li><li>失败检测延迟与误判</li>
+          <li>技能覆盖、前置条件和效果准确度</li><li>计划可执行率与几何可行率</li>
+          <li>人工接管率和安全违规</li><li>完整事件日志和可回放性</li>
+        </ul>
+      </section>
+
+      <section id="expansion-template">
+        <h2>下一步如何扩写</h2>
+        <p>后续每个主题都可以拆成独立页面，并使用同一个模板，以便逐步走向结构化而不是堆论文：</p>
+        <ol>
+          <li><strong>定义与边界：</strong>对象是什么，不是什么。</li>
+          <li><strong>对象与接口：</strong>输入、输出、状态、坐标系、时间尺度。</li>
+          <li><strong>基本方程：</strong>最小数学结构和核心假设。</li>
+          <li><strong>算法族：</strong>按共同结构分类，而非按实验室或产品名分类。</li>
+          <li><strong>实现栈：</strong>硬件、实时系统、仿真器、SDK 与数据契约。</li>
+          <li><strong>基准与数据：</strong>评测拆分、指标和不可比条件。</li>
+          <li><strong>失败模式：</strong>奇异、接触、分布外、延迟、模型误差和安全。</li>
+          <li><strong>支柱论文：</strong>经典定义、关键转折和当前开放实现。</li>
+          <li><strong>开放问题：</strong>可被实验或理论工作推进的具体问题。</li>
+        </ol>
+      </section>
+
+      <section id="references">
+        <h2>参考文献与一手资料</h2>
+        <ol class="refs">
+          <li id="ref-1"><a href="https://en.wikipedia.org/wiki/Robot_kinematics" target="_blank" rel="noopener noreferrer">Wikipedia: Robot kinematics</a>.</li>
+          <li id="ref-2"><a href="https://en.wikipedia.org/wiki/Inverse_kinematics" target="_blank" rel="noopener noreferrer">Wikipedia: Inverse kinematics</a>.</li>
+          <li id="ref-3"><a href="https://en.wikipedia.org/wiki/Vision%E2%80%93language%E2%80%93action_model" target="_blank" rel="noopener noreferrer">Wikipedia: Vision-language-action model</a>.</li>
+          <li id="ref-4">Murray, Li, Sastry. <a href="https://www.cse.lehigh.edu/~trink/Courses/RoboticsII/reading/murray-li-sastry-94-complete.pdf" target="_blank" rel="noopener noreferrer">A Mathematical Introduction to Robotic Manipulation</a>, 1994.</li>
+          <li id="ref-5">Wampler. <a href="https://doi.org/10.1109/TSMC.1986.289285" target="_blank" rel="noopener noreferrer">Manipulator Inverse Kinematic Solutions Based on Vector Formulations and Damped Least-Squares Methods</a>, 1986.</li>
+          <li id="ref-6">Chiaverini, Oriolo, Walker. <a href="http://www.diag.uniroma1.it/~labrob/pub/papers/SHOR08_Chp11.pdf" target="_blank" rel="noopener noreferrer">Kinematically Redundant Manipulators</a>, Springer Handbook of Robotics.</li>
+          <li id="ref-7">Hogan. <a href="https://doi.org/10.1115/1.3140702" target="_blank" rel="noopener noreferrer">Impedance Control: An Approach to Manipulation</a>, 1985.</li>
+          <li id="ref-8">Khatib. <a href="https://doi.org/10.1109/JRA.1987.1087068" target="_blank" rel="noopener noreferrer">A Unified Approach for Motion and Force Control of Robot Manipulators</a>, 1987.</li>
+          <li id="ref-9">Peng et al. <a href="https://arxiv.org/abs/1804.02717" target="_blank" rel="noopener noreferrer">DeepMimic</a>, 2018.</li>
+          <li id="ref-10">Tan et al. <a href="https://arxiv.org/abs/1804.10332" target="_blank" rel="noopener noreferrer">Sim-to-Real: Learning Agile Locomotion for Quadruped Robots</a>, 2018.</li>
+          <li id="ref-11">Kumar et al. <a href="https://arxiv.org/abs/2107.04034" target="_blank" rel="noopener noreferrer">RMA: Rapid Motor Adaptation for Legged Robots</a>, 2021.</li>
+          <li id="ref-12">Brohan et al. <a href="https://arxiv.org/abs/2212.06817" target="_blank" rel="noopener noreferrer">RT-1: Robotics Transformer for Real-World Control at Scale</a>, 2022.</li>
+          <li id="ref-13">Brohan et al. <a href="https://arxiv.org/abs/2307.15818" target="_blank" rel="noopener noreferrer">RT-2: Vision-Language-Action Models Transfer Web Knowledge to Robotic Control</a>, 2023.</li>
+          <li id="ref-14">Open X-Embodiment Collaboration. <a href="https://arxiv.org/abs/2310.08864" target="_blank" rel="noopener noreferrer">Open X-Embodiment: Robotic Learning Datasets and RT-X Models</a>, 2023-2025.</li>
+          <li id="ref-15">Octo Model Team. <a href="https://arxiv.org/abs/2405.12213" target="_blank" rel="noopener noreferrer">Octo: An Open-Source Generalist Robot Policy</a>, 2024.</li>
+          <li id="ref-16">Kim et al. <a href="https://arxiv.org/abs/2406.09246" target="_blank" rel="noopener noreferrer">OpenVLA</a>, 2024.</li>
+          <li id="ref-17">Black et al. <a href="https://arxiv.org/abs/2410.24164" target="_blank" rel="noopener noreferrer">pi0: A Vision-Language-Action Flow Model for General Robot Control</a>, 2024-2026.</li>
+          <li id="ref-18">Physical Intelligence. <a href="https://arxiv.org/abs/2504.16054" target="_blank" rel="noopener noreferrer">pi0.5: A Vision-Language-Action Model with Open-World Generalization</a>, 2025.</li>
+          <li id="ref-19">Wang et al. <a href="https://arxiv.org/abs/2605.12090" target="_blank" rel="noopener noreferrer">World Action Models: The Next Frontier in Embodied AI</a>, 2026.</li>
+          <li id="ref-20">Zhao et al. <a href="https://arxiv.org/abs/2304.13705" target="_blank" rel="noopener noreferrer">Learning Fine-Grained Bimanual Manipulation with Low-Cost Hardware</a>, 2023.</li>
+          <li id="ref-21">Khazatsky et al. <a href="https://arxiv.org/abs/2403.12945" target="_blank" rel="noopener noreferrer">DROID: A Large-Scale In-The-Wild Robot Manipulation Dataset</a>, 2024-2025.</li>
+          <li id="ref-22">Ahn et al. <a href="https://arxiv.org/abs/2204.01691" target="_blank" rel="noopener noreferrer">Do As I Can, Not As I Say: Grounding Language in Robotic Affordances</a>, 2022.</li>
+          <li id="ref-23">Liang et al. <a href="https://arxiv.org/abs/2209.07753" target="_blank" rel="noopener noreferrer">Code as Policies</a>, 2022.</li>
+          <li id="ref-24"><a href="https://bostondynamics.com/atlas/" target="_blank" rel="noopener noreferrer">Boston Dynamics: Atlas</a>, accessed 2026-07-28.</li>
+          <li id="ref-25"><a href="https://www.unitree.com/g1" target="_blank" rel="noopener noreferrer">Unitree: G1</a>, accessed 2026-07-28.</li>
+          <li id="ref-26"><a href="https://www.unitree.com/h1" target="_blank" rel="noopener noreferrer">Unitree: H1 / H1-2</a>, accessed 2026-07-28.</li>
+          <li id="ref-27"><a href="https://www.1x.tech/neo" target="_blank" rel="noopener noreferrer">1X: NEO</a>, accessed 2026-07-28.</li>
+          <li id="ref-28"><a href="https://www.ubtrobot.com/en/humanoid/products/walker-s" target="_blank" rel="noopener noreferrer">UBTECH: Walker S and product navigation</a>, accessed 2026-07-28.</li>
+          <li id="ref-29"><a href="https://pal-robotics.com/robot/talos/" target="_blank" rel="noopener noreferrer">PAL Robotics: TALOS</a>, accessed 2026-07-28.</li>
+          <li id="ref-30"><a href="https://www.agibot.com/" target="_blank" rel="noopener noreferrer">AGIBOT product index</a>, accessed 2026-07-28.</li>
+          <li id="ref-31"><a href="https://www.boosterobotics.com/" target="_blank" rel="noopener noreferrer">Booster Robotics product index</a>, accessed 2026-07-28.</li>
+          <li id="ref-32"><a href="https://franka.de/franka-research-3" target="_blank" rel="noopener noreferrer">Franka Robotics: Franka Research 3</a>, accessed 2026-07-28.</li>
+          <li id="ref-33"><a href="https://www.universal-robots.com/products/" target="_blank" rel="noopener noreferrer">Universal Robots product index</a>, accessed 2026-07-28.</li>
+          <li id="ref-34"><a href="https://huggingface.co/docs/lerobot/en/lerobot-dataset-v3" target="_blank" rel="noopener noreferrer">LeRobotDataset v3 documentation</a>, accessed 2026-07-28.</li>
+          <li id="ref-35"><a href="https://github.com/google-research/rlds" target="_blank" rel="noopener noreferrer">Google Research RLDS repository</a>, archived 2025-11-29.</li>
+          <li id="ref-36"><a href="https://www.behaviortree.dev/" target="_blank" rel="noopener noreferrer">BehaviorTree.CPP documentation</a>, accessed 2026-07-28.</li>
+          <li id="ref-37"><a href="https://moveit.picknik.ai/main/doc/tutorials/pick_and_place_with_moveit_task_constructor/pick_and_place_with_moveit_task_constructor.html" target="_blank" rel="noopener noreferrer">MoveIt Task Constructor tutorial</a>, accessed 2026-07-28.</li>
+          <li id="ref-38"><a href="https://www.agilityrobotics.com/" target="_blank" rel="noopener noreferrer">Agility Robotics</a>, accessed 2026-07-28.</li>
+          <li id="ref-39"><a href="https://www.figure.ai/" target="_blank" rel="noopener noreferrer">Figure AI</a>, accessed 2026-07-28.</li>
+          <li id="ref-40"><a href="https://apptronik.com/" target="_blank" rel="noopener noreferrer">Apptronik</a>, accessed 2026-07-28.</li>
+          <li id="ref-41"><a href="https://www.tesla.com/AI" target="_blank" rel="noopener noreferrer">Tesla AI and Robotics</a>, accessed 2026-07-28.</li>
+          <li id="ref-42"><a href="https://www.fftai.com/" target="_blank" rel="noopener noreferrer">Fourier Intelligence</a>, accessed 2026-07-28.</li>
+          <li id="ref-43">Huang et al. <a href="https://arxiv.org/abs/2207.05608" target="_blank" rel="noopener noreferrer">Inner Monologue: Embodied Reasoning through Planning with Language Models</a>, 2022.</li>
+          <li id="ref-44"><a href="https://moveit.picknik.ai/main/doc/concepts/motion_planning.html" target="_blank" rel="noopener noreferrer">MoveIt 2: Motion Planning Concepts</a>, accessed 2026-07-29.</li>
+          <li id="ref-45"><a href="https://moveit.picknik.ai/main/doc/how_to_guides/stomp_planner/stomp_planner.html" target="_blank" rel="noopener noreferrer">MoveIt 2: STOMP Planning Pipeline</a>, accessed 2026-07-29.</li>
+          <li id="ref-46"><a href="https://moveit.picknik.ai/main/doc/how_to_guides/pilz_industrial_motion_planner/pilz_industrial_motion_planner.html" target="_blank" rel="noopener noreferrer">MoveIt 2: Pilz Industrial Motion Planner</a>, accessed 2026-07-29.</li>
+          <li id="ref-47"><a href="https://moveit.picknik.ai/main/doc/examples/realtime_servo/realtime_servo_tutorial.html" target="_blank" rel="noopener noreferrer">MoveIt 2: MoveIt Servo Tutorial</a>, accessed 2026-07-29.</li>
+          <li id="ref-48"><a href="https://curobo.org/" target="_blank" rel="noopener noreferrer">cuRobo Documentation</a>, accessed 2026-07-29.</li>
+          <li id="ref-49">Sundaralingam et al. <a href="https://arxiv.org/abs/2310.17274" target="_blank" rel="noopener noreferrer">cuRobo: Parallelized Collision-Free Minimum-Jerk Robot Motion Generation</a>, 2023.</li>
+          <li id="ref-50">Bellman. <a href="https://press.princeton.edu/books/paperback/9780691146683/dynamic-programming" target="_blank" rel="noopener noreferrer">Dynamic Programming</a>, 1957.</li>
+          <li id="ref-51">Sutton and Barto. <a href="http://incompleteideas.net/book/the-book-2nd.html" target="_blank" rel="noopener noreferrer">Reinforcement Learning: An Introduction, second edition</a>, 2018.</li>
+          <li id="ref-52">Schulman et al. <a href="https://arxiv.org/abs/1707.06347" target="_blank" rel="noopener noreferrer">Proximal Policy Optimization Algorithms</a>, 2017.</li>
+          <li id="ref-53">Haarnoja et al. <a href="https://arxiv.org/abs/1801.01290" target="_blank" rel="noopener noreferrer">Soft Actor-Critic</a>, 2018.</li>
+          <li id="ref-54">Ha et al. <a href="https://arxiv.org/abs/2406.01152" target="_blank" rel="noopener noreferrer">Learning-Based Legged Locomotion: State of the Art and Future Perspectives</a>, 2024-2025.</li>
+          <li id="ref-55">Rudin et al. <a href="https://arxiv.org/abs/2109.11978" target="_blank" rel="noopener noreferrer">Learning to Walk in Minutes Using Massively Parallel Deep Reinforcement Learning</a>, 2021-2022.</li>
+          <li id="ref-56">Peng et al. <a href="https://arxiv.org/abs/2104.02180" target="_blank" rel="noopener noreferrer">AMP: Adversarial Motion Priors for Stylized Physics-Based Character Control</a>, 2021.</li>
+          <li id="ref-57">Lee et al. <a href="https://doi.org/10.1126/scirobotics.abc5986" target="_blank" rel="noopener noreferrer">Learning Quadrupedal Locomotion over Challenging Terrain</a>, 2020.</li>
+          <li id="ref-58">Radosavovic et al. <a href="https://hybrid-robotics.berkeley.edu/publications/ScienceRobotics2024_Learning_Humanoid_Locomotion.pdf" target="_blank" rel="noopener noreferrer">Real-World Humanoid Locomotion with Reinforcement Learning</a>, 2024.</li>
+        </ol>
+      </section>
+    </article>
+  </main>
+
+  <footer>
+    <span>SWARMOTOR 机器人学学习骨架</span>
+    <a href="posts.html">返回学习笔记</a>
+  </footer>
+</body>
+</html>

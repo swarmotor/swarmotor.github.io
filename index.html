@@ -1,110 +1,771 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>适合发布的技术博客</title>
-  <style>
-:root {
-  color-scheme: light;
-  --bg: #f5f8f8;
-  --bg-soft: #edf4f4;
-  --paper: rgba(255,255,255,.94);
-  --paper-strong: #ffffff;
-  --ink: #18333b;
-  --muted: #465f68;
-  --subtle: #596f77;
-  --line: rgba(28,78,88,.18);
-  --cyan: #008c95;
-  --cyan-2: #3aa7b0;
-  --warm: #9a6a16;
-  --green: #0f766e;
-  --red: #a33a2b;
-  --shadow: 0 18px 48px rgba(23,74,83,.10);
-}
-* { box-sizing: border-box; }
-body {
-  margin: 0;
-  background:
-    radial-gradient(circle at 8% -10%, rgba(0,140,149,.15), transparent 34%),
-    radial-gradient(circle at 88% 2%, rgba(58,167,176,.13), transparent 30%),
-    linear-gradient(180deg, #f7faf9 0%, #eef5f5 52%, #f8faf9 100%);
-  color: var(--ink);
-  font-family: "Avenir Next", "Inter", "SF Pro Text", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
-  line-height: 1.76;
-  text-rendering: optimizeLegibility;
-}
-a { color: #006f78; text-decoration: none; }
-a:hover { text-decoration: underline; }
-main { width: min(1040px, calc(100vw - 32px)); margin: 0 auto; padding: 48px 0 72px; }
-.hero, section, .card {
-  background: var(--paper);
-  border: 1px solid var(--line);
-  border-radius: 24px;
-  box-shadow: var(--shadow);
-}
-.hero { padding: clamp(28px, 5vw, 54px); background: linear-gradient(135deg, rgba(0,140,149,.12), rgba(255,255,255,.86) 52%, rgba(58,167,176,.10)); }
-.kicker { color: var(--cyan); font-size: 13px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
-h1 { margin: 12px 0 14px; color: #102f38; font-family: "Iowan Old Style", "LXGW WenKai Screen", "霞鹜文楷", "Noto Serif SC", "Source Han Serif SC", "Songti SC", Georgia, serif; font-size: clamp(32px, 5vw, 56px); line-height: 1.12; letter-spacing: -.04em; }
-h2 { margin: 0 0 14px; color: #173943; font-family: "Optima", "Avenir Next", "Noto Serif SC", "Noto Sans SC", system-ui, sans-serif; font-size: clamp(22px, 3vw, 30px); line-height: 1.24; letter-spacing: -.02em; }
-h3 { margin: 22px 0 8px; color: #1c4049; font-size: 18px; }
-p { margin: 0 0 14px; color: var(--muted); }
-ul, ol { margin: 10px 0 0 22px; padding: 0; color: var(--muted); }
-li { margin: 7px 0; }
-section { margin-top: 22px; padding: clamp(22px, 4vw, 34px); }
-.lead { max-width: 820px; color: var(--muted); font-size: 18px; }
-.meta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
-.pill { display: inline-flex; padding: 5px 11px; border: 1px solid rgba(0,140,149,.24); border-radius: 999px; background: rgba(0,140,149,.08); color: #31545d; font-size: 13px; font-weight: 700; }
-.grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-top: 18px; }
-.card { padding: 18px; box-shadow: none; }
-.card strong { display: block; margin-bottom: 6px; color: #173943; }
-.note { margin-top: 16px; padding: 16px 18px; border-left: 4px solid var(--cyan); border-radius: 16px; background: rgba(0,140,149,.08); color: var(--muted); }
-code { padding: 2px 6px; border: 1px solid rgba(0,140,149,.24); border-radius: 6px; background: rgba(0,140,149,.10); color: #005f68; font-family: "JetBrains Mono", "SFMono-Regular", Consolas, monospace; font-size: .92em; }
-.table-wrap { overflow-x: auto; margin-top: 14px; }
-table { width: 100%; border-collapse: collapse; overflow: hidden; border-radius: 16px; background: #fff; font-size: 15px; }
-th, td { padding: 12px 14px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; color: var(--muted); }
-th { background: rgba(0,140,149,.08); color: #173943; }
-footer { margin-top: 28px; color: var(--subtle); font-size: 14px; text-align: center; }
-@media (max-width: 760px) { main { width: min(100vw - 22px, 1040px); padding-top: 22px; } .grid { grid-template-columns: 1fr; } .hero, section { border-radius: 18px; } }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SWARMOTOR - 简历</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;500;600&family=Noto+Sans+SC:wght@300;400;500;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        #game-of-life {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.15;
+            pointer-events: none;
+        }
 
-.entries { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 18px; }
-.entry { display: block; padding: 18px; border: 1px solid var(--line); border-radius: 18px; background: rgba(255,255,255,.88); box-shadow: 0 10px 24px rgba(23,74,83,.07); text-decoration: none; }
-.entry:hover { text-decoration: none; transform: translateY(-1px); }
-.entry span { display: inline-flex; margin-bottom: 10px; padding: 3px 9px; border-radius: 999px; background: rgba(0,140,149,.08); color: #31545d; font-size: 12px; font-weight: 800; }
-.entry strong { display: block; color: #173943; font-size: 18px; line-height: 1.35; }
-.entry p { margin: 8px 0 0; font-size: 14px; }
-@media (max-width: 760px) { .entries { grid-template-columns: 1fr; } }
-</style>
+        :root {
+            --bg-primary: #fafaf9;
+            --bg-secondary: #ffffff;
+            --surface-soft: rgba(255, 255, 255, 0.82);
+            --text-primary: #1a1a1a;
+            --text-secondary: #525252;
+            --text-muted: #737373;
+            --accent: #0f4c5c;
+            --accent-light: #e8f4f6;
+            --accent-line: rgba(15, 76, 92, 0.18);
+            --border: #e5e5e5;
+            --shadow: rgba(15, 76, 92, 0.08);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            min-height: 100vh;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: 'DM Sans', 'Noto Sans SC', sans-serif;
+            font-size: 15px;
+            line-height: 1.7;
+            text-rendering: optimizeLegibility;
+        }
+
+        a { color: inherit; text-decoration: none; }
+        a:hover { color: var(--accent); }
+
+        .lang-toggle,
+        .game-toggle,
+        .page-nav { position: fixed; z-index: 1000; }
+
+        .lang-toggle {
+            top: 1.5rem;
+            right: 1.5rem;
+            display: flex;
+            gap: 0.25rem;
+            padding: 0.25rem;
+            border: 1px solid var(--border);
+            border-radius: 2rem;
+            background: var(--bg-secondary);
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+        }
+
+        .lang-btn,
+        .game-btn,
+        .page-btn {
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .lang-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 1.5rem;
+            color: var(--text-muted);
+            font: inherit;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .lang-btn.active,
+        .page-btn.active,
+        .game-btn.active { background: var(--accent); color: white; }
+
+        .game-toggle {
+            top: 50%;
+            right: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.15rem;
+            padding: 0.25rem;
+            transform: translateY(-50%);
+            border: 1px solid var(--border);
+            border-radius: 2rem;
+            background: var(--bg-secondary);
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+        }
+
+        .game-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            font-size: 1rem;
+        }
+
+        .game-btn:hover,
+        .page-btn:hover { background: var(--accent-light); transform: translateY(-1px); }
+
+        .page-nav {
+            right: 1.5rem;
+            bottom: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .page-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.5rem;
+            height: 2.5rem;
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            background: var(--bg-secondary);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            font-size: 1.2rem;
+        }
+
+        .container {
+            width: min(960px, calc(100vw - 4rem));
+            margin: 0 auto;
+            padding: 3rem 0 4rem;
+        }
+
+        .hero,
+        section {
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            background: var(--surface-soft);
+            box-shadow: 0 18px 48px var(--shadow);
+            backdrop-filter: blur(10px);
+        }
+
+        .hero {
+            display: grid;
+            grid-template-columns: minmax(0, 1.3fr) minmax(260px, 0.7fr);
+            gap: 2rem;
+            margin-bottom: 1.5rem;
+            padding: clamp(2rem, 5vw, 3.5rem);
+        }
+
+        .eyebrow,
+        .section-title,
+        .card-label {
+            color: var(--accent);
+            font-size: 0.76rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+
+        h1,
+        h2 {
+            font-family: 'Crimson Pro', serif;
+            color: var(--text-primary);
+            letter-spacing: -0.02em;
+        }
+
+        h1 {
+            max-width: 680px;
+            margin: 0.6rem 0 1rem;
+            font-size: clamp(3rem, 8vw, 5.7rem);
+            font-weight: 600;
+            line-height: 0.95;
+        }
+
+        h2 {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+            font-size: 1.45rem;
+            font-weight: 600;
+        }
+
+        h2::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(to right, var(--border), transparent);
+        }
+
+        p { color: var(--text-secondary); }
+
+        .lead {
+            max-width: 680px;
+            color: var(--text-secondary);
+            font-size: 1.08rem;
+        }
+
+        .hero-actions,
+        .chips,
+        .contact-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .hero-actions { margin-top: 1.5rem; }
+
+        .button-link,
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            border-radius: 999px;
+            font-weight: 700;
+        }
+
+        .button-link {
+            min-height: 2.65rem;
+            padding: 0.68rem 1.05rem;
+            border: 1px solid var(--accent-line);
+            background: var(--bg-secondary);
+            color: var(--accent);
+            box-shadow: 0 8px 20px rgba(15, 76, 92, 0.06);
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+        }
+
+        .button-link.primary { background: var(--accent); color: white; }
+        .button-link:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(15, 76, 92, 0.12); }
+
+        .profile-card {
+            align-self: stretch;
+            padding: 1.35rem;
+            border: 1px solid var(--accent-line);
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.74);
+        }
+
+        .profile-card dl { display: grid; gap: 1rem; }
+        .profile-card dt { color: var(--text-muted); font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; }
+        .profile-card dd { margin-top: 0.2rem; color: var(--text-primary); font-weight: 600; }
+
+        section {
+            margin-top: 1.25rem;
+            padding: clamp(1.35rem, 4vw, 2rem);
+        }
+
+        .focus-grid,
+        .highlight-grid,
+        .skills-grid,
+        .writing-grid,
+        .details-grid {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .focus-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+        .highlight-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .skills-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+        .writing-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        .details-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+        .card,
+        .pub-item,
+        .project-item,
+        .skill-card,
+        .writing-card {
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.72);
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+        }
+
+        .card:hover,
+        .writing-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--accent-line);
+            box-shadow: 0 12px 26px rgba(15, 76, 92, 0.09);
+        }
+
+        .card,
+        .skill-card,
+        .writing-card { padding: 1rem; }
+        .card strong,
+        .skill-card strong,
+        .writing-card strong { display: block; margin: 0.35rem 0; color: var(--text-primary); font-size: 1rem; line-height: 1.35; }
+        .card p,
+        .skill-card p,
+        .writing-card p { font-size: 0.92rem; }
+
+        .stacked-list { display: grid; gap: 0.85rem; }
+
+        .pub-item,
+        .project-item { padding: 1rem 1.1rem; }
+        .pub-title,
+        .project-title { color: var(--text-primary); font-weight: 700; line-height: 1.45; }
+        .pub-meta,
+        .project-meta { margin-top: 0.35rem; color: var(--text-muted); font-size: 0.88rem; }
+
+        .project-item ul {
+            margin: 0.7rem 0 0 1.1rem;
+            color: var(--text-secondary);
+        }
+
+        .project-item li { margin: 0.25rem 0; }
+
+        .chips { margin-top: 1rem; }
+        .chip {
+            padding: 0.35rem 0.75rem;
+            background: var(--accent-light);
+            color: var(--accent);
+            font-size: 0.78rem;
+        }
+
+        .contact-row { align-items: center; }
+        .contact-row a,
+        .contact-row span {
+            padding: 0.55rem 0.85rem;
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.68);
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        [data-lang="en"] { display: none !important; }
+        body.lang-en [data-lang="zh"] { display: none !important; }
+        body.lang-en [data-lang="en"] { display: block !important; }
+        body.lang-en a.button-link[data-lang="en"] { display: inline-flex !important; }
+        body.lang-en li[data-lang="en"] { display: list-item !important; }
+        body.lang-en span[data-lang="en"] { display: inline !important; }
+
+        @media (max-width: 900px) {
+            .hero,
+            .highlight-grid { grid-template-columns: 1fr; }
+            .focus-grid,
+            .skills-grid,
+            .writing-grid,
+            .details-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .page-nav { right: 0.5rem; }
+        }
+
+        @media (max-width: 640px) {
+            .container { width: min(100vw - 2rem, 960px); padding-top: 5rem; }
+            .hero, section { border-radius: 18px; }
+            .focus-grid,
+            .skills-grid,
+            .writing-grid,
+            .details-grid { grid-template-columns: 1fr; }
+            .lang-toggle { top: 1rem; right: 1rem; }
+            .game-toggle {
+                top: 1rem;
+                right: auto;
+                left: 1rem;
+                flex-direction: row;
+                transform: none;
+            }
+            .page-nav { right: 1rem; bottom: 1rem; }
+            h1 { font-size: clamp(2.7rem, 17vw, 4.4rem); }
+        }
+    </style>
 </head>
-<body><main>
-<header class="hero">
-  <div class="kicker">Blog Shelf</div>
-  <h1>适合发布的技术博客</h1>
-  <p class="lead">我把偏观点、方法论、路线判断和经验复盘的内容放到这里。部署命令、环境 runbook、周计划和纯交付记录仍留在原目录，不混进博客入口。</p>
-  <div class="meta"><span class="pill">浅灰-青色</span><span class="pill">第一人称</span><span class="pill">少过渡</span><span class="pill">保留原文</span></div>
-</header>
-<section>
-  <h2>发布候选</h2>
-  <div class="entries"><a class="entry" href="vla-post-training-lora-isaac-loop.html"><span>新整理</span><strong>从 LoRA 验证到 Isaac Sim 闭环评测：我怎么设计 VLA 后训练路线</strong><p>把 LoRA 验证、Isaac Sim 联通、Benchmark、DAgger 和 rollout feedback 合并成一篇博客。</p></a>
-<a class="entry" href="embodied-ai-data-generation.html"><span>总论</span><strong>数据生成是什么？为什么它对具身智能重要？</strong><p>适合作为具身智能数据生成的入口长文。</p></a>
-<a class="entry" href="real-to-sim-frontiers.html"><span>R2S</span><strong>Real-to-Sim 前沿</strong><p>梳理 3DGS、物理属性、生成式 Real2Sim 和动态数字孪生。</p></a>
-<a class="entry" href="3dgs-role-in-r2s.html"><span>R2S</span><strong>3DGS 在 R2S 中到底扮演什么角色？</strong><p>主题单点清楚，适合单独发布。</p></a>
-<a class="entry" href="r2s2r-data-pipeline-report.html"><span>Pipeline</span><strong>R2S2R 数据生成管线全景图</strong><p>适合作为真实场景到训练数据的管线总览。</p></a>
-<a class="entry" href="r2s-autodatagen-integration.html"><span>Pipeline</span><strong>R2S 与 AutoDataGen 融合</strong><p>适合作为上篇的架构补充。</p></a>
-<a class="entry" href="rollout-vlm-evaluation.html"><span>Evaluation</span><strong>自动评测不应只靠看视频判成败</strong><p>适合发布，观点明确。</p></a>
-<a class="entry" href="openpi-aloha-world-model-roadmap.html"><span>World Model</span><strong>OpenPI / ALOHA 世界模型探索与评价器路线图</strong><p>适合作为研究路线博客。</p></a>
-<a class="entry" href="recap-theory-analysis.html"><span>RECAP</span><strong>我如何理解 RECAP</strong><p>偏理论解释，适合系列第一篇。</p></a>
-<a class="entry" href="recap-deployment-analysis.html"><span>RECAP</span><strong>RECAP 为什么难部署</strong><p>偏工程部署，适合系列第二篇。</p></a>
-<a class="entry" href="recap-cost-convergence-risk.html"><span>RECAP</span><strong>RECAP 的数据、算量与收敛风险</strong><p>偏成本判断，适合系列第三篇。</p></a>
-<a class="entry" href="vla-ft-pipeline-gase-simfoundry-vlk.html"><span>Paper</span><strong>GASE / SimFoundry / VLK 的 VLA 训练-评测 Pipeline 对比</strong><p>适合作为论文对比主文。</p></a>
-<a class="entry" href="pi05-unified-model-paper-comparison.html"><span>Paper</span><strong>三篇论文对比：统一 pi0.5 模型视角</strong><p>适合作为表格附录。</p></a>
-<a class="entry" href="openpi-pi05-ft-deployment.html"><span>FT</span><strong>OpenPI pi0.5 实际部署 FT 路线分析</strong><p>适合改成工程经验短文。</p></a>
-<a class="entry" href="lerobot-mixed-dataset-compatibility.html"><span>Data</span><strong>OpenPI 微调中混合 LeRobot 数据集的兼容性说明</strong><p>适合作为数据契约短文。</p></a></div>
-</section>
-<section>
-  <h2>没有放进来的内容类型</h2>
-  <p>pi0.5 + LIBERO 环境记录、服务器同步 runbook、Isaac Sim WebRTC 教程、项目结构说明、周计划拆解等内容更适合内部留档。它们可以提供素材，但不直接作为博客入口。</p>
-</section>
-<footer>这个目录只收发布候选和重新组织后的文章；上一级目录保留完整技术履历。</footer>
-</main></body>
+<body>
+    <canvas id="game-of-life"></canvas>
+
+    <div class="lang-toggle" aria-label="Language switcher">
+        <button class="lang-btn active" onclick="setLang('zh')">中文</button>
+        <button class="lang-btn" onclick="setLang('en')">EN</button>
+    </div>
+
+    <div class="game-toggle" aria-label="Background mode switcher">
+        <button class="game-btn active" onclick="setGame('flocking', this)" title="Flocking">🦎</button>
+        <button class="game-btn" onclick="setGame('pursuit', this)" title="Pursuit-Evasion">🎯</button>
+        <button class="game-btn" onclick="setGame('rps', this)" title="Rock-Paper-Scissors">✊</button>
+        <button class="game-btn" onclick="setGame('sweep', this)" title="Particle Sweep">💨</button>
+        <button class="game-btn" onclick="setGame('ant', this)" title="Ant Colony">🐜</button>
+        <button class="game-btn" onclick="setGame('life', this)" title="Game of Life">🎲</button>
+    </div>
+
+    <div class="page-nav" aria-label="Page navigation">
+        <button class="page-btn active" title="简历">📄</button>
+        <button class="page-btn" onclick="location.href='share.html'" title="分享">📁</button>
+        <button class="page-btn" onclick="location.href='posts.html'" title="帖子">📝</button>
+    </div>
+
+    <main class="container">
+        <header class="hero">
+            <div>
+                <div class="eyebrow">SWARMOTOR</div>
+                <h1 data-lang="zh">张景</h1>
+                <h1 data-lang="en">Jing Zhang</h1>
+                <p class="lead" data-lang="zh">我聚焦具身智能数据闭环，研究真实—仿真数据生成、质量评估与训练反馈；以 VLM、VLA、WAM 为研究对象和工具，连接数据、策略学习与机器人评测。</p>
+                <p class="lead" data-lang="en">I focus on embodied-AI data loops across real-to-sim generation, quality evaluation, and training feedback, studying and using VLMs, VLAs, and WAMs to connect data, policy learning, and robot evaluation.</p>
+                <div class="hero-actions">
+                    <a class="button-link primary" href="mailto:jzhang1@supmicrotech.fr">jzhang1@supmicrotech.fr</a>
+                    <a class="button-link" href="share.html" data-lang="zh">项目展示</a>
+                    <a class="button-link" href="share.html" data-lang="en">Projects</a>
+                    <a class="button-link" href="posts.html" data-lang="zh">学习笔记</a>
+                    <a class="button-link" href="posts.html" data-lang="en">Notes</a>
+                </div>
+            </div>
+            <aside class="profile-card">
+                <dl>
+                    <div>
+                        <dt data-lang="zh">当前方向</dt>
+                        <dt data-lang="en">Focus</dt>
+                        <dd data-lang="zh">具身数据 / 数据闭环 / 机器人学习</dd>
+                        <dd data-lang="en">Embodied Data / Data Loops / Robot Learning</dd>
+                    </div>
+                    <div>
+                        <dt data-lang="zh">机构</dt>
+                        <dt data-lang="en">Affiliation</dt>
+                        <dd>SUPMICROTECH-ENSMM · FEMTO-ST Laboratory</dd>
+                    </div>
+                    <div>
+                        <dt data-lang="zh">教育</dt>
+                        <dt data-lang="en">Education</dt>
+                        <dd>SUPMICROTECH-ENSMM · Anhui University</dd>
+                    </div>
+                    <div>
+                        <dt data-lang="zh">关键词</dt>
+                        <dt data-lang="en">Keywords</dt>
+                        <dd>VLM · VLA · WAM · OpenPI · LeRobot · Isaac Sim</dd>
+                    </div>
+                </dl>
+            </aside>
+        </header>
+
+        <section>
+            <h2><span class="section-title" data-lang="zh">研究焦点</span><span class="section-title" data-lang="en">Focus Areas</span></h2>
+            <div class="focus-grid">
+                <div class="card">
+                    <span class="card-label">01</span>
+                    <strong data-lang="zh">具身数据生成</strong>
+                    <strong data-lang="en">Embodied Data Generation</strong>
+                    <p data-lang="zh">研究 R2S2R、仿真轨迹合成与自动数据生成，构建覆盖任务变化和失败状态的数据。</p>
+                    <p data-lang="en">Studying R2S2R, simulated trajectory synthesis, and automatic generation for task variation and failure-state coverage.</p>
+                </div>
+                <div class="card">
+                    <span class="card-label">02</span>
+                    <strong data-lang="zh">数据质量与评测</strong>
+                    <strong data-lang="en">Data Quality & Evaluation</strong>
+                    <p data-lang="zh">结合 VLM 语义判断、WAM 动力学预测与仿真真值，诊断 rollout 质量和失败原因。</p>
+                    <p data-lang="en">Combining VLM semantic judgment, WAM dynamics prediction, and simulator ground truth to diagnose rollout quality and failures.</p>
+                </div>
+                <div class="card">
+                    <span class="card-label">03</span>
+                    <strong data-lang="zh">数据驱动后训练</strong>
+                    <strong data-lang="en">Data-Driven Post-Training</strong>
+                    <p data-lang="zh">以 VLA 为策略载体，围绕数据契约、微调、成对 rollout 与反馈回流组织可复现闭环。</p>
+                    <p data-lang="en">Using VLAs as policy models in reproducible loops spanning data contracts, fine-tuning, paired rollouts, and feedback collection.</p>
+                </div>
+                <div class="card">
+                    <span class="card-label">04</span>
+                    <strong data-lang="zh">群体机器人方法</strong>
+                    <strong data-lang="en">Swarm Robotics Methods</strong>
+                    <p data-lang="zh">以拓扑保持感知、图论、分布式优化和稳定性分析作为多机器人数据与策略研究基础。</p>
+                    <p data-lang="en">Using topology-preserving perception, graph theory, distributed optimization, and stability analysis as foundations for multi-robot data and policy research.</p>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2><span class="section-title" data-lang="zh">精选成果</span><span class="section-title" data-lang="en">Selected Work</span></h2>
+            <div class="highlight-grid">
+                <div class="stacked-list">
+                    <div class="pub-item">
+                        <div class="pub-title">Instantaneous Strong Connectivity: A Novel Perceptual Paradigm for Swarm Guidance in Communication-Denied Environments</div>
+                        <div class="pub-meta"><span data-lang="zh">第一作者 · IEEE Transactions on Control of Network Systems · 审稿中 · 2026</span><span data-lang="en">First Author · IEEE Transactions on Control of Network Systems · Under Review · 2026</span></div>
+                    </div>
+                    <div class="pub-item">
+                        <div class="pub-title">Adaptive Encirclement Control Strategy for Swarm Robots Based on Multi-Sensor Dynamic Fusion</div>
+                        <div class="pub-meta"><span data-lang="zh">本科生第一作者 · Control Engineering of China · 已录用 · 2026</span><span data-lang="en">Undergraduate First Author · Control Engineering of China · Accepted · 2026</span></div>
+                    </div>
+                    <div class="pub-item">
+                        <div class="pub-title">Multi-robot Capture Strategy for Observation-Limited Scenarios</div>
+                        <div class="pub-meta"><span data-lang="zh">本科生第一作者 · ROBOMECH · 已录用 · 2026</span><span data-lang="en">Undergraduate First Author · ROBOMECH · Accepted · 2026</span></div>
+                    </div>
+                    <div class="pub-item">
+                        <div class="pub-title"><a href="https://www.sciencedirect.com/science/article/pii/S2405896325020579" target="_blank" rel="noopener">Bio-inspired Neighbor Selection Mechanism and Performance Evaluation for UAV Swarms</a></div>
+                        <div class="pub-meta"><span data-lang="zh">第一作者 · IFAC-ACA 2025 · 已发表</span><span data-lang="en">First Author · IFAC-ACA 2025 · Published</span></div>
+                    </div>
+                </div>
+                <div class="stacked-list">
+                    <div class="project-item">
+                        <div class="project-title" data-lang="zh">OpenPI / pi0.5 ALOHA 后训练链路验证</div>
+                        <div class="project-title" data-lang="en">OpenPI / pi0.5 ALOHA Post-Training Pipeline Validation</div>
+                        <div class="project-meta">OpenPI · LeRobot · ALOHA Sim · LoRA · 2026</div>
+                        <ul>
+                            <li data-lang="zh">基于 50 episodes、20,000 frames、50 Hz、14D state/action 的 ALOHA 数据完成 norm stats 与 500-step LoRA smoke test；该结果验证训练链路，不代表策略质量。</li>
+                            <li data-lang="zh">注册 pi0.5 base 初始化的 5,000-step 正式配置并准备 metrics JSONL；下一步为固定 seeds 的成对 rollout 与离线 critic。</li>
+                            <li data-lang="en">Completed norm statistics and a 500-step LoRA smoke test on 50 ALOHA episodes (20,000 frames at 50 Hz, 14D state/action); this validates the training path, not policy quality.</li>
+                            <li data-lang="en">Registered a 5,000-step pi0.5-base configuration and prepared metrics JSONL; paired fixed-seed rollouts and an offline critic remain next steps.</li>
+                        </ul>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-title" data-lang="zh">拓扑保持的群体感知研究</div>
+                        <div class="project-title" data-lang="en">Topology-Preserving Swarm Perception</div>
+                        <div class="project-meta">SUPMICROTECH-ENSMM · FEMTO-ST Laboratory · 2025-Present</div>
+                        <ul>
+                            <li data-lang="zh">提出即时强连通的拓扑保持感知范式。</li>
+                            <li data-lang="zh">用 Lyapunov 方法分析收敛性与稳定性。</li>
+                            <li data-lang="en">Formulated a perceptual paradigm for instantaneous strong connectivity.</li>
+                            <li data-lang="en">Analyzed convergence and stability with Lyapunov methods.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2><span class="section-title" data-lang="zh">技术栈</span><span class="section-title" data-lang="en">Technical Stack</span></h2>
+            <div class="skills-grid">
+                <div class="skill-card"><strong data-lang="zh">编程语言</strong><strong data-lang="en">Languages</strong><p>Python, C/C++, MATLAB, Java</p></div>
+                <div class="skill-card"><strong data-lang="zh">AI 与机器人</strong><strong data-lang="en">AI & Robotics</strong><p>OpenPI, LeRobot, LoRA, ROS2, PyTorch, TensorRT, OpenCV</p></div>
+                <div class="skill-card"><strong data-lang="zh">仿真与评测</strong><strong data-lang="en">Simulation & Evaluation</strong><p>Isaac Sim, Isaac Lab, MuJoCo, Genesis, Gazebo</p></div>
+                <div class="skill-card"><strong data-lang="zh">理论基础</strong><strong data-lang="en">Theory</strong><p>Distributed Optimization, Graph Theory, Lyapunov Stability, MARL</p></div>
+            </div>
+        </section>
+
+        <section>
+            <h2><span class="section-title" data-lang="zh">教育与荣誉</span><span class="section-title" data-lang="en">Education & Honors</span></h2>
+            <div class="details-grid">
+                <div class="skill-card">
+                    <strong data-lang="zh">教育经历</strong><strong data-lang="en">Education</strong>
+                    <p>SUPMICROTECH-ENSMM · 2025-2026</p>
+                    <p data-lang="zh">安徽大学 · 2023-2025</p><p data-lang="en">Anhui University · 2023-2025</p>
+                </div>
+                <div class="skill-card">
+                    <strong data-lang="zh">竞赛荣誉</strong><strong data-lang="en">Competition Honors</strong>
+                    <p data-lang="zh">RoboMaster 机甲大师赛全国三等奖 · 2025.04</p><p data-lang="en">National Third Prize, RoboMaster University League · 2025.04</p>
+                    <p data-lang="zh">蓝桥杯 C++ A 组省级三等奖 · 2024.04</p><p data-lang="en">Provincial Third Prize, Blue Bridge Cup C++ Group A · 2024.04</p>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2><span class="section-title" data-lang="zh">技术写作</span><span class="section-title" data-lang="en">Writing</span></h2>
+            <div class="writing-grid">
+                <a class="writing-card" href="embodied-ai-data-generation.html"><span class="card-label">Overview</span><strong>数据生成是什么？为什么它对具身智能重要？</strong><p>具身智能数据生成的入口长文。</p></a>
+                <a class="writing-card" href="real-to-sim-frontiers.html"><span class="card-label">R2S</span><strong>Real-to-Sim 前沿</strong><p>3DGS、物理属性、生成式 Real2Sim 与动态数字孪生。</p></a>
+                <a class="writing-card" href="r2s2r-data-pipeline-report.html"><span class="card-label">Pipeline</span><strong>R2S2R 数据生成管线全景图</strong><p>真实场景到仿真数据再到真实机器人的完整管线。</p></a>
+                <a class="writing-card" href="rollout-vlm-evaluation.html"><span class="card-label">Evaluation</span><strong>自动评测不应只靠看视频判成败</strong><p>关于 rollout、VLM 与多维诊断的评测方法。</p></a>
+                <a class="writing-card" href="openpi-aloha-world-model-roadmap.html"><span class="card-label">World Model</span><strong>OpenPI / ALOHA 世界模型探索路线图</strong><p>从 world model 到离线 critic 的研究路线。</p></a>
+                <a class="writing-card" href="vla-ft-pipeline-gase-simfoundry-vlk.html"><span class="card-label">Paper</span><strong>GASE / SimFoundry / VLK Pipeline 对比</strong><p>VLA 训练与评测管线的论文对照。</p></a>
+            </div>
+        </section>
+
+        <section>
+            <h2><span class="section-title" data-lang="zh">联系</span><span class="section-title" data-lang="en">Contact</span></h2>
+            <div class="contact-row">
+                <a href="mailto:jzhang1@supmicrotech.fr">jzhang1@supmicrotech.fr</a>
+                <span>+33 07 43 55 91 27</span>
+                <span>+86 158 0095 2694</span>
+                <span>WeChat: Astrofutur</span>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        let currentGame = 'flocking';
+
+        function setGame(game, btn) {
+            currentGame = game;
+            document.querySelectorAll('.game-btn').forEach((button) => button.classList.remove('active'));
+            btn.classList.add('active');
+        }
+
+        (function initBackground() {
+            const canvas = document.getElementById('game-of-life');
+            const ctx = canvas.getContext('2d');
+            let width = 0;
+            let height = 0;
+            let agents = [];
+            let frame = 0;
+
+            function resize() {
+                width = window.innerWidth;
+                height = window.innerHeight;
+                canvas.width = width;
+                canvas.height = height;
+                initAgents();
+            }
+
+            function initAgents(count = 72) {
+                agents = Array.from({ length: count }, (_, index) => ({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    vx: (Math.random() - 0.5) * 2.6,
+                    vy: (Math.random() - 0.5) * 2.6,
+                    hue: 180 + (index % 18) * 2,
+                    phase: Math.random() * Math.PI * 2,
+                }));
+            }
+
+            function clear() {
+                ctx.fillStyle = '#fafaf9';
+                ctx.fillRect(0, 0, width, height);
+            }
+
+            function wrap(agent) {
+                if (agent.x < -20) agent.x = width + 20;
+                if (agent.x > width + 20) agent.x = -20;
+                if (agent.y < -20) agent.y = height + 20;
+                if (agent.y > height + 20) agent.y = -20;
+            }
+
+            function drawAgent(agent, size = 8) {
+                const angle = Math.atan2(agent.vy, agent.vx);
+                ctx.save();
+                ctx.translate(agent.x, agent.y);
+                ctx.rotate(angle);
+                ctx.beginPath();
+                ctx.moveTo(size, 0);
+                ctx.lineTo(-size * 0.55, -size * 0.48);
+                ctx.lineTo(-size * 0.55, size * 0.48);
+                ctx.closePath();
+                ctx.fillStyle = `hsl(${agent.hue}, 58%, 34%)`;
+                ctx.fill();
+                ctx.restore();
+            }
+
+            function updateFlocking() {
+                const perceptionRadius = 82;
+                const separationDistance = 24;
+
+                agents.forEach((agent, index) => {
+                    let avgX = 0;
+                    let avgY = 0;
+                    let avgVX = 0;
+                    let avgVY = 0;
+                    let sepX = 0;
+                    let sepY = 0;
+                    let count = 0;
+
+                    agents.forEach((other, otherIndex) => {
+                        if (index === otherIndex) return;
+                        const dx = other.x - agent.x;
+                        const dy = other.y - agent.y;
+                        const distance = Math.hypot(dx, dy);
+                        if (distance > perceptionRadius || distance === 0) return;
+
+                        avgX += other.x;
+                        avgY += other.y;
+                        avgVX += other.vx;
+                        avgVY += other.vy;
+                        count += 1;
+
+                        if (distance < separationDistance) {
+                            sepX -= dx / distance;
+                            sepY -= dy / distance;
+                        }
+                    });
+
+                    if (count > 0) {
+                        avgX /= count;
+                        avgY /= count;
+                        avgVX /= count;
+                        avgVY /= count;
+                        agent.vx += (avgX - agent.x) * 0.004 + (avgVX - agent.vx) * 0.045;
+                        agent.vy += (avgY - agent.y) * 0.004 + (avgVY - agent.vy) * 0.045;
+                    }
+
+                    agent.vx += sepX * 0.14;
+                    agent.vy += sepY * 0.14;
+
+                    const speed = Math.hypot(agent.vx, agent.vy);
+                    if (speed > 4) {
+                        agent.vx = (agent.vx / speed) * 4;
+                        agent.vy = (agent.vy / speed) * 4;
+                    }
+
+                    agent.x += agent.vx;
+                    agent.y += agent.vy;
+                    wrap(agent);
+                });
+            }
+
+            function updateMode() {
+                if (currentGame === 'pursuit') {
+                    const target = agents[0];
+                    target.vx += Math.sin(frame * 0.014) * 0.04;
+                    target.vy += Math.cos(frame * 0.012) * 0.04;
+                    agents.slice(1).forEach((agent) => {
+                        agent.vx += (target.x - agent.x) * 0.0007;
+                        agent.vy += (target.y - agent.y) * 0.0007;
+                    });
+                } else if (currentGame === 'rps') {
+                    agents.forEach((agent, index) => {
+                        agent.hue = [8, 132, 210][index % 3];
+                        agent.vx += Math.sin(frame * 0.02 + agent.phase) * 0.025;
+                        agent.vy += Math.cos(frame * 0.018 + agent.phase) * 0.025;
+                    });
+                } else if (currentGame === 'sweep') {
+                    agents.forEach((agent) => {
+                        agent.vx += 0.018;
+                        agent.vy += Math.sin((agent.x + frame) * 0.01) * 0.03;
+                    });
+                } else if (currentGame === 'ant') {
+                    agents.forEach((agent) => {
+                        agent.vx += Math.cos(agent.phase + frame * 0.025) * 0.035;
+                        agent.vy += Math.sin(agent.phase + frame * 0.025) * 0.035;
+                    });
+                } else if (currentGame === 'life') {
+                    agents.forEach((agent, index) => {
+                        const ring = 90 + (index % 6) * 24;
+                        const angle = frame * 0.006 + agent.phase;
+                        agent.x += (width / 2 + Math.cos(angle) * ring - agent.x) * 0.012;
+                        agent.y += (height / 2 + Math.sin(angle * 1.7) * ring - agent.y) * 0.012;
+                    });
+                }
+            }
+
+            function draw() {
+                clear();
+                if (currentGame !== 'flocking') updateMode();
+                updateFlocking();
+
+                ctx.globalAlpha = currentGame === 'life' ? 0.28 : 0.18;
+                ctx.strokeStyle = '#0f4c5c';
+                agents.forEach((agent, index) => {
+                    for (let i = index + 1; i < agents.length; i += 1) {
+                        const other = agents[i];
+                        const distance = Math.hypot(agent.x - other.x, agent.y - other.y);
+                        if (distance < 72) {
+                            ctx.beginPath();
+                            ctx.moveTo(agent.x, agent.y);
+                            ctx.lineTo(other.x, other.y);
+                            ctx.stroke();
+                        }
+                    }
+                });
+                ctx.globalAlpha = 1;
+
+                agents.forEach((agent) => drawAgent(agent, currentGame === 'ant' ? 5 : 8));
+            }
+
+            function animate() {
+                frame += 1;
+                draw();
+                requestAnimationFrame(animate);
+            }
+
+            window.addEventListener('resize', resize);
+            resize();
+            animate();
+        })();
+
+        function setLang(lang) {
+            localStorage.setItem('swarmotor-lang', lang);
+            document.body.classList.toggle('lang-en', lang === 'en');
+            document.querySelectorAll('.lang-btn').forEach((btn) => {
+                btn.classList.toggle('active', (btn.textContent === 'EN' && lang === 'en') || (btn.textContent === '中文' && lang === 'zh'));
+            });
+        }
+
+        (function initLang() {
+            const saved = localStorage.getItem('swarmotor-lang');
+            if (saved) setLang(saved);
+        })();
+    </script>
+</body>
 </html>

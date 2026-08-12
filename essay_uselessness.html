@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>"这没有用，所以不要做"——两种"无用论"的跨学科解剖</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;600;700;900&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap');
+
+  :root {
+    --ink: #17343a;
+    --paper: #f5f8f8;
+    --gold: #0b5966;
+    --gold-light: #dceff0;
+    --rust: #1a7280;
+    --slate: #526970;
+    --margin: #0b5966;
+    --rule: #cddfe1;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { font-size: 18px; scroll-behavior: smooth; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Noto Serif SC', 'Georgia', serif;
+    line-height: 1.9;
+    min-height: 100vh;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.3;
+  }
+
+  .page {
+    max-width: 740px;
+    margin: 0 auto;
+    padding: 80px 48px 120px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Masthead */
+  .masthead {
+    text-align: center;
+    margin-bottom: 56px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--rule);
+    position: relative;
+  }
+
+  .masthead::after {
+    content: '◆';
+    position: absolute;
+    bottom: -14px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--paper);
+    padding: 0 12px;
+    color: var(--gold);
+    font-size: 16px;
+  }
+
+  .series-label {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 0.85rem;
+    letter-spacing: 0.18em;
+    color: var(--margin);
+    margin-bottom: 28px;
+    text-transform: uppercase;
+  }
+
+  h1 {
+    font-size: 2rem;
+    font-weight: 900;
+    line-height: 1.45;
+    letter-spacing: 0.02em;
+    color: var(--ink);
+    margin-bottom: 20px;
+  }
+
+  .subtitle {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 1.05rem;
+    color: var(--slate);
+    font-weight: 300;
+  }
+
+  /* Abstract */
+  .abstract {
+    background: linear-gradient(135deg, rgba(11,89,102,0.06) 0%, rgba(26,114,128,0.04) 100%);
+    border-left: 3px solid var(--gold);
+    padding: 28px 32px;
+    margin: 0 0 56px 0;
+    border-radius: 0 4px 4px 0;
+  }
+
+  .abstract-label {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.78rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+
+  .abstract p {
+    font-size: 0.92rem;
+    color: var(--slate);
+    line-height: 1.85;
+    margin-bottom: 0;
+  }
+
+  /* Sections */
+  .section {
+    margin-bottom: 64px;
+  }
+
+  .section-number {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 0.82rem;
+    letter-spacing: 0.2em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  h2 {
+    font-size: 1.45rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 28px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--rule);
+    letter-spacing: 0.03em;
+  }
+
+  h3 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--rust);
+    margin: 32px 0 14px;
+    letter-spacing: 0.04em;
+  }
+
+  p {
+    margin-bottom: 22px;
+    font-weight: 300;
+    font-size: 1.05rem;
+    line-height: 2.1;
+    text-indent: 2em;
+  }
+
+  .divider {
+    text-align: center;
+    margin: 48px 0;
+    color: var(--rule);
+    letter-spacing: 0.5em;
+    font-size: 1.1rem;
+  }
+
+  /* Blockquote styling for key passages */
+  blockquote {
+    border-left: 2px solid var(--gold);
+    margin: 28px 0;
+    padding: 12px 24px;
+    color: var(--slate);
+    font-style: italic;
+    font-size: 0.95rem;
+    line-height: 1.9;
+  }
+
+  blockquote p {
+    text-indent: 0;
+  }
+
+  /* Conclusion */
+  .conclusion {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 48px 48px;
+    margin: 64px -48px -120px;
+  }
+
+  .conclusion h2 {
+    color: var(--gold-light);
+    border-bottom-color: rgba(0, 131, 143, 0.3);
+    margin-bottom: 24px;
+  }
+
+  .conclusion p {
+    color: rgba(245, 247, 250, 0.85);
+    font-size: 1rem;
+    text-indent: 0;
+  }
+
+  .conclusion .final-line {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 1.1rem;
+    color: var(--gold-light);
+    text-align: center;
+    margin-top: 36px;
+    padding-top: 28px;
+    border-top: 1px solid rgba(0, 131, 143, 0.25);
+    line-height: 1.8;
+  }
+
+  em {
+    font-style: italic;
+    color: var(--rust);
+  }
+
+  strong {
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  .conclusion strong {
+    color: var(--gold-light);
+  }
+
+  @media (max-width: 600px) {
+    .page { padding: 48px 24px 80px; }
+    h1 { font-size: 1.55rem; }
+    .conclusion { margin: 48px -24px -80px; padding: 36px 28px; }
+  }
+  ::selection { background: var(--gold-light); color: var(--ink); }
+  body { text-rendering: optimizeLegibility; -webkit-font-smoothing: antialiased; }
+  .page a { color: var(--rust); text-decoration-thickness: 1px; text-underline-offset: 0.18em; }
+  .page a:focus-visible { outline: 2px solid var(--gold); outline-offset: 4px; }
+  @media (max-width: 600px) {
+    html { font-size: 17px; }
+    .page { padding: 52px 24px 88px; }
+    p { line-height: 2; }
+    .masthead { margin-bottom: 52px; padding-bottom: 28px; }
+  }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="abstract">
+    <div class="abstract-label">引言</div>
+    <p style="text-indent: 0;">"这没有用，所以不要做"作为一种流行的劝退话语，其表面诉诸效益计算，实则根植于认知结构的错位、技术理性对价值的殖民，以及个体在异化处境中的自我保全。更为复杂的是，在受教育程度较高的群体中，这一话语还呈现出一种反常的、自反性的变体：不是"努力无用"，恰恰相反，是"快乐无用、娱乐无用"。在此种逻辑下，一切不能直接服务于再生产与竞争性自我增值的活动皆被视为"无用"，唯有将自身打造成1000%的效能机器以证明自己比同辈更"优秀"，才被奉为唯一正确的生存之道。本文尝试将强化学习的信用分配与时间贴现难题、机器学习中的价值函数近似与特征筛选，同西方马克思主义关于物化、工具理性批判与单向度社会的理论进行嫁接，展开一种跨学科的深度解剖，揭示这两种看似对立的"无用论"实为同一理性病理的不同症候。</p>
+  </div>
+
+  <!-- Section I -->
+  <section class="section">
+    <div class="section-number">一</div>
+    <h2>延迟奖励的信用悬置：从强化学习到现实行为的"无用"归因</h2>
+    <p>在强化学习框架中，智能体的目标是学习一个策略，使得长期累积奖励最大化。核心困难之一便是<strong>信用分配问题</strong>：当最终奖励到来时，如何正确地将功劳分配给数十甚至数百步之前某个看似无足轻重的动作。在许多稀疏奖励环境中，早期动作在即时反馈中得到的奖励为0或极小，其价值只有通过远期、不确定的成功才能被回溯性地确立。</p>
+    <p>将此映射至人类行为，当人们宣称"努力无用""读书无用""健身无用"时，其认知处境正像一个遭遇稀疏奖励且未能解决长期信用分配的智能体。一项需要长期坚持的实践活动，其正面回报在时间轴上极度分散且非线性：知识的复利、身体的蜕变、技艺的精熟往往要在数月乃至数年后才以涌现的方式呈现。在此期间，个体的每一次单独付出都无法被当下的价值函数捕捉为"有用"。如果缺乏有效的价值近似和策略信念，主体便极易跌入认知陷阱：既然持续的行为未产生即时奖励，那么就判定整个行为序列的期望价值为零，从而以"无用"为由终止探索。</p>
+    <p>这一过程还受到<strong>时间贴现</strong>的扭曲。标准的强化学习使用折扣因子γ来权衡未来奖励的现值：γ越小，智能体越短视。社会"无用论"的盛行，正是个体与社会层面异常高昂的贴现率所致——当消费主义文化、绩效焦虑和生存压力将人们的心理γ值推至极端水平时，任何无法在两三年内直接兑换为物质优势、身份符号或可见安全感的行为，其远期回报都被折算至几近于零。由此，长久投入便被理性化为彻底的"无用"。</p>
+  </section>
+
+  <div class="divider">· · ·</div>
+
+  <!-- Section II -->
+  <section class="section">
+    <div class="section-number">二</div>
+    <h2>价值函数的单向标度：工具理性对"有用"的垄断性定义</h2>
+    <p>"无用论"更深层的支撑，在于一个被修剪到单一维度的价值函数。在监督学习和特征工程中，如果标签空间被限定为只包含少数几个可度量的维度，那么任何无法被这些标签解释的特征都会被算法视为噪声或无关变量。类似地，当社会运作所认可的"价值"被逐步窄化为<strong>可商品化、可计量化、可迅速交换的效用</strong>时，一切不能被此标尺测量的活动便落入"无用"的虚空。</p>
+    <p>西方马克思主义对此提供了锐利的哲学剖析。马尔库塞在《单向度的人》中指出，发达工业社会通过技术理性的全面胜利，将超越性、否定性的向度——即那些无法被操作逻辑整合的潜能——悉数压抑。在此社会中，"有用"被等同于对既定系统的顺利运转发挥功能，而心灵沉思、审美体验、不求产出的博雅教育、纯粹的体能精进，这些非工具性的活动因其无法直接贡献于生产-消费循环，便被贬为"无用的"乃至"奢侈的"残余。于是，说"xx无用"并非在陈述事实，而是在执行一种<strong>技术合理性的审查</strong>：凡是不能作为手段服务于可量化目标的东西，都理应被排斥在理性行为清单之外。</p>
+    <p>这与卢卡奇《历史与阶级意识》中的<strong>物化</strong>概念一脉相承。在普遍的物化结构下，人的活动、能力、甚至关系，都按照商品形式来塑形，一种活动只有作为能够在市场上被公平交换的"物"，才能取得它的价值证明。读书如果不能换成文凭和薪资，便是无用；健身如果不能以体型照片换取社交资本，便是无用。物化意识将质上各有差异的生命实践，暴力地统摄在抽象的交换价值之下，使得"有用/无用"的二元对立成为笼罩一切日常选择的铁笼。因此，"无用论"恰恰是物化内化为主体思维方式的典型症状——人主动用商品的眼光来丈量自己的生命活动，并果断舍弃那些难以被这一眼光辨识的部分。</p>
+  </section>
+
+  <div class="divider">· · ·</div>
+
+  <!-- Section III -->
+  <section class="section">
+    <div class="section-number">三</div>
+    <h2>探索-利用困境下的防御性放弃：作为意识形态的"必然性"</h2>
+    <p>在强化学习中，智能体永远在<strong>探索与利用之间权衡</strong>：是坚持已知的中等回报策略，还是冒险尝试可能带来极高回报但当前不确定的未知行动？许多智能体因惧怕短期惩罚而陷入过度利用，放弃长远探索。当人们说"这事没用，不要做"，往往并非理性推演的结果，而是一种<strong>防御性的认知闭合</strong>——它为放弃探索提供了一个"客观必然性"的华丽外壳，使主体可以免于承担自由选择与可能失败的风险。</p>
+    <p>在此，阿多诺和霍克海默的《启蒙辩证法》提供了更冷峻的洞察。启蒙理性原本承诺使人摆脱恐惧、成为主人，但彻底工具化的理性却反转为一种新的神话：对一切无法被计算、无法被立刻掌控的事物充满恐惧。面对充满偶然性的世界，人们宁愿将自己禁锢在一个狭隘的"利用"循环中，提前宣布任何超出这一循环的努力注定无用，从而回避真正艰巨的实践。这种"无用论"最终成为一种<strong>命运神话</strong>：它把特定社会条件下价值实现的困难，形而上学地偷换为事物本身的无效性，从而让压抑性秩序显得天经地义。</p>
+    <p>弗洛姆的《逃避自由》也揭示了类似机制：个体面对现代社会的孤立与无力感，为了缓解焦虑，可以主动交出自由，拥抱一种机械的必然性叙事。承认"努力无用"，就是以此种必然性来抚慰焦虑——不是我缺乏勇气或屈从于条件，而是世界本就如此安排，行动注定无效。这种意识形态构造让人们在自我放弃中体验到一种虚假的解脱，并把对现状的不满安全地引流到犬儒主义的消沉中，而非转变为变革的实践。</p>
+  </section>
+
+  <div class="divider">· · ·</div>
+
+  <!-- Section IV -->
+  <section class="section">
+    <div class="section-number">四</div>
+    <h2>群体动力与价值共识的扭曲：社会回音室对信用分配的重塑</h2>
+    <p>在复杂的社会场景中，个体并非孤立地学习价值函数，而是在多智能体环境中通过与周围群体的交互来塑造信念。当一个群体中大量成员都面临相似的异化处境——例如，劳动者无法从自己的创造中获得肯定，努力与回报之间的关联被体制性断裂——群体就会形成一套共享的解释框架：不是我们缺乏策略或条件，而是行动本身没有意义。</p>
+    <p>卢卡奇曾论述，在物化意识笼罩下，无产阶级可能无法直接认识到自己是历史的主客体，反而接受资产阶级意识形态所描绘的僵固现实。当个体观察到周围人皆以"无用"为由放弃某些活动，这种共识便具有了<strong>社会验证</strong>的力量。从强化学习角度看，这是一种价值函数的<strong>群体传染</strong>：他人在类似任务上的失败或放弃，被当作负面信用信号，强化了"该领域无回报"的信念模型，尽管每个人的初始条件和约束并不相同。于是，"无用论"从个体的防御性策略，蜕变为维系集体惰性的社会性压抑——它使人们既容忍了低于可能性的生活，又在彼此的共鸣中消解了改变处境的主体能动性。</p>
+  </section>
+
+  <div class="divider">· · ·</div>
+
+  <!-- Section V -->
+  <section class="section">
+    <div class="section-number">五</div>
+    <h2>反常的变体："快乐无用"与再生产机器的自我塑造</h2>
+    <p>然而，在受教育群体中，一种更为悖谬的"无用论"变体正愈发流行。此处被判定为"无用"的对象不再是长期努力，而是快乐本身——放松、娱乐、闲暇、无目的的审美体验、纯粹的社交愉悦。其内在逻辑是：时间与精力若不投入于可量化、可比较、可积累为竞争优势的再生产活动中，便是虚掷。个体必须将自身打造成一台1000%效能的机器，以不断产出"优秀"的证明来超越同辈，舍此之外的任何活动都是"无用"乃至负罪的。</p>
+    <p>从强化学习的视角审视，这一现象可被理解为一种<strong>价值函数的恐怖纯粹化</strong>。智能体的奖励函数被设定为唯一标量——相对排名，即在与同辈的持续比较中胜出。为使这一标量最大化，所有无法贡献于该目标的"内在奖励"均被强行归零。在标准强化学习中，研究者常需设计内在奖励以鼓励探索与多样性，防止智能体陷入局部最优；而"快乐无用论"恰恰是反向操作——它将一切非工具性的内在奖励当作干扰项予以清除，迫使自己专注于唯一的外部标量信号。其结果是，智能体陷入一种极端的利用模式，探索被完全废除，因为任何不被既定的竞争函数直接奖励的行为都成了不可容忍的浪费。</p>
+    <p>从西马的批判视角看，这一心态是<strong>工具理性的内向殖民达到极致</strong>的表现。马尔库塞笔下的"单向度的人"在此找到了最纯粹的形态：主体不仅接受系统对"有用"的定义，更主动将这种定义内化为超我的严苛律令，对自己实施比任何外部规训都更残酷的自我剥削。如果说一般的物化是将人的活动当作商品来交换，那么"快乐无用论"则是将整个生命存在本身当作一件在竞争市场上不断自我增值的资产来经营。放松不再是人之为人的自然节律，而被重新编码为"充电"——一种为了更高效率再生产而不得不施于自身的功能性维护。</p>
+    <p>这一论调在受教育群体中格外流行，恰是因为该群体最深地嵌入到竞争性选拔与符号性区隔的再生产体制中。学业成绩、名校履历、职业成就，构成了一个看似客观的阶梯序列，个体在这序列中的位置很大程度上定义着其社会价值与自我认同。长期的规训使得他们将这场竞争的内在规则彻底内化，甚至在其不再被外部强制时，也自发地以之为唯一的生活框架。任何溢出此框架的快乐，都因其不可量化、不可比较、不能转化为相对优势，而在其价值函数中被评估为"无用"。这不是对快乐的简单否定，而是一种更为深刻的异化：连快乐本身也被要求出示它的效用凭证，无法出示者，必须被自我审查、被自我剥夺。</p>
+    <p>由此，两种看似对立的"无用论"——"努力无用"与"快乐无用"——实为同一枚硬币的两面。前者是物化处境下的防御性放弃，后者是物化内化后的攻击性自律；前者因看不到远期回报而终止投入，后者为追逐唯一的相对回报而禁绝一切不相关活动。两者共享的根基是价值向度的单维化：在"无用论"的视野中，不存在不能被效率逻辑所整合的生命内容。区别仅在于，一个是因绝望而退出游戏，另一个是因狂热而压榨自身的所有生命能量以赢得游戏——但游戏本身的规则，他们都不再有能力去质疑。</p>
+  </section>
+
+  <!-- Conclusion -->
+  <section class="section">
+    <div class="conclusion">
+      <h2>结语：重估一切"无用"，恢复价值的复数性</h2>
+      <p>综合以上跨学科透镜，"xx无用论"看似是一个损益计算问题，实则是现代性在认知与价值结构上的一处深刻病变：它源于长期信用分配的认知失败，被工具理性单维化的价值标尺所固化，由逃避自由的防御机制所维持，并经由物化意识的群体认同而自然化为社会常识。其反常变体——"快乐无用论"——则将这一病理推向极端：主体从被动接受价值窄化，发展为主动清洗自身生命实践中一切不可通约的维度，自命为纯粹效能机器，以竞争性自我剥削为唯一合法的存在方式。</p>
+      <p>揭穿这两种论调，正是要恢复一种复数的价值理性。正如强化学习的突破往往需要设计内在奖励或好奇心驱动，以跳出贪婪利用的陷阱，个体与社会也需要重新激活那些不可通约的、非工具的生命向度——沉思、审美、志业之爱、对卓越单纯而持久的追求，以及，无目的却丰盈的快乐本身。这些活动或许在商品-效能的神话下显得"无用"，但它们恰恰是人克服异化、实现类本质自由的真正场域。</p>
+      <p class="final-line">说出"这没有用"便匆匆停止，常常是对深度生活的逃逸；<br>而敢于在"无用"之处坚持行动与欢愉，<br>或许才是朝向人的全面解放的第一步。</p>
+    </div>
+  </section>
+
+</div>
+</body>
+</html>

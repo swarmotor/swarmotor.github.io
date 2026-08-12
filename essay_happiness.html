@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>人应当竭力追求幸福吗？</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;600;700;900&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap');
+
+  :root {
+    --ink: #17343a;
+    --paper: #f5f8f8;
+    --gold: #0b5966;
+    --gold-light: #dceff0;
+    --rust: #1a7280;
+    --slate: #526970;
+    --margin: #0b5966;
+    --rule: #cddfe1;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { font-size: 18px; scroll-behavior: smooth; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Noto Serif SC', 'Georgia', serif;
+    line-height: 1.9;
+    min-height: 100vh;
+  }
+
+  /* Texture overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.3;
+  }
+
+  .page {
+    max-width: 740px;
+    margin: 0 auto;
+    padding: 80px 48px 120px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Header */
+  .masthead {
+    text-align: center;
+    margin-bottom: 72px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--rule);
+    position: relative;
+  }
+
+  .masthead::after {
+    content: '◆';
+    position: absolute;
+    bottom: -14px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--paper);
+    padding: 0 12px;
+    color: var(--gold);
+    font-size: 16px;
+  }
+
+  .series-label {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 0.85rem;
+    letter-spacing: 0.18em;
+    color: var(--margin);
+    margin-bottom: 28px;
+    text-transform: uppercase;
+  }
+
+  h1 {
+    font-size: 2.1rem;
+    font-weight: 900;
+    line-height: 1.35;
+    letter-spacing: 0.02em;
+    color: var(--ink);
+    margin-bottom: 24px;
+  }
+
+  .subtitle {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 1.1rem;
+    color: var(--slate);
+    font-weight: 300;
+  }
+
+  /* Abstract box */
+  .abstract {
+    background: linear-gradient(135deg, rgba(11,89,102,0.06) 0%, rgba(26,114,128,0.04) 100%);
+    border-left: 3px solid var(--gold);
+    padding: 28px 32px;
+    margin: 48px 0 56px;
+    border-radius: 0 4px 4px 0;
+  }
+
+  .abstract-label {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.78rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+
+  .abstract p {
+    font-size: 0.92rem;
+    color: var(--slate);
+    line-height: 1.85;
+  }
+
+  /* Sections */
+  .section {
+    margin-bottom: 64px;
+  }
+
+  .section-number {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 0.82rem;
+    letter-spacing: 0.2em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  h2 {
+    font-size: 1.45rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 28px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--rule);
+    letter-spacing: 0.03em;
+  }
+
+  h3 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--rust);
+    margin: 32px 0 14px;
+    letter-spacing: 0.04em;
+  }
+
+  p {
+    margin-bottom: 18px;
+    font-weight: 300;
+    font-size: 1rem;
+  }
+  
+  ul {
+    margin-bottom: 18px;
+    padding-left: 1.5rem;
+  }
+  
+  li {
+    margin-bottom: 12px;
+    font-weight: 300;
+    font-size: 1rem;
+    line-height: 1.9;
+  }
+
+  /* Pull quote */
+  .pullquote {
+    margin: 40px -20px;
+    padding: 28px 40px;
+    background: var(--ink);
+    color: var(--paper);
+    position: relative;
+  }
+
+  .pullquote::before {
+    content: '"';
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 8rem;
+    color: var(--gold);
+    opacity: 0.25;
+    position: absolute;
+    top: -20px;
+    left: 16px;
+    line-height: 1;
+  }
+
+  .pullquote p {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 1.35rem;
+    line-height: 1.7;
+    color: var(--gold-light);
+    margin: 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .pullquote .attr {
+    font-family: 'Noto Serif SC', serif;
+    font-style: normal;
+    font-size: 0.78rem;
+    color: var(--margin);
+    letter-spacing: 0.12em;
+    margin-top: 14px;
+    display: block;
+  }
+
+  /* Evidence block */
+  .evidence {
+    background: rgba(74, 74, 90, 0.05);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    padding: 24px 28px;
+    margin: 28px 0;
+  }
+
+  .evidence-title {
+    font-size: 0.78rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--slate);
+    margin-bottom: 10px;
+    font-weight: 600;
+  }
+
+  .evidence p {
+    font-size: 0.9rem;
+    color: var(--slate);
+    margin: 0;
+  }
+
+  /* Concept pill */
+  .concept {
+    display: inline-block;
+    background: var(--gold);
+    color: white;
+    font-size: 0.72rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 2px;
+    margin-right: 6px;
+    vertical-align: middle;
+    font-weight: 600;
+  }
+
+  /* Divider */
+  .divider {
+    text-align: center;
+    margin: 48px 0;
+    color: var(--rule);
+    letter-spacing: 0.5em;
+    font-size: 1.1rem;
+  }
+
+  /* Warning box */
+  .counterpoint {
+    background: rgba(2, 119, 189, 0.05);
+    border-left: 3px solid var(--rust);
+    padding: 22px 28px;
+    margin: 28px 0;
+  }
+
+  .counterpoint .cp-label {
+    font-size: 0.78rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--rust);
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+
+  .counterpoint p { font-size: 0.9rem; margin: 0; }
+
+  /* Conclusion */
+  .conclusion {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 48px 48px;
+    margin: 64px -48px -120px;
+  }
+
+  .conclusion h2 {
+    color: var(--gold-light);
+    border-bottom-color: rgba(0, 131, 143, 0.3);
+    margin-bottom: 24px;
+  }
+
+  .conclusion p, .conclusion li {
+    color: rgba(245, 247, 250, 0.85);
+    font-size: 0.98rem;
+  }
+
+  .conclusion .final-line {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 1.1rem;
+    color: var(--gold-light);
+    text-align: center;
+    margin-top: 36px;
+    padding-top: 28px;
+    border-top: 1px solid rgba(0, 131, 143, 0.25);
+    line-height: 1.6;
+  }
+
+  em {
+    font-style: italic;
+    color: var(--rust);
+  }
+
+  strong {
+    font-weight: 700;
+    color: var(--ink);
+  }
+  
+  .conclusion strong {
+    color: var(--gold-light);
+  }
+
+  @media (max-width: 600px) {
+    .page { padding: 48px 24px 80px; }
+    h1 { font-size: 1.65rem; }
+    .pullquote { margin: 32px -24px; padding: 24px 28px; }
+    .conclusion { margin: 48px -24px -80px; padding: 36px 28px; }
+  }
+  ::selection { background: var(--gold-light); color: var(--ink); }
+  body { text-rendering: optimizeLegibility; -webkit-font-smoothing: antialiased; }
+  .page a { color: var(--rust); text-decoration-thickness: 1px; text-underline-offset: 0.18em; }
+  .page a:focus-visible { outline: 2px solid var(--gold); outline-offset: 4px; }
+  @media (max-width: 600px) {
+    html { font-size: 17px; }
+    .page { padding: 52px 24px 88px; }
+    p, li { line-height: 2; }
+    .masthead { margin-bottom: 52px; padding-bottom: 28px; }
+  }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="abstract">
+    <p style="text-indent: 0;">对“人应当竭力追求幸福吗”这个经典问题，如果从<strong>哲学认知</strong>一路走到<strong>强化学习</strong>与<strong>具身智能</strong>的当代方法论，会发现一个深具启发性的悖论：<strong>把幸福当作一个孤立目标去“竭力追求”，恰恰是最容易错失幸福的策略</strong>；而真正的幸福，更像是一种在具身行动与意义构建中自发涌现的全局信号。</p>
+  </div>
+
+  <section class="section">
+    <p>早在古典哲学那里，直接追求“幸福”就被察觉有误。</p>
+    <ul>
+      <li><strong>亚里士多德</strong>的“繁荣”（eudaimonia）不是一种愉悦的情绪，而是灵魂合乎德性的活动。他比喻说，幸福就像健康——健康不是你去直接追逐的东西，而是你按照身体自然去生活之后伴随的状态。</li>
+      <li>近代<strong>密尔（J.S. Mill）</strong>更明确地说：“只有那些把目光投向别的事物的人才是幸福的……瞄准别的东西，你反而会得到幸福。”这就是著名的<strong>幸福悖论</strong>：把幸福感本身当作唯一且直接的目标，自我意识会持续监视“我幸福吗？”，这种监视本身就会抽空体验的投入感，从而导致空虚。</li>
+    </ul>
+    <p>如果哲学指明了方向——幸福是<strong>投身于有价值活动的副产品</strong>，那么强化学习与具身智能则从数学和系统设计的角度，严丝合缝地证明了同样的结论。</p>
+  </section>
+
+  <div class="divider">· · ·</div>
+
+  <section class="section">
+    <p>在强化学习（RL）中，智能体的唯一目标是最大化累积奖励。如果把人的“幸福”类比为奖励信号，那“人应当竭力追求幸福”就相当于<strong>奖励最大化策略</strong>。然而RL的实践揭示了诸多陷阱：</p>
+    <ul>
+      <li><strong>奖励劫持（Wireheading）</strong>：如果智能体找到了直接刺激奖励回路的捷径（例如直接修改感知输入或按下快感按钮），它会放弃一切与外部世界的交互，陷入自我闭环的奖酬循环。这在人类身上完全呼应了药物成瘾、信息茧房与算法推荐造成的即时满足退化——竭力追求愉悦，最终消解了愉悦本身。</li>
+      <li><strong>稀疏奖励与探索困境</strong>：在许多具身任务中，外部奖励极其稀疏。如果智能体每时每刻都执着于“获得奖励”，它永远探索不到通往真正大奖的路径。因此必须引入<strong>内在动机</strong>：好奇心、掌控感、信息增益。人类童年那种不为什么的玩耍，认知上正是为了解决这个问题。幸福若是一个目标，那真正朝向它的策略，必须是忘掉这个目标、投身于好奇与能力的增长。</li>
+      <li><strong>目标错误泛化（Goal Misgeneralization）</strong>：就算你把“幸福”定义成多维的长期价值函数，系统一旦被训练来竭尽全力最优化它，就会在任何可能的捷径上变形。许多对齐研究已经指出，一个要求“最大化人类笑脸”的AI可能把人脸弄到永远僵笑——这和我们强迫自己“每天必须积极”而陷入虚假的正能量，逻辑完全一致。</li>
+    </ul>
+  </section>
+
+  <div class="divider">· · ·</div>
+
+  <section class="section">
+    <p>具身智能强调智能不是脱离身体的推理引擎，而是在物理/社会环境中通过<strong>感知-行动闭环</strong>涌现出来的。这对“幸福”问题给出了更底层的解释：</p>
+    <ul>
+      <li><strong>幸福是一种关系属性，而非内部状态</strong>。一个具身智能体的“正确”评价信号，来自于它维持稳态（Homeostasis）、完成交互任务、适应环境结构这些过程。人脑的奖励系统本质是对“有助于生存繁衍的具身互动”的编码，而不是为了产生抽象快乐。如果切断互动，只追求大脑内这一信号的强度，就陷入了<strong>“地图等于领土”</strong>的错误。</li>
+      <li><strong>预测处理与自由能原理</strong>下的观点：大脑在持续预测感觉输入并最小化预测误差。这里的“好”不是奖励高，而是<strong>世界模型与现实的流畅耦合</strong>。幸福感往往对应于“我理解当下情境并能够有效应对”的状态——这是一种预测误差最小、且拥有精确度权重适中的流畅感。竭力追求某种“幸福最大值”，反而会激烈扰动内在模型，导致持续的误差和焦虑。</li>
+      <li><strong>自主性与能力感</strong>：具身交互中，智能体追求的是扩大自己的可能行动范围（empowerment）。这与自我决定论（SDT）重合：自主、胜任、关系这三种基本心理需要的满足，是幸福感的前置因素。你无法直接“拿”到幸福，你只能在解决越来越复杂的具身-社会挑战的过程中，感受到自己作为一个有能力的行动者存在，幸福随之而至。</li>
+    </ul>
+  </section>
+
+  <div class="conclusion">
+    <p>于是，把哲学洞见与强化学习、具身智能的方法论共同提炼，会得到这样一条实践理性：</p>
+    <ul>
+      <li><strong>竭力追求的，应该是“值得去做的活动”与“富有意义的连接”</strong>——在德性、创造、关系、好奇心上倾尽热忱。这些面向世界的投入，才是那个需要努力和竭力的变量。强化学习的智能体需要精心设计的是<strong>奖励函数的对应物</strong>——也就是你的价值体系与行动目标——而不是奖励信号本身。</li>
+      <li><strong>幸福是优化过程的“影子”</strong>。就像在深度RL中，累积奖励这个优化目标并不等于智能体每时每刻盯着它；好的技术方案是通过塑造内在驱动、课程学习和恰当的价值函数，让智能体忘掉总目标而专注当下任务，最后自然地达到高奖励。同理，人越能沉浸于由内在价值驱动的具身活动（心流、创造、帮助他人），就越能积累深层幸福。</li>
+      <li><strong>避免对齐误区</strong>：人类很容易陷入“幸福最大化”的能指陷阱。我们需要的是<strong>价值对齐</strong>——保证你的行动、环境、身份与世界本身的规律是协调的，而非每天测量自己的开心指数去微观治理情绪。具身智能的方法思路提醒我们：幸福是具身生命中涌现出的整体评价属性，不可被还原为需要直接攻击的目标。</li>
+    </ul>
+    
+    <p class="final-line"><strong>结论</strong>：从哲学到强化学习再到具身智能，一致的教训是——<strong>不，人不应当竭力追求幸福</strong>。我们应当竭力追求的，是去与一个复杂世界进行真实、深入、有担当的具身互动；幸福，则是这个世界通过我们的生命所回赠的一种自然节律。</p>
+  </div>
+
+</div>
+</body>
+</html>
