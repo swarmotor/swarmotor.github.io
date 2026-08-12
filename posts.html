@@ -194,6 +194,33 @@
             color: var(--text-secondary);
             line-height: 1.8;
         }
+        .group-title {
+            margin: 2.25rem 0 0.5rem;
+            font-family: 'Crimson Pro', 'Noto Serif SC', serif;
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .group-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(to right, var(--border), transparent);
+        }
+        .post-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0 1.5rem;
+        }
+        .post-grid .post-item {
+            break-inside: avoid;
+        }
+        @media (max-width: 720px) {
+            .post-grid { grid-template-columns: 1fr; }
+        }
         .post-list {
             list-style: none;
         }
@@ -236,6 +263,215 @@
         <section>
             <h2><span class="section-title" data-lang="zh">学习笔记</span><span class="section-title" data-lang="en">Notes</span></h2>
             
+            <h3 class="group-title"><span data-lang="zh">数据生成与管线</span><span data-lang="en">Data & Pipelines</span></h3>
+            <ul class="post-list">
+                <li>
+                    <a href="embodied-ai-data-generation.html" style="text-decoration: none; color: inherit;">
+                        <div class="post-title" data-lang="zh">数据生成是什么？为什么它对具身智能重要？</div>
+                        <div class="post-title" data-lang="en">What Is Data Generation and Why Does It Matter for Embodied AI?</div>
+                    </a>
+                    <div class="post-content" data-lang="zh">
+                        具身智能数据生成的入口长文：让机器人通过感知、行动、反馈形成持续学习的数据闭环。
+                    </div>
+                    <div class="post-content" data-lang="en">
+                        An entry-level essay on embodied-AI data generation: perception, action, and feedback forming a continuous learning loop.
+                    </div>
+                </li>
+                <li>
+                    <a href="real-to-sim-frontiers.html" style="text-decoration: none; color: inherit;">
+                        <div class="post-title" data-lang="zh">Real-to-Sim 前沿</div>
+                        <div class="post-title" data-lang="en">Real-to-Sim Frontiers</div>
+                    </a>
+                    <div class="post-content" data-lang="zh">
+                        从真实世界构建可交互数字孪生——当前 R2S 技术全景与 AutoDataGen 的演进方向。
+                    </div>
+                    <div class="post-content" data-lang="en">
+                        Building interactive digital twins from the real world: the R2S landscape and AutoDataGen directions.
+                    </div>
+                </li>
+                <li>
+                    <a href="r2s2r-data-pipeline-report.html" style="text-decoration: none; color: inherit;">
+                        <div class="post-title" data-lang="zh">R2S2R 数据生成管线全景图</div>
+                        <div class="post-title" data-lang="en">The R2S2R Data Pipeline at a Glance</div>
+                    </a>
+                    <div class="post-content" data-lang="zh">
+                        从真实场景到仿真数据再到真实机器人：完整管线 + 前沿项目映射。
+                    </div>
+                    <div class="post-content" data-lang="en">
+                        Full pipeline from real scenes to simulated data to real robots, mapped to frontier projects.
+                    </div>
+                </li>
+                <li>
+                    <a href="3dgs-role-in-r2s.html" style="text-decoration: none; color: inherit;">
+                        <div class="post-title" data-lang="zh">3DGS 在 R2S 中到底扮演什么角色？</div>
+                        <div class="post-title" data-lang="en">What Role Does 3DGS Play in R2S?</div>
+                    </a>
+                    <div class="post-content" data-lang="zh">
+                        从 18 篇顶会/顶刊论文视角：为什么 3DGS 是 R2S 的第一块积木，以及为什么光靠它远远不够。
+                    </div>
+                    <div class="post-content" data-lang="en">
+                        Through 18 top papers: why 3DGS is the first building block of R2S, and why it alone is far from enough.
+                    </div>
+                </li>
+                <li>
+                    <a href="r2s-autodatagen-integration.html" style="text-decoration: none; color: inherit;">
+                        <div class="post-title" data-lang="zh">R2S 与 AutoDataGen 融合：3DGS→URDF→IsaacLab→RL/IL→机器人训练</div>
+                        <div class="post-title" data-lang="en">R2S + AutoDataGen: 3DGS → URDF → IsaacLab → RL/IL → Robot Training</div>
+                    </a>
+                    <div class="post-content" data-lang="zh">
+                        融合前沿 R2S 技术与自动化训练系统的完整闭环管道。
+                    </div>
+                    <div class="post-content" data-lang="en">
+                        A closed-loop pipeline fusing frontier R2S techniques with an automated training system.
+                    </div>
+                </li>
+                <li>
+                    <a href="lerobot-mixed-dataset-compatibility.html" style="text-decoration: none; color: inherit;">
+                        <div class="post-title" data-lang="zh">OpenPI 微调中混合 LeRobot 数据集的兼容性说明</div>
+                        <div class="post-title" data-lang="en">Mixing LeRobot Datasets in OpenPI Fine-Tuning</div>
+                    </a>
+                    <div class="post-content" data-lang="zh">
+                        字段不完全一致的 LeRobot 数据能否用于一次微调，OpenPI 是否会使用 episode_metadata、force_torque 等附加字段。
+                    </div>
+                    <div class="post-content" data-lang="en">
+                        Whether fields-inconsistent LeRobot data can be fine-tuned together, and whether OpenPI consumes extra fields.
+                    </div>
+                </li>
+            </ul>
+
+            <h3 class="group-title"><span data-lang="zh">评测与诊断</span><span data-lang="en">Evaluation</span></h3>
+            <ul class="post-list">
+                <li>
+                    <a href="rollout-vlm-evaluation.html" style="text-decoration: none; color: inherit;">
+                        <div class="post-title" data-lang="zh">自动评测应从"看完视频判成败"升级为混合式评测系统</div>
+                        <div class="post-title" data-lang="en">From Watching Videos to a Hybrid Evaluation System</div>
+                    </a>
+                    <div class="post-content" data-lang="zh">
+                        面向 OpenPI / Isaac Sim / 真实机器人 rollout：硬规则、子目标向量、VLM 证据判断、pairwise 排名与人工校准闭环。
+                    </div>
+                    <div class="post-content" data-lang="en">
+                        Hard rules, subgoal vectors, VLM evidence, pairwise ranking, and human calibration for rollout evaluation.
+                    </div>
+                </li>
+            </ul>
+
+            <h3 class="group-title"><span data-lang="zh">VLA 与后训练</span><span data-lang="en">VLA & Post-Training</span></h3>
+            <ul class="post-list">
+                <li>
+                    <a href="vla-post-training-lora-isaac-loop.html" style="text-decoration: none; color: inherit;">
+                        <div class="post-title" data-lang="zh">从 LoRA 验证到 Isaac Sim 闭环评测：我怎么设计 VLA 后训练路线</div>
+                        <div class="post-title" data-lang="en">From LoRA Validation to Isaac Sim Closed-Loop Evaluation</div>
+                    </a>
+                    <div class="post-content" data-lang="zh">
+                        后训练流水线：先确认数据和接口，再让策略进入自己制造的状态分布——LoRA、Isaac Sim、VLM QA、DAgger、World Model 是不同闸门。
+                    </div>
+                    <div class="post-content" data-lang="en">
+                        LoRA, Isaac Sim, VLM QA, DAgger, and world models as gates in a post-training pipeline.
+                    </div>
+                </li>
+                <li>
+                    <a href="openpi-aloha-world-model-roadmap.html" style="text-decoration: none; color: inherit;">
+                        <div class="post-title" data-lang="zh">OpenPI / ALOHA 世界模型探索与评价器路线图</div>
+                        <div class="post-title" data-lang="en">OpenPI / ALOHA World-Model Roadmap</div>
+                    </a>
+                    <div class="post-content" data-lang="zh">
+                        建立一条可证伪的离线评价链：定位 VLA 动作瑕疵、提出反事实修正、再由 MuJoCo 真值验证。
+                    </div>
+                    <div class="post-content" data-lang="en">
+                        A falsifiable offline evaluation chain: locate VLA errors, propose counterfactual fixes, verify with MuJoCo ground truth.
+                    </div>
+                </li>
+                <li>
+                    <a href="openpi-pi05-ft-deployment.html" style="text-decoration: none; color: inherit;">
+                        <div class="post-title" data-lang="zh">OpenPI pi0.5 实际部署 FT 路线分析</div>
+                        <div class="post-title" data-lang="en">OpenPI pi0.5 Fine-Tuning for Deployment</div>
+                    </a>
+                    <div class="post-content" data-lang="zh">
+                        Isaac Sim / DROID 风格部署里能执行的训练路线、代码改造、数据契约、算力边界、评估门槛与停损条件。
+                    </div>
+                    <div class="post-content" data-lang="en">
+                        Executable training route, code changes, data contract, compute bounds, and stop-loss conditions for deployment.
+                    </div>
+                </li>
+                <li>
+                    <a href="pi05-unified-model-paper-comparison.html" style="text-decoration: none; color: inherit;">
+                        <div class="post-title" data-lang="zh">三篇论文对比：统一 pi0.5 模型视角</div>
+                        <div class="post-title" data-lang="en">Three Papers Compared: A Unified pi0.5 View</div>
+                    </a>
+                    <div class="post-content" data-lang="zh">
+                        GASE / SimFoundry / VLK 数据到手后的训练-评测 pipeline 表格版：固定模型，比较数据、监督、训练、评测与创新点。
+                    </div>
+                    <div class="post-content" data-lang="en">
+                        Tabular comparison of GASE / SimFoundry / VLK pipelines: data, supervision, training, evaluation, novelty.
+                    </div>
+                </li>
+                <li>
+                    <a href="vla-ft-pipeline-gase-simfoundry-vlk.html" style="text-decoration: none; color: inherit;">
+                        <div class="post-title" data-lang="zh">GASE / SimFoundry / VLK：拿到数据之后，VLA 训练-评测 Pipeline 的创新点对比</div>
+                        <div class="post-title" data-lang="en">GASE / SimFoundry / VLK Pipeline Innovation Comparison</div>
+                    </a>
+                    <div class="post-content" data-lang="zh">
+                        只分析数据交给策略学习之后：如何组织 fine-tuning、仿真评测、真实部署和闭环验证。
+                    </div>
+                    <div class="post-content" data-lang="en">
+                        How each system organizes fine-tuning, sim evaluation, real deployment, and closed-loop verification.
+                    </div>
+                </li>
+            </ul>
+
+            <h3 class="group-title"><span data-lang="zh">论文与部署分析</span><span data-lang="en">Paper & Deployment Analysis</span></h3>
+            <ul class="post-list">
+                <li>
+                    <a href="recap-cost-convergence-risk.html" style="text-decoration: none; color: inherit;">
+                        <div class="post-title" data-lang="zh">RECAP 数据、算量与收敛风险分析</div>
+                        <div class="post-title" data-lang="en">RECAP: Data, Compute, and Convergence Risk</div>
+                    </a>
+                    <div class="post-content" data-lang="zh">
+                        RECAP 对数据和算量要求明显高且收敛困难；它更像是有足够 rollout、GPU、诊断工具和部署闭环之后才值得上的离线 RL 工程管线。
+                    </div>
+                    <div class="post-content" data-lang="en">
+                        RECAP demands heavy data and compute and converges slowly; worth adopting only with mature rollout/deploy tooling.
+                    </div>
+                </li>
+                <li>
+                    <a href="recap-theory-analysis.html" style="text-decoration: none; color: inherit;">
+                        <div class="post-title" data-lang="zh">RECAP 理论工作具体分析</div>
+                        <div class="post-title" data-lang="en">RECAP: A Close Look at the Theory</div>
+                    </a>
+                    <div class="post-content" data-lang="zh">
+                        把 RECAP 拆成可学习、可实现、可诊断的对象：目标函数、return/value/advantage 的数学含义，以及 CFG 如何把"高优势"变成推理时的行为偏置。
+                    </div>
+                    <div class="post-content" data-lang="en">
+                        Objective functions, return/value/advantage math, and how CFG turns high advantage into inference-time bias.
+                    </div>
+                </li>
+                <li>
+                    <a href="recap-deployment-analysis.html" style="text-decoration: none; color: inherit;">
+                        <div class="post-title" data-lang="zh">RECAP 实际部署具体分析</div>
+                        <div class="post-title" data-lang="en">RECAP: Deployment Analysis</div>
+                    </a>
+                    <div class="post-content" data-lang="zh">
+                        从 checkpoint 变成 Isaac Sim 或真实机器人上的闭环控制系统：环境矩阵、策略 server、校准、延迟、安全与回滚。
+                    </div>
+                    <div class="post-content" data-lang="en">
+                        From checkpoint to closed-loop control: environment matrix, policy server, calibration, latency, safety, rollback.
+                    </div>
+                </li>
+                <li>
+                    <a href="scanark-icra-outline-zh.html" style="text-decoration: none; color: inherit;">
+                        <div class="post-title" data-lang="zh">ScanArk：面向真实演示高效 VLA 适配的场景原生 Gaussian 物体提取</div>
+                        <div class="post-title" data-lang="en">ScanArk: Scene-Native Gaussian Object Extraction for VLA Adaptation</div>
+                    </a>
+                    <div class="post-content" data-lang="zh">
+                        从一次原生场景 3DGS 自动分解可交互物体，以零真实演示的仿真轨迹首次适配 AgiBot G2 VLA，并量化可替代多少真实演示。
+                    </div>
+                    <div class="post-content" data-lang="en">
+                        Automatically decomposing interactive objects from one scene 3DGS, adapting AgiBot G2 VLA with zero real demos.
+                    </div>
+                </li>
+            </ul>
+
+            <h3 class="group-title"><span data-lang="zh">知识骨架</span><span data-lang="en">Knowledge Base</span></h3>
             <ul class="post-list">
                 <li>
                     <a href="robotics-embodied-intelligence-wiki.html" style="text-decoration: none; color: inherit;">
@@ -249,34 +485,171 @@
                         A sourced map from embodiment, control, and kinematics to RL control, VLA, WAM, data collection, and task orchestration.
                     </div>
                 </li>
+            </ul>
 
+            <h3 class="group-title"><span data-lang="zh">随笔思考</span><span data-lang="en">Essays</span></h3>
+            <ul class="post-list">
+                <li>
+                    <a href="essay_synthesis.html" style="text-decoration: none; color: inherit;">
+                        <div class="post-title" data-lang="zh">血肉之躯的强化学习引擎：一份自我理解与自我越狱的笔记</div>
+                        <div class="post-title" data-lang="en">A Reinforcement-Learning Engine of Flesh and Blood</div>
+                    </a>
+                    <div class="post-content" data-lang="zh">
+                        九篇随笔熔炼而成。不是拼接，是重铸。如果只读一篇，就是这篇。
+                    </div>
+                    <div class="post-content" data-lang="en">
+                        Distilled from nine essays. If you read only one, read this.
+                    </div>
+                </li>
+                <li>
+                    <a href="essay_emotion_rl_feedback.html" style="text-decoration: none; color: inherit;">
+                        <div class="post-title" data-lang="zh">多巴胺的微积分：情绪、奖励函数与生命的强化学习</div>
+                        <div class="post-title" data-lang="en">The Calculus of Dopamine: Emotion, Reward, and RL in Life</div>
+                    </a>
+                    <div class="post-content" data-lang="zh">
+                        情绪不是理性的对立面，而是大脑底层最核心的奖励函数。
+                    </div>
+                    <div class="post-content" data-lang="en">
+                        Emotion is not the opposite of reason but the brain's core reward function.
+                    </div>
+                </li>
+                <li>
+                    <a href="essay_happiness.html" style="text-decoration: none; color: inherit;">
+                        <div class="post-title" data-lang="zh">人应当竭力追求幸福吗？</div>
+                        <div class="post-title" data-lang="en">Should One Strive for Happiness?</div>
+                    </a>
+                    <div class="post-content" data-lang="zh">
+                        把幸福当作孤立目标去竭力追求，恰恰最容易错失幸福。
+                    </div>
+                    <div class="post-content" data-lang="en">
+                        Pursuing happiness as an isolated goal is the surest way to miss it.
+                    </div>
+                </li>
+                <li>
+                    <a href="essay_integrated_rl_mind.html" style="text-decoration: none; color: inherit;">
+                        <div class="post-title" data-lang="zh">优化信号与具身算法：情绪、时间与意义的强化学习假说</div>
+                        <div class="post-title" data-lang="en">Optimization Signals and Embodied Algorithms</div>
+                    </a>
+                    <div class="post-content" data-lang="zh">
+                        把情绪、时间与意义等线索编织进同一台强化学习引擎。
+                    </div>
+                    <div class="post-content" data-lang="en">
+                        Weaving emotion, time, and meaning into one reinforcement-learning engine.
+                    </div>
+                </li>
+                <li>
+                    <a href="essay_learning_depth.html" style="text-decoration: none; color: inherit;">
+                        <div class="post-title" data-lang="zh">从身体现象学到强化学习：学习速度与理解深度为何总不一致？</div>
+                        <div class="post-title" data-lang="en">Learning Speed vs. Understanding Depth</div>
+                    </a>
+                    <div class="post-content" data-lang="zh">
+                        学习是"上手速度"与"理解深度"构成的双轴结构。
+                    </div>
+                    <div class="post-content" data-lang="en">
+                        Learning as a two-axis structure of hands-on speed and transferable understanding.
+                    </div>
+                </li>
+                <li>
+                    <a href="essay_life_algorithms.html" style="text-decoration: none; color: inherit;">
+                        <div class="post-title" data-lang="zh">生命算法的跨学科沉思</div>
+                        <div class="post-title" data-lang="en">Cross-Disciplinary Meditations on Life as Algorithm</div>
+                    </a>
+                    <div class="post-content" data-lang="zh">
+                        用哲学认知、强化学习与具身智能审视"追求稳定""追求幸福"与"生命价值"。
+                    </div>
+                    <div class="post-content" data-lang="en">
+                        Stability, happiness, and value examined through philosophy, RL, and embodiment.
+                    </div>
+                </li>
+                <li>
+                    <a href="essay_logarithmic_time.html" style="text-decoration: none; color: inherit;">
+                        <div class="post-title" data-lang="zh">生命的对数折现：重估早期幸福与理性的超前消费</div>
+                        <div class="post-title" data-lang="en">Logarithmic Discounting of Life</div>
+                    </a>
+                    <div class="post-content" data-lang="zh">
+                        "平均期望"与"对数期望"的对立，是两种截然不同的生存哲学。
+                    </div>
+                    <div class="post-content" data-lang="en">
+                        The contrast between average and logarithmic expectation as two philosophies of living.
+                    </div>
+                </li>
+                <li>
+                    <a href="essay_love_dynamics.html" style="text-decoration: none; color: inherit;">
+                        <div class="post-title" data-lang="zh">强化学习框架下的"爱情动力学"</div>
+                        <div class="post-title" data-lang="en">The Dynamics of Love Under RL</div>
+                    </a>
+                    <div class="post-content" data-lang="zh">
+                        人生是一个巨大的马尔可夫决策过程，爱情和伴侣会从根本上重塑这个模型。
+                    </div>
+                    <div class="post-content" data-lang="en">
+                        Life as an MDP: love and partnership reshape its rewards and state space.
+                    </div>
+                </li>
+                <li>
+                    <a href="essay_self_blame_emotions.html" style="text-decoration: none; color: inherit;">
+                        <div class="post-title" data-lang="zh">梯度爆炸与具身底色：自责、情绪与意义的重塑</div>
+                        <div class="post-title" data-lang="en">Gradient Explosions and Embodied Ground</div>
+                    </a>
+                    <div class="post-content" data-lang="zh">
+                        理智始终在远古情绪与具身本能交织的庞大架构上运行。
+                    </div>
+                    <div class="post-content" data-lang="en">
+                        Reason runs atop a vast architecture woven from ancient emotion and embodied instinct.
+                    </div>
+                </li>
+                <li>
+                    <a href="essay_unlimited_talent.html" style="text-decoration: none; color: inherit;">
+                        <div class="post-title" data-lang="zh">人应当预想自己拥有极大的甚至无限的才能吗？</div>
+                        <div class="post-title" data-lang="en">Should One Imagine Unlimited Talent?</div>
+                    </a>
+                    <div class="post-content" data-lang="zh">
+                        对潜能设定有限的先验上界，本身是一种认识论错误。
+                    </div>
+                    <div class="post-content" data-lang="en">
+                        Setting a finite prior upper bound on one's potential is itself an epistemic error.
+                    </div>
+                </li>
+                <li>
+                    <a href="essay_uselessness.html" style="text-decoration: none; color: inherit;">
+                        <div class="post-title" data-lang="zh">"这没有用，所以不要做"——两种"无用论"的跨学科解剖</div>
+                        <div class="post-title" data-lang="en">Two Kinds of "Uselessness"</div>
+                    </a>
+                    <div class="post-content" data-lang="zh">
+                        表面诉诸效益计算，实则根植于认知结构的错位与技术理性对价值的殖民。
+                    </div>
+                    <div class="post-content" data-lang="en">
+                        Beyond cost-benefit talk: cognitive misalignment and the colonization of value by technical rationality.
+                    </div>
+                </li>
+            </ul>
+
+            <h3 class="group-title"><span data-lang="zh">外部资源与待发布</span><span data-lang="en">External & Drafts</span></h3>
+            <ul class="post-list">
                 <li>
                     <a href="https://qcn0sr22ysoh.feishu.cn/docx/ZqBdd0IUPo7CsKxyEXFcI5PInZc" target="_blank" style="text-decoration: none; color: inherit;">
                         <div class="post-title" data-lang="zh">多智能体强化学习 (MARL) 入门指南</div>
                         <div class="post-title" data-lang="en">Multi-Agent Reinforcement Learning (MARL) Getting Started</div>
                     </a>
                     <div class="post-content" data-lang="zh">
-                        介绍多智能体系统的基本概念、常见算法 (QMIX, MAPPO, MADDPG) 以及应用场景。
+                        介绍多智能体系统的基本概念、常见算法 (QMIX, MAPPO, MADDPG) 以及应用场景。（外部链接）
                     </div>
                     <div class="post-content" data-lang="en">
-                        Introduction to multi-agent systems, common algorithms (QMIX, MAPPO, MADDPG) and applications.
+                        Introduction to multi-agent systems and common algorithms (QMIX, MAPPO, MADDPG). (External)
                     </div>
                 </li>
-
                 <li>
-                    <div class="post-title" data-lang="zh">图神经网络 (GNN) 在机器人群体中的应用</div>
-                    <div class="post-title" data-lang="en">Graph Neural Networks for Robot Swarms</div>
+                    <div class="post-title" data-lang="zh">图神经网络 (GNN) 在机器人群体中的应用 <span style="color: var(--text-muted); font-weight: 400; font-size: 0.8rem;">待发布</span></div>
+                    <div class="post-title" data-lang="en">Graph Neural Networks for Robot Swarms <span style="color: var(--text-muted); font-weight: 400; font-size: 0.8rem;">Draft</span></div>
                     <div class="post-content" data-lang="zh">
-                        探讨如何用GNN表示通信拓扑，以及图强化学习框架的设计。
+                        探讨如何用 GNN 表示通信拓扑，以及图强化学习框架的设计。
                     </div>
                     <div class="post-content" data-lang="en">
-                        Exploring how to represent communication topology with GNN and design of graph reinforcement learning frameworks.
+                        Exploring communication-topology representation with GNN and graph RL framework design.
                     </div>
                 </li>
-
                 <li>
-                    <div class="post-title" data-lang="zh">分布式优化与群体协同</div>
-                    <div class="post-title" data-lang="en">Distributed Optimization & Swarm Coordination</div>
+                    <div class="post-title" data-lang="zh">分布式优化与群体协同 <span style="color: var(--text-muted); font-weight: 400; font-size: 0.8rem;">待发布</span></div>
+                    <div class="post-title" data-lang="en">Distributed Optimization & Swarm Coordination <span style="color: var(--text-muted); font-weight: 400; font-size: 0.8rem;">Draft</span></div>
                     <div class="post-content" data-lang="zh">
                         经典分布式优化算法 (Consensus, ADMM) 与群体智能的结合。
                     </div>
