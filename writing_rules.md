@@ -101,7 +101,7 @@
 
 推荐：
 
-> 为此，我们提出 ScanArk，一种结合自适应课程与闭环纠正的机器人操作框架。
+> 为此，我们提出 Scan2VLA，一种结合自适应课程与闭环纠正的机器人操作框架。
 
 **第 4 至 5 句：关键机制**
 
@@ -425,11 +425,11 @@ These results demonstrate that [bounded conclusion].
 
 不推荐：
 
-> 为解决上述问题，本文提出 ScanArk。
+> 为解决上述问题，本文提出 Scan2VLA。
 
 推荐：
 
-> 我们的核心观察是，训练数据的有效难度应随策略能力变化：过早引入大幅分布偏移会产生缺乏学习信号的失败，而长期停留在简单样本上又无法形成恢复能力。基于这一观察，我们提出 ScanArk，一种由策略表现驱动的自适应课程与闭环纠正框架。
+> 我们的核心观察是，训练数据的有效难度应随策略能力变化：过早引入大幅分布偏移会产生缺乏学习信号的失败，而长期停留在简单样本上又无法形成恢复能力。基于这一观察，我们提出 Scan2VLA，一种由策略表现驱动的自适应课程与闭环纠正框架。
 
 推荐顺序：
 
@@ -441,7 +441,7 @@ These results demonstrate that [bounded conclusion].
 
 推荐：
 
-> ScanArk 首先根据任务成功率和状态偏差估计策略能力，并调整训练样本的物体位姿扰动范围。系统随后收集失败附近状态和专家纠正，以扩展恢复轨迹覆盖。在真机阶段，闭环执行器根据实时关节反馈更新动作，并在发布前检查限位、速度、碰撞、急停和耦合约束。
+> Scan2VLA 首先根据任务成功率和状态偏差估计策略能力，并调整训练样本的物体位姿扰动范围。系统随后收集失败附近状态和专家纠正，以扩展恢复轨迹覆盖。在真机阶段，闭环执行器根据实时关节反馈更新动作，并在发布前检查限位、速度、碰撞、急停和耦合约束。
 
 对应关系：
 
@@ -1001,14 +1001,14 @@ camera frame
 - 安装包的逐步命令。
 - 与贡献无关的调试记录。
 
-## 3.16 ScanArk/G2 方法章节示例结构
+## 3.16 Scan2VLA/G2 方法章节示例结构
 
 ```text
 3. Method
 3.1 Task Formulation
     定义视觉、语言、本体状态、动作块和任务成功条件。
 
-3.2 ScanArk Overview
+3.2 Scan2VLA Overview
     给出课程训练、失败数据聚合、VLA 推理和 G2 安全执行的总览图。
 
 3.3 Performance-Adaptive Curriculum
@@ -1080,7 +1080,7 @@ camera frame
 建议在章节开头列出研究问题：
 
 ```text
-RQ1: ScanArk 是否提高标准任务和分布外位姿下的成功率？
+RQ1: Scan2VLA 是否提高标准任务和分布外位姿下的成功率？
 RQ2: 自适应课程和失败状态聚合分别贡献多少？
 RQ3: 闭环执行是否减少长时序误差累积？
 RQ4: 方法能否在 AgiBot G2 上满足实时与安全要求？
@@ -1275,7 +1275,7 @@ RQ5: 方法在什么条件下失败？
 
 模板：
 
-> Table 1 compares ScanArk with behavior cloning and fixed-curriculum baselines under in-distribution and out-of-distribution object poses. ScanArk achieves `[X]%` OOD success, improving over the strongest baseline by `[Y]` percentage points. The improvement is larger under position perturbations than under appearance changes, suggesting that failure-state aggregation mainly improves recovery from geometric deviations. However, the advantage decreases at perturbations beyond `[range]`, indicating that the learned recovery policy remains limited by training coverage.
+> Table 1 compares Scan2VLA with behavior cloning and fixed-curriculum baselines under in-distribution and out-of-distribution object poses. Scan2VLA achieves `[X]%` OOD success, improving over the strongest baseline by `[Y]` percentage points. The improvement is larger under position perturbations than under appearance changes, suggesting that failure-state aggregation mainly improves recovery from geometric deviations. However, the advantage decreases at perturbations beyond `[range]`, indicating that the learned recovery policy remains limited by training coverage.
 
 弱写法：
 

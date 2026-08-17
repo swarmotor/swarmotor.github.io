@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="GSWorld 论文 100 问：基于 arXiv 2510.20813 整理，覆盖定位、GSDF 资产格式、重建管线、闭环应用 IL/RL/DAgger、实验评测与相关对比。">
+  <meta name="theme-color" content="#fafaf9">
+  <link rel="icon" href="data:,">
+  <title>GSWorld 论文 100 问</title>
+  <style>
+    :root {
+      --bg: #fafaf9;
+      --surface: #ffffff;
+      --text: #1a1a1a;
+      --secondary: #525252;
+      --muted: #737373;
+      --accent: #0f4c5c;
+      --accent-light: #e8f4f6;
+      --border: #e5e5e5;
+      --todo-text: #8a5a16;
+      --todo-bg: #fff7e6;
+      --shadow: 0 12px 32px color-mix(in srgb, var(--accent) 10%, transparent);
+      --radius: 16px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 80px;
+    }
+
+    body {
+      margin: 0;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 8% 0%, color-mix(in srgb, var(--accent-light) 72%, transparent), transparent 32%),
+        linear-gradient(180deg, var(--bg), color-mix(in srgb, var(--accent-light) 24%, var(--bg)) 52%, var(--bg));
+      font-family: "DM Sans", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+      font-size: 16px;
+      line-height: 1.75;
+      text-rendering: optimizeLegibility;
+    }
+
+    a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+    a:hover { text-decoration-thickness: 2px; }
+
+    a:focus-visible,
+    summary:focus-visible {
+      outline: 3px solid color-mix(in srgb, var(--accent) 44%, var(--surface));
+      outline-offset: 3px;
+      border-radius: 4px;
+    }
+
+    .skip-link {
+      position: fixed;
+      top: 8px;
+      left: 8px;
+      z-index: 20;
+      padding: 8px 12px;
+      color: var(--surface);
+      background: var(--accent);
+      transform: translateY(-160%);
+      transition: transform 160ms ease;
+    }
+
+    .skip-link:focus { transform: translateY(0); }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      border-bottom: 1px solid color-mix(in srgb, var(--accent) 14%, var(--border));
+      background: color-mix(in srgb, var(--bg) 88%, transparent);
+      backdrop-filter: blur(16px);
+    }
+
+    .topbar-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: min(1000px, calc(100% - 32px));
+      min-height: 56px;
+      margin: 0 auto;
+      gap: 16px;
+    }
+
+    .brand {
+      color: var(--text);
+      font-family: "Crimson Pro", "Noto Serif SC", "Source Han Serif SC", Georgia, serif;
+      font-size: 20px;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .top-links { display: flex; align-items: center; gap: 16px; font-size: 14px; }
+
+    .hero {
+      width: min(1000px, calc(100% - 32px));
+      margin: 48px auto 32px;
+      padding: 48px;
+      border: 1px solid color-mix(in srgb, var(--accent) 18%, var(--border));
+      border-radius: var(--radius);
+      background:
+        linear-gradient(135deg, color-mix(in srgb, var(--accent-light) 82%, var(--surface)), var(--surface) 56%),
+        var(--surface);
+      box-shadow: var(--shadow);
+    }
+
+    .eyebrow {
+      margin: 0 0 12px;
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    h1, h2 {
+      font-family: "Crimson Pro", "Noto Serif SC", "Source Han Serif SC", "Songti SC", Georgia, serif;
+      text-wrap: balance;
+    }
+
+    h1 {
+      max-width: 840px;
+      margin: 0;
+      font-size: 44px;
+      line-height: 1.16;
+      letter-spacing: -.025em;
+    }
+
+    .subtitle {
+      max-width: 760px;
+      margin: 16px 0 0;
+      color: var(--secondary);
+      font-size: 20px;
+      line-height: 1.6;
+    }
+
+    .hero-meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 24px; }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      min-height: 32px;
+      padding: 4px 12px;
+      border: 1px solid color-mix(in srgb, var(--accent) 22%, var(--border));
+      border-radius: 999px;
+      color: var(--accent);
+      background: color-mix(in srgb, var(--accent-light) 68%, var(--surface));
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .thesis {
+      margin-top: 32px;
+      padding: 20px 24px;
+      border-left: 4px solid var(--accent);
+      border-radius: 0 12px 12px 0;
+      background: var(--surface);
+      color: var(--secondary);
+    }
+
+    .thesis strong { color: var(--text); }
+
+    .page {
+      display: grid;
+      grid-template-columns: 224px minmax(0, 1fr);
+      align-items: start;
+      width: min(1000px, calc(100% - 32px));
+      margin: 0 auto 64px;
+      gap: 32px;
+    }
+
+    .toc {
+      position: sticky;
+      top: 80px;
+      padding: 20px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: color-mix(in srgb, var(--surface) 92%, transparent);
+      box-shadow: 0 8px 24px color-mix(in srgb, var(--accent) 7%, transparent);
+    }
+
+    .toc h2 {
+      margin: 0 0 12px;
+      font-family: inherit;
+      font-size: 14px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .toc ul {
+      margin: 0;
+      padding-left: 0;
+      list-style: none;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .toc li { margin: 5px 0; }
+    .toc a { color: var(--secondary); text-decoration: none; }
+    .toc a:hover { color: var(--accent); }
+
+    article { min-width: 0; }
+
+    .qa-group {
+      margin-bottom: 48px;
+      padding: 32px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: color-mix(in srgb, var(--surface) 96%, transparent);
+      box-shadow: 0 8px 24px color-mix(in srgb, var(--accent) 6%, transparent);
+    }
+
+    .group-number {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    h2 {
+      margin: 0 0 24px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid color-mix(in srgb, var(--accent) 24%, var(--border));
+      font-size: 28px;
+      line-height: 1.3;
+    }
+
+    p { margin: 0 0 16px; color: var(--secondary); }
+    ul, ol { margin: 12px 0 20px; padding-left: 24px; color: var(--secondary); }
+    li { margin: 8px 0; }
+    strong { color: var(--text); }
+
+    .qa {
+      margin: 12px 0;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--surface);
+      overflow: hidden;
+    }
+
+    .qa summary {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      padding: 14px 18px;
+      cursor: pointer;
+      list-style: none;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .qa summary::-webkit-details-marker { display: none; }
+    .qa summary::after { content: "＋"; margin-left: auto; color: var(--muted); font-weight: 400; }
+    .qa[open] summary::after { content: "－"; }
+    .qa summary:hover { background: color-mix(in srgb, var(--accent-light) 40%, var(--surface)); }
+
+    .qa-body {
+      padding: 4px 18px 16px;
+      border-top: 1px dashed var(--border);
+      color: var(--secondary);
+    }
+
+    .qa-body p:last-child,
+    .qa-body ul:last-child,
+    .qa-body ol:last-child { margin-bottom: 0; }
+
+    .qnum {
+      flex: none;
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: .04em;
+    }
+
+    code {
+      padding: 2px 6px;
+      border: 1px solid color-mix(in srgb, var(--accent) 16%, var(--border));
+      border-radius: 4px;
+      color: var(--accent);
+      background: var(--accent-light);
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      font-size: .9em;
+    }
+
+    .callout {
+      margin: 24px 0;
+      padding: 20px 24px;
+      border-left: 4px solid var(--accent);
+      border-radius: 0 12px 12px 0;
+      background: color-mix(in srgb, var(--accent-light) 68%, var(--surface));
+    }
+
+    .callout p:last-child { margin-bottom: 0; }
+
+    footer {
+      width: min(1000px, calc(100% - 32px));
+      margin: 0 auto 48px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    @media (max-width: 860px) {
+      .page { grid-template-columns: 1fr; }
+      .toc { position: static; }
+      .hero { padding: 32px 24px; }
+      h1 { font-size: 32px; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">跳到正文</a>
+
+  <nav class="topbar" aria-label="页面导航">
+    <div class="topbar-inner">
+      <a class="brand" href="#top">GSWorld 100 问</a>
+      <div class="top-links">
+        <a href="scanark-icra-100-questions.html">Scan2VLA 100 问</a>
+        <a href="scanark-icra-outline-zh.html">Scan2VLA 论文框架</a>
+        <a href="posts.html">返回文章列表</a>
+      </div>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <p class="eyebrow">GSWorld · arXiv:2510.20813 · 论文 100 问</p>
+    <h1>把 GSWorld 论文讲成 100 个问题</h1>
+    <p class="subtitle">基于 arXiv 2510.20813 v1（Jiang et al., UCSD/UCLA/Meta, 2025）公开版本整理：定位、GSDF 资产格式、重建管线、闭环 IL / RL / DAgger、实验评测与相关对比。标注「作者解读」的是从论文内容延伸的推断，供对比学习使用。</p>
+    <div class="hero-meta" role="group" aria-label="关键词">
+      <span class="chip">100 问</span>
+      <span class="chip">GSDF</span>
+      <span class="chip">3DGS 仿真</span>
+      <span class="chip">闭环</span>
+      <span class="chip">DAgger</span>
+      <span class="chip">sim2real</span>
+    </div>
+    <div class="thesis">
+      <strong>一句话主旨：</strong>GSWorld 用可移植的 GSDF 资产格式把 3DGS 照片级渲染接入物理仿真器，让「仿真训练 → 真机部署 → 仿真再纠正」的闭环转起来——IL、RL、DAgger 与可复现基准都在同一环境中完成。
+    </div>
+  </header>
+
+  <div class="page">
+    <aside class="toc" aria-label="问答目录">
+      <h2>目录</h2>
+      <ul>
+        <li><a href="#g1">一、论文定位与立意 (01–10)</a></li>
+        <li><a href="#g2">二、背景与动机 (11–20)</a></li>
+        <li><a href="#g3">三、问题定义与表示 (21–30)</a></li>
+        <li><a href="#g4">四、GSDF 资产格式 (31–40)</a></li>
+        <li><a href="#g5">五、重建管线 (41–50)</a></li>
+        <li><a href="#g6">六、闭环应用 (51–65)</a></li>
+        <li><a href="#g7">七、实验与评测 (66–80)</a></li>
+        <li><a href="#g8">八、与相关工作的对比 (81–90)</a></li>
+        <li><a href="#g9">九、局限与结论 (91–100)</a></li>
+      </ul>
+    </aside>
+
+    <main id="main-content">
+      <article aria-label="GSWorld 论文 100 问">
+
+        <section class="qa-group" id="g1">
+          <span class="group-number">Part I</span>
+          <h2>一、论文定位与立意</h2>
+
+          <details class="qa" open id="q01"><summary><span class="qnum">01</span>GSWorld 是什么？</summary>
+            <div class="qa-body"><p>结合 3D Gaussian Splatting（3DGS）与物理引擎的照片级机器人操作仿真器。核心主张是「closing the loop」：用可复现评测与无需真实机器人的 sim2real 训练，闭环开发操作策略。</p></div>
+          </details>
+
+          <details class="qa" open id="q02"><summary><span class="qnum">02</span>「Closed-loop」在这里指什么？</summary>
+            <div class="qa-body"><p>同一环境可用于训练、评测、诊断失败与重新标注（relabel），实现快速迭代：策略看到照片级渲染，同时在机器人原生动作空间发出控制，而环境与真实场景足够对齐以支持零样本迁移与高效适配。</p></div>
+          </details>
+
+          <details class="qa" open id="q03"><summary><span class="qnum">03</span>GSWorld 解决什么问题？</summary>
+            <div class="qa-body"><p>三种数据源各有取舍：仿真动作空间对齐但有 sim-to-real 差距；人类视频场景与物理真实但缺少与动作时间对齐的标注；真实遥操作感知与动作都对齐但成本高、难扩展。GSWorld 用 3DGS + 物理同时缩小视觉与动作空间两个差距。</p></div>
+          </details>
+
+          <details class="qa" open id="q04"><summary><span class="qnum">04</span>为什么强调「照片级」（photo-realistic）？</summary>
+            <div class="qa-body"><p>用 3DGS 重建真实场景提供照片级渲染，让策略观测接近真实部署，从而缩小 sim2real 视觉差距——这是后续零样本迁移与 DAgger 可靠评测的前提。</p></div>
+          </details>
+
+          <details class="qa" open id="q05"><summary><span class="qnum">05</span>论文贡献有哪几条？</summary>
+            <div class="qa-body"><ol>
+              <li>稳健的 real-to-sim-to-real 管线：准确对齐仿真与真实环境；</li>
+              <li>仿真数据采集与视觉模仿学习（IL）：多种采集方式，IL 策略可直接部署到重建的真实场景；</li>
+              <li>视觉强化学习（RL）：利用并行环境训练，分析表明减小 RL sim2real 视觉差距；</li>
+              <li>闭环 DAgger 学习与视觉基准评测：评测结果与真机部署相关，支持迭代改进。</li>
+            </ol></div>
+          </details>
+
+          <details class="qa" open id="q06"><summary><span class="qnum">06</span>GSWorld 是渲染器还是仿真器？</summary>
+            <div class="qa-body"><p>是「现有仿真器之上的照片级渲染包装器」：物理碰撞、深度 / 分割等仍由底层仿真器（如 ManiSkill）计算，GSWorld 用 GSDF 资产让 RGB 渲染照片级化，并支持域随机化。</p></div>
+          </details>
+
+          <details class="qa" open id="q07"><summary><span class="qnum">07</span>为什么叫「suite」（套件）？</summary>
+            <div class="qa-body"><p>提供资产格式（GSDF）、重建管线、数据采集（运动规划 / 遥操作）、策略训练与基准评测的成套工具，而不只是一个渲染器。</p></div>
+          </details>
+
+          <details class="qa" open id="q08"><summary><span class="qnum">08</span>目标用户与用途？</summary>
+            <div class="qa-body"><p>机器人操作研究者：训练 IL / RL / DAgger 策略、在仿真中可复现评测真实策略、虚拟遥操作采数据、域随机化研究等。</p></div>
+          </details>
+
+          <details class="qa" open id="q09"><summary><span class="qnum">09</span>GSWorld 与 Scan2VLA 是什么关系？</summary>
+            <div class="qa-body"><p>GSWorld 是 Scan2VLA 论文中「系统侧最需要防守的先验」之一：它提供闭环照片级模拟与 GSDF 资产格式，但其交互物体来自数据集或单独的自定义物体重建；Scan2VLA 研究「一次联合场景重建能否直接提供可移动资产」——不竞争模拟器功能。</p></div>
+          </details>
+
+          <details class="qa" open id="q10"><summary><span class="qnum">10</span>用一句话总结 GSWorld？</summary>
+            <div class="qa-body"><p>用可移植的 GSDF 资产格式把 3DGS 照片级渲染接入物理仿真，闭环支持 IL、RL、DAgger 与可复现基准评测的机器人操作仿真套件。</p></div>
+          </details>
+        </section>
+
+        <section class="qa-group" id="g2">
+          <span class="group-number">Part II</span>
+          <h2>二、背景与动机</h2>
+
+          <details class="qa" open id="q11"><summary><span class="qnum">11</span>传统仿真为什么有 sim2real 差距？</summary>
+            <div class="qa-body"><p>渲染不够照片级：材质、光照、相机与真实环境不一致，策略学到仿真特有线索，部署时失效。</p></div>
+          </details>
+
+          <details class="qa" open id="q12"><summary><span class="qnum">12</span>人类视频数据的局限？</summary>
+            <div class="qa-body"><p>场景与物理真实，但缺少与机器人动作时间对齐的动作标注，且动作空间与目标机器人不匹配。</p></div>
+          </details>
+
+          <details class="qa" open id="q13"><summary><span class="qnum">13</span>真实遥操作的局限？</summary>
+            <div class="qa-body"><p>感知与动作都对齐，但采集成本高、难扩展：需要机器人本体、人工操作、物理复位与安全监督。</p></div>
+          </details>
+
+          <details class="qa" open id="q14"><summary><span class="qnum">14</span>为什么用 3DGS 而不是 NeRF？</summary>
+            <div class="qa-body"><p>NeRF 是隐式表示，物体运动需依赖变形场等代理，不自然且低效；3DGS 用显式 Gaussian blobs，外观可以随物体的物理位移一致地移动。</p></div>
+          </details>
+
+          <details class="qa" open id="q15"><summary><span class="qnum">15</span>为什么不用 Mesh？</summary>
+            <div class="qa-body"><p>Mesh 表示存在大量伪影（artifacts），带来明显视觉差距。</p></div>
+          </details>
+
+          <details class="qa" open id="q16"><summary><span class="qnum">16</span>Simpler 的问题？</summary>
+            <div class="qa-body"><p>用生成式建模支持照片级渲染与可复现基准，但需要昂贵的人工匹配绿幕与纹理，扩展性差。</p></div>
+          </details>
+
+          <details class="qa" open id="q17"><summary><span class="qnum">17</span>SplatSim 的贡献与局限？</summary>
+            <div class="qa-body"><p>首次把 3DGS 与 PyBullet 结合，演示零样本 sim2real 策略部署；但依赖人工 3D 分割机械臂与物体，过拟合单一场景。</p></div>
+          </details>
+
+          <details class="qa" open id="q18"><summary><span class="qnum">18</span>Re3Sim 做了什么？</summary>
+            <div class="qa-body"><p>扩展 SplatSim，发现照片级仿真配合域随机化与混合仿真（非照片级资产 + 照片级场景）能带来更稳健的操作策略。</p></div>
+          </details>
+
+          <details class="qa" open id="q19"><summary><span class="qnum">19</span>现有 GS 仿真器的共同缺口？</summary>
+            <div class="qa-body"><p>要么只做单一设置的照片级渲染，要么提供引擎绑定、无可移植资产标准的管线，要么缺少跨本体可复现基准与部署导向的 on-policy 数据采集。</p></div>
+          </details>
+
+          <details class="qa" open id="q20"><summary><span class="qnum">20</span>与 Roboverse 等 meta-simulator 的区别？</summary>
+            <div class="qa-body"><p>Roboverse 提供统一接口复用各仿真器优势；GSWorld 专注用 3DGS 提升渲染保真度并与物理引擎结合，不追求统一多引擎接口。</p></div>
+          </details>
+        </section>
+
+        <section class="qa-group" id="g3">
+          <span class="group-number">Part III</span>
+          <h2>三、问题定义与表示</h2>
+
+          <details class="qa" open id="q21"><summary><span class="qnum">21</span>问题如何形式化？</summary>
+            <div class="qa-body"><p>目标是用 3DGS 渲染图像 <code>I^gs</code> 替代真实 RGB 观测 <code>I^real</code> 用于下游学习。状态 <code>st = (qt, xt1, …, xtn)</code>：机器人关节位置 + n 个物体的 6D 位姿；观测 <code>ot = G_real(pt, st)</code>，由重建的 3DGS 场景按相机位姿与环境状态渲染。</p></div>
+          </details>
+
+          <details class="qa" open id="q22"><summary><span class="qnum">22</span>观测如何生成？</summary>
+            <div class="qa-body"><p><code>ot = G_real(pt, st)</code>：给定当前相机位姿 pt 与环境状态 st，从重建场景 G_real 渲染 RGB 图像作为观测——与真机相机观测同构。</p></div>
+          </details>
+
+          <details class="qa" open id="q23"><summary><span class="qnum">23</span>控制模式？</summary>
+            <div class="qa-body"><p>主要使用关节位置控制（joint position control）：策略输出目标关节位置，由底层控制器执行。</p></div>
+          </details>
+
+          <details class="qa" open id="q24"><summary><span class="qnum">24</span>IL 的专家数据形式？</summary>
+            <div class="qa-body"><p><code>τE = {(q1, o1, a1), …, (qT, oT, aT)}</code>：关节状态、观测与动作的同步序列，用于监督策略 πθ。</p></div>
+          </details>
+
+          <details class="qa" open id="q25"><summary><span class="qnum">25</span>RL 如何训练？</summary>
+            <div class="qa-body"><p>策略与环境交互获得奖励；GSWorld 利用并行环境规模化数据生成与训练，并给出 RL sim2real 视觉差距的分析。</p></div>
+          </details>
+
+          <details class="qa" open id="q26"><summary><span class="qnum">26</span>为什么观测只用图像（pixel-to-action）？</summary>
+            <div class="qa-body"><p>让策略直接吃与部署一致的相机像素，避免状态接口差异——训练与部署的观测空间完全匹配，是零样本 sim2real 的前提。</p></div>
+          </details>
+
+          <details class="qa" open id="q27"><summary><span class="qnum">27</span>场景、相机、动作语义一致为什么重要？</summary>
+            <div class="qa-body"><p>只有几何、相机属性与动作语义跨 real—sim 保持一致，训练策略才能不经接口转换直接部署；这是 real-to-sim-to-real 对齐的核心。</p></div>
+          </details>
+
+          <details class="qa" open id="q28"><summary><span class="qnum">28</span>如何度量两个世界的对应程度？</summary>
+            <div class="qa-body"><p>一组指标评估视觉（visual）、几何（geometric）与功能（functional）相似性，衡量数字孪生与真实世界的对齐质量。</p></div>
+          </details>
+
+          <details class="qa" open id="q29"><summary><span class="qnum">29</span>与 Scan2VLA 的问题定义区别？</summary>
+            <div class="qa-body"><p>GSWorld 面向通用操作策略的闭环训练（不特定于某一本体适配）；Scan2VLA 针对「通用 VLA 基模适配预训练中完全未见的目标本体」的数据价值——范围更窄、更聚焦适配。</p></div>
+          </details>
+
+          <details class="qa" open id="q30"><summary><span class="qnum">30</span>重建输入是什么？</summary>
+            <div class="qa-body"><p>多视角 RGB 观测 <code>V = {vi}</code>，重建出场景 Gaussian 表示 G_real，可渲染任意相机位姿与新环境状态下的图像。</p></div>
+          </details>
+        </section>
+
+        <section class="qa-group" id="g4">
+          <span class="group-number">Part IV</span>
+          <h2>四、GSDF 资产格式</h2>
+
+          <details class="qa" open id="q31"><summary><span class="qnum">31</span>GSDF 是什么？</summary>
+            <div class="qa-body"><p>Gaussian Scene Description File，GSWorld 提出的可移植资产格式：把 Gaussian-on-Mesh 表示与机器人 URDF 及其他物体融合进一个文件。</p></div>
+          </details>
+
+          <details class="qa" open id="q32"><summary><span class="qnum">32</span>「Gaussian-on-Mesh」指什么？</summary>
+            <div class="qa-body"><p>视觉外观用 Gaussian 渲染，几何与碰撞用 Mesh 表达，两者绑定在同一资产上——兼顾照片级外观与接触级物理。</p></div>
+          </details>
+
+          <details class="qa" open id="q33"><summary><span class="qnum">33</span>为什么需要新格式？</summary>
+            <div class="qa-body"><p>裸 3DGS 资产无法直接导入物理仿真器；GSDF 统一视觉与物理表示，并兼容现有仿真器的标准输出（深度、分割）与物理碰撞计算。</p></div>
+          </details>
+
+          <details class="qa" open id="q34"><summary><span class="qnum">34</span>GSDF 包含哪些内容？</summary>
+            <div class="qa-body"><p>场景 Gaussian 重建、机器人 URDF、物体资产、碰撞 Mesh 与材质属性——一套文件描述「看得见 + 能碰撞」的完整资产。</p></div>
+          </details>
+
+          <details class="qa" open id="q35"><summary><span class="qnum">35</span>GSDF 数据库规模？</summary>
+            <div class="qa-body"><p>3 个机器人本体（覆盖单臂与双臂操作）以及 40+ 个物体。</p></div>
+          </details>
+
+          <details class="qa" open id="q36"><summary><span class="qnum">36</span>如何与现有仿真器兼容？</summary>
+            <div class="qa-body"><p>GSDF 用标准格式表达视觉渲染与物理碰撞数据，GSWorld 在其上只加一层渲染包装器（GSWorldWrapper），不替换物理引擎。</p></div>
+          </details>
+
+          <details class="qa" open id="q37"><summary><span class="qnum">37</span>支持哪些渲染输出？</summary>
+            <div class="qa-body"><p>标准渲染（RGB、深度、分割等）+ 照片级 RGB（3DGS 渲染），供不同下游应用选择。</p></div>
+          </details>
+
+          <details class="qa" open id="q38"><summary><span class="qnum">38</span>域随机化支持？</summary>
+            <div class="qa-body"><p>渲染包装器支持多种域随机化配置与不同应用，便于鲁棒性研究。</p></div>
+          </details>
+
+          <details class="qa" open id="q39"><summary><span class="qnum">39</span>与 Isaac Lab 资产管道的关系？</summary>
+            <div class="qa-body"><p>Isaac Lab 走 URDF/MJCF → USD；3DGS 本身不是仿真格式，GSDF 是目前最接近「3DGS 直接进 Isaac Lab」的方案（见仓库 R2S2R 管线分析）。</p></div>
+          </details>
+
+          <details class="qa" open id="q40"><summary><span class="qnum">40</span>与 Mesh 提取传统管线的区别？</summary>
+            <div class="qa-body"><p>传统管线从 3DGS 提取 Mesh 会丢失外观信息；GSDF 保留 3DGS 渲染质量并桥接物理仿真，端到端一致性更好。</p></div>
+          </details>
+        </section>
+
+        <section class="qa-group" id="g5">
+          <span class="group-number">Part V</span>
+          <h2>五、重建管线</h2>
+
+          <details class="qa" open id="q41"><summary><span class="qnum">41</span>real-to-sim 方向做什么？</summary>
+            <div class="qa-body"><p>从短多视角采集重建公制精确（metric-accurate）的数字孪生，步骤：训练视角采集 → ArUco 设定绝对尺度 → 机器人 / 桌子对齐 → 物体资产生成。</p></div>
+          </details>
+
+          <details class="qa" open id="q42"><summary><span class="qnum">42</span>如何设定绝对尺度？</summary>
+            <div class="qa-body"><p>用 ArUco 标记设定绝对尺度，使仿真场景与真实场景在公制单位下一致——这是后续 sim2real 对齐的基础。</p></div>
+          </details>
+
+          <details class="qa" open id="q43"><summary><span class="qnum">43</span>机器人 URDF 如何对齐到场景？</summary>
+            <div class="qa-body"><p>通过表面拟合（如 ICP）把机器人 URDF 与重建场景对齐，保证机器人几何在仿真中位置正确。</p></div>
+          </details>
+
+          <details class="qa" open id="q44"><summary><span class="qnum">44</span>物体资产怎么来？</summary>
+            <div class="qa-body"><p>物体单独重建：每个物体约 100 张图训练 3DGS，生成可移动资产（这是 GSWorld 与 Scan2VLA「一次联合重建」路线的关键差异）。</p></div>
+          </details>
+
+          <details class="qa" open id="q45"><summary><span class="qnum">45</span>机器人重建用多少图？</summary>
+            <div class="qa-body"><p>机器人约 300 张图（物体约 100 张），配合 Colmap 初始化点云。</p></div>
+          </details>
+
+          <details class="qa" open id="q46"><summary><span class="qnum">46</span>3DGS 训练配置？</summary>
+            <div class="qa-body"><p>使用官方实现默认参数，Colmap 初始化点云，迭代 7000 与 30000 处保存模型。</p></div>
+          </details>
+
+          <details class="qa" open id="q47"><summary><span class="qnum">47</span>与 Scan2VLA 的重建差异？</summary>
+            <div class="qa-body"><p>GSWorld 分别重建场景与物体（物体独立扫描后插入）；Scan2VLA 只做一次联合场景重建，再从同一场景原位提取物体——这是「资产来源」的核心对照。</p></div>
+          </details>
+
+          <details class="qa" open id="q48"><summary><span class="qnum">48</span>sim-to-real 方向做什么？</summary>
+            <div class="qa-body"><p>策略在 GSWorld 训练后直接部署到硬件：控制与观测空间与机器人原生 API 匹配，无需接口转换。</p></div>
+          </details>
+
+          <details class="qa" open id="q49"><summary><span class="qnum">49</span>如何闭环？</summary>
+            <div class="qa-body"><p>用 sim + real 数据训练的策略可在仿真中部署、评测、诊断失败、收集 DAgger 纠正，再迭代训练——训练与评测共用同一环境。</p></div>
+          </details>
+
+          <details class="qa" open id="q50"><summary><span class="qnum">50</span>重建管线的目标？</summary>
+            <div class="qa-body"><p>让场景几何、相机属性与动作语义在 real 与 sim 两侧一致，支撑零样本迁移、可复现评测与高效 DAgger 采集。</p></div>
+          </details>
+        </section>
+
+        <section class="qa-group" id="g6">
+          <span class="group-number">Part VI</span>
+          <h2>六、闭环应用</h2>
+
+          <details class="qa" open id="q51"><summary><span class="qnum">51</span>五个应用演示是什么？</summary>
+            <div class="qa-body"><ol>
+              <li>零样本 sim2real 像素到动作模仿学习；</li>
+              <li>自动高质量 DAgger 数据采集（适配部署环境）；</li>
+              <li>仿真中可复现评测真实机器人操作策略；</li>
+              <li>虚拟遥操作仿真数据采集；</li>
+              <li>零样本 sim2real 视觉强化学习。</li>
+            </ol></div>
+          </details>
+
+          <details class="qa" open id="q52"><summary><span class="qnum">52</span>零样本 IL 怎么工作？</summary>
+            <div class="qa-body"><p>用 GSWorld 渲染数据训练 ACT / PI0 等策略，直接部署到重建的真实场景——观测与动作空间与真机一致，无需再训练。</p></div>
+          </details>
+
+          <details class="qa" open id="q53"><summary><span class="qnum">53</span>闭环 DAgger 怎么工作？</summary>
+            <div class="qa-body"><p>在数字孪生中复现真机失败，逐帧回放定位问题，收集针对性纠正标签——遥操作开销大幅降低，策略迭代改进。</p></div>
+          </details>
+
+          <details class="qa" open id="q54"><summary><span class="qnum">54</span>DAgger 相比从零训练的优势？</summary>
+            <div class="qa-body"><p>表 II 显示：各任务多轮迭代后，dagger 成功率持续高于 train-from-scratch（如 Stack Cans 仿真第 5 轮 88% vs 60%）。</p></div>
+          </details>
+
+          <details class="qa" open id="q55"><summary><span class="qnum">55</span>视觉基准评测为何可复现？</summary>
+            <div class="qa-body"><p>共享 GSDF 资产、固定相机内外参、一致光照 / 材质、标准化动作语义——跨机器人、场景与任务可 apples-to-apples 比较，改进反映算法进步而非环境方差。</p></div>
+          </details>
+
+          <details class="qa" open id="q56"><summary><span class="qnum">56</span>RL 如何加速？</summary>
+            <div class="qa-body"><p>利用并行环境规模化数据生成与训练；论文提供分析说明 GSWorld 减小了 RL 的 sim2real 视觉差距。</p></div>
+          </details>
+
+          <details class="qa" open id="q57"><summary><span class="qnum">57</span>虚拟遥操作怎么做？</summary>
+            <div class="qa-body"><p>仿真内用 ManiSkill 自带的点击拖拽系统（键盘 + 鼠标）：用户定义关键帧，运动规划器完成到达。</p></div>
+          </details>
+
+          <details class="qa" open id="q58"><summary><span class="qnum">58</span>真机 VR 遥操作细节？</summary>
+            <div class="qa-body"><p>HTC Vive 控制器 6-DOF 手部运动映射到机械臂末端位姿，配合 SteamVR / triad-openvr 与位置-速度控制器；xArm6 平台使用 ACE-F。</p></div>
+          </details>
+
+          <details class="qa" open id="q59"><summary><span class="qnum">59</span>仿真数据采集方式？</summary>
+            <div class="qa-body"><p>主要用运动规划（MPlib）全自动采集：任务分解为若干子任务与动作序列；也支持仿真内遥操作。</p></div>
+          </details>
+
+          <details class="qa" open id="q60"><summary><span class="qnum">60</span>训练用哪些策略架构？</summary>
+            <div class="qa-body"><p>两种：ACT（视觉骨干从 ResNet-18 换成 DinoV2 ViT-S）与 PI0（LeRobot 实现，加载 PI0-base 权重，冻结视觉 / 语言主干只训 action expert）。</p></div>
+          </details>
+
+          <details class="qa" open id="q61"><summary><span class="qnum">61</span>ACT 训练配置？</summary>
+            <div class="qa-body"><p>batch 42，SGD 常数学习率 1e-4，共 50000 迭代；其余超参与原版 ACT 一致。</p></div>
+          </details>
+
+          <details class="qa" open id="q62"><summary><span class="qnum">62</span>PI0 训练配置？</summary>
+            <div class="qa-body"><p>batch 10，SGD 常数学习率 1e-4，50000 迭代；只训练 action expert，冻结视觉与语言主干。</p></div>
+          </details>
+
+          <details class="qa" open id="q63"><summary><span class="qnum">63</span>策略的观测与输出？</summary>
+            <div class="qa-body"><p>输入双视觉图像 + 机器人本体 proprioceptive 信息，输出目标关节位置作为动作。</p></div>
+          </details>
+
+          <details class="qa" open id="q64"><summary><span class="qnum">64</span>真机相机？</summary>
+            <div class="qa-body"><p>两台 RealSense D435i，与仿真环境的观测设定保持一致。</p></div>
+          </details>
+
+          <details class="qa" open id="q65"><summary><span class="qnum">65</span>使用方式有多简单？</summary>
+            <div class="qa-body"><p><code>gym.make(...)</code> 之后包一层 <code>GSWorldWrapper(env, gs_cfg)</code> 即可，像素观测自动改为 3DGS 渲染——一行代码接入现有 gym 环境。</p></div>
+          </details>
+        </section>
+
+        <section class="qa-group" id="g7">
+          <span class="group-number">Part VII</span>
+          <h2>七、实验与评测</h2>
+
+          <details class="qa" open id="q66"><summary><span class="qnum">66</span>仿真评测协议？</summary>
+            <div class="qa-body"><p>每任务 25 个随机 seed，初始时物体随机配置；采用部分成功标准（完成中间步骤给半学分）。</p></div>
+          </details>
+
+          <details class="qa" open id="q67"><summary><span class="qnum">67</span>真机评测协议？</summary>
+            <div class="qa-body"><p>每策略 10 次试验，初始条件随机；同样使用部分成功指标，观测框架与仿真保持一致（两台 D435i）。</p></div>
+          </details>
+
+          <details class="qa" open id="q68"><summary><span class="qnum">68</span>评测任务有哪些？</summary>
+            <div class="qa-body"><p>Place Box（放盒子）、Pour Sauce（倒酱）、Stack Cans（叠罐）、Arrange Cans（排列罐）四项操作任务。</p></div>
+          </details>
+
+          <details class="qa" open id="q69"><summary><span class="qnum">69</span>各任务时间步限制？</summary>
+            <div class="qa-body"><p>Place Box / Pour Sauce / Stack Cans 限 500 步；Arrange Cans 因任务视界更长，限 800 步。</p></div>
+          </details>
+
+          <details class="qa" open id="q70"><summary><span class="qnum">70</span>部分成功如何定义？</summary>
+            <div class="qa-body"><p>完成中间步骤得半学分，例如成功拾起物体、把一个罐放上架子——捕捉渐进进步而非只看最终成败。</p></div>
+          </details>
+
+          <details class="qa" open id="q71"><summary><span class="qnum">71</span>零样本 IL 如何验证？</summary>
+            <div class="qa-body"><p>仿真训练 → 真机部署，报告 10 次试验的成功率（含部分成功）。</p></div>
+          </details>
+
+          <details class="qa" open id="q72"><summary><span class="qnum">72</span>DAgger 迭代效果（表 II）？</summary>
+            <div class="qa-body"><p>平均值：仿真 train-from-scratch 从 35% 升到 60%，dagger 从 35% 升到 75%；真机 train-from-scratch 30%→55%，dagger 30%→63.75%。每轮迭代 dagger 都优于 from scratch。</p></div>
+          </details>
+
+          <details class="qa" open id="q73"><summary><span class="qnum">73</span>为什么 dagger 在真机提升小于仿真？</summary>
+            <div class="qa-body"><p>真机评测受硬件噪声、复位成本与有限试验数限制（作者解读），但趋势一致：每轮 dagger 均高于 from-scratch。</p></div>
+          </details>
+
+          <details class="qa" open id="q74"><summary><span class="qnum">74</span>RL 实验结论？</summary>
+            <div class="qa-body"><p>GSWorld 减小 RL 的 sim2real 视觉差距，支持零样本 sim2real 视觉强化学习。</p></div>
+          </details>
+
+          <details class="qa" open id="q75"><summary><span class="qnum">75</span>评测可复现性体现在哪？</summary>
+            <div class="qa-body"><p>共享资产 + 固定相机 + 标准化动作语义，使不同方法在同一环境下比较，改进反映算法进步而非环境方差。</p></div>
+          </details>
+
+          <details class="qa" open id="q76"><summary><span class="qnum">76</span>与 Scan2VLA 评测风格对比？</summary>
+            <div class="qa-body"><p>GSWorld 用 25 seeds / 10 trials 与部分成功指标；Scan2VLA 更强调 successes/trials + 精确 CI、预注册配对子集与 cluster bootstrap——统计学严谨度更高（作者解读）。</p></div>
+          </details>
+
+          <details class="qa" open id="q77"><summary><span class="qnum">77</span>动作空间？</summary>
+            <div class="qa-body"><p>关节位置控制：策略输出目标关节位置，与真实部署的低层控制一致。</p></div>
+          </details>
+
+          <details class="qa" open id="q78"><summary><span class="qnum">78</span>资产与数据规模？</summary>
+            <div class="qa-body"><p>3 个机器人本体 + 40+ 物体构成的 GSDF 数据库；仿真数据采集以运动规划全自动为主。</p></div>
+          </details>
+
+          <details class="qa" open id="q79"><summary><span class="qnum">79</span>实验平台？</summary>
+            <div class="qa-body"><p>单臂与双臂平台（含 xArm6 等），真机 + 仿真双轨评测。</p></div>
+          </details>
+
+          <details class="qa" open id="q80"><summary><span class="qnum">80</span>与 ACT / PI0 基线的关系？</summary>
+            <div class="qa-body"><p>两者是通用策略架构，GSWorld 证明其数据可直接零样本 sim2real 部署、并可通过 DAgger 迭代提升。</p></div>
+          </details>
+        </section>
+
+        <section class="qa-group" id="g8">
+          <span class="group-number">Part VIII</span>
+          <h2>八、与相关工作的对比</h2>
+
+          <details class="qa" open id="q81"><summary><span class="qnum">81</span>与 SplatSim？</summary>
+            <div class="qa-body"><p>都做 3DGS + 物理；GSWorld 提供可移植资产标准、多本体、闭环 DAgger 与可复现基准，克服 SplatSim 依赖人工分割、单场景过拟合的局限。</p></div>
+          </details>
+
+          <details class="qa" open id="q82"><summary><span class="qnum">82</span>与 Re3Sim？</summary>
+            <div class="qa-body"><p>Re3Sim 强调域随机化与混合资产提升鲁棒性；GSWorld 强调统一资产格式与闭环应用（训练 / 评测 / DAgger 同一环境）。</p></div>
+          </details>
+
+          <details class="qa" open id="q83"><summary><span class="qnum">83</span>与 Embodied-GS？</summary>
+            <div class="qa-body"><p>Embodied-GS 在单场景学习臂物交互且不使用物理引擎；GSWorld 用物理引擎 + 可移植资产，面向多场景。</p></div>
+          </details>
+
+          <details class="qa" open id="q84"><summary><span class="qnum">84</span>与 Robo-GS？</summary>
+            <div class="qa-body"><p>Robo-GS 专注从渲染识别物体物理参数；GSWorld 提供完整仿真套件，物理参数作为资产一部分输入。</p></div>
+          </details>
+
+          <details class="qa" open id="q85"><summary><span class="qnum">85</span>与 ManiGaussian？</summary>
+            <div class="qa-body"><p>ManiGaussian 从仿真器同步多视图信息优化 Gaussian；GSWorld 面向 IL / RL / DAgger / 基准的闭环应用。</p></div>
+          </details>
+
+          <details class="qa" open id="q86"><summary><span class="qnum">86</span>与 Scalable Real2Sim？</summary>
+            <div class="qa-body"><p>物性估计工作（自动化估计质量、质心、惯量）；GSWorld 消费这类物理参数构建 GSDF 资产。</p></div>
+          </details>
+
+          <details class="qa" open id="q87"><summary><span class="qnum">87</span>与 PhysTwin？</summary>
+            <div class="qa-body"><p>PhysTwin 针对软体物体做物理估计；GSWorld 面向刚体操作仿真与策略训练。</p></div>
+          </details>
+
+          <details class="qa" open id="q88"><summary><span class="qnum">88</span>与 Simpler？</summary>
+            <div class="qa-body"><p>Simpler 用生成式建模 + 人工绿幕匹配；GSWorld 用 3DGS 真实重建，免去昂贵人工纹理工作。</p></div>
+          </details>
+
+          <details class="qa" open id="q89"><summary><span class="qnum">89</span>与 RoboTwin？</summary>
+            <div class="qa-body"><p>RoboTwin 是生成式数字孪生的双臂基准；GSWorld 基于真实重建，提供可移植 GSDF 资产与闭环工作流。</p></div>
+          </details>
+
+          <details class="qa" open id="q90"><summary><span class="qnum">90</span>定位总结？</summary>
+            <div class="qa-body"><p>统一「重建 → 资产 → 训练 → 评测 → 部署 → 再纠正」的闭环，填补现有 GS 仿真器缺可移植资产标准与跨本体可复现基准的空白。</p></div>
+          </details>
+        </section>
+
+        <section class="qa-group" id="g9">
+          <span class="group-number">Part IX</span>
+          <h2>九、局限与结论</h2>
+
+          <details class="qa" open id="q91"><summary><span class="qnum">91</span>主要局限？</summary>
+            <div class="qa-body"><p>① 物体资产仍单独扫描再插入，不是场景原位提取（作者解读，也是 Scan2VLA 要回答的问题）；② 依赖真实场景采集与重建质量；③ 渲染保留采集条件下外观，光照 / 高光可能烘焙。</p></div>
+          </details>
+
+          <details class="qa" open id="q92"><summary><span class="qnum">92</span>为什么 ArUco 与对齐是前提？</summary>
+            <div class="qa-body"><p>公制尺度与 URDF 对齐决定 sim2real 一致性；对齐误差会在部署时放大为抓取与放置偏差。</p></div>
+          </details>
+
+          <details class="qa" open id="q93"><summary><span class="qnum">93</span>场景规模限制？</summary>
+            <div class="qa-body"><p>需要多视角采集与标定，大规模或动态场景重建成本高；物体资产逐件扫描难扩展（作者解读）。</p></div>
+          </details>
+
+          <details class="qa" open id="q94"><summary><span class="qnum">94</span>对 Scan2VLA 的启示？</summary>
+            <div class="qa-body"><p>GSWorld 可作为平台级上界与「独立资产路线」对照：其「单独扫描物体 + 插入」正是 Scan2VLA 用受控 Independent-GS 基线要对比的路线。</p></div>
+          </details>
+
+          <details class="qa" open id="q95"><summary><span class="qnum">95</span>结论如何收束？</summary>
+            <div class="qa-body"><p>GSWorld 提供统一闭环仿真：照片级渲染 + 原生动作空间 + 可复现基准，支持 IL、RL、DAgger 从训练到部署再到迭代改进。</p></div>
+          </details>
+
+          <details class="qa" open id="q96"><summary><span class="qnum">96</span>未来方向（作者解读）？</summary>
+            <div class="qa-body"><p>场景内物体自动分解（免逐件扫描）、光照 / 材质分解（摆脱烘焙外观）、更大规模资产库、跨本体基准扩展。</p></div>
+          </details>
+
+          <details class="qa" open id="q97"><summary><span class="qnum">97</span>可复现性要求？</summary>
+            <div class="qa-body"><p>共享 GSDF 资产与固定相机 / 光照 / 动作语义，使不同方法在同一环境下比较——改进反映算法进步而非环境方差。</p></div>
+          </details>
+
+          <details class="qa" open id="q98"><summary><span class="qnum">98</span>开源情况？</summary>
+            <div class="qa-body"><p>开源，官网 3dgsworld.github.io；覆盖从重建到部署的完整管线。</p></div>
+          </details>
+
+          <details class="qa" open id="q99"><summary><span class="qnum">99</span>审稿人可能攻击的点（作者解读）？</summary>
+            <div class="qa-body"><p>物体资产仍需单独扫描、真机验证规模有限（10 trials）、重建依赖采集环境与标定、渲染光照烘焙限制大幅运动。</p></div>
+          </details>
+
+          <details class="qa" open id="q100"><summary><span class="qnum">100</span>一句话记忆点？</summary>
+            <div class="qa-body"><p>3DGS 照片级渲染 × 物理引擎 × 可移植 GSDF 资产 × 闭环 IL / RL / DAgger——让「仿真训练 → 真机部署 → 仿真再纠正」真正转起来。</p></div>
+          </details>
+
+          <div class="callout">
+            <p><strong>说明：</strong>本页基于 arXiv:2510.20813 v1（2025-10-23）公开版本整理，用于与 <a href="scanark-icra-100-questions.html">Scan2VLA 论文 100 问</a> 对照阅读。标注「作者解读」的内容为从论文内容延伸的推断；实验数字取自论文表 II 与附录，具体以原文为准。</p>
+          </div>
+        </section>
+
+      </article>
+    </main>
+  </div>
+
+  <footer>
+    GSWorld 论文 100 问 · arXiv:2510.20813 · 与 <a href="scanark-icra-100-questions.html">Scan2VLA 100 问</a> 对照阅读
+  </footer>
+</body>
+</html>

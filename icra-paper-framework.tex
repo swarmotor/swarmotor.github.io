@@ -14,12 +14,12 @@
 \newif\ifanonymous
 \anonymoustrue
 
-\newcommand{\system}{\textsc{ScanArk}}
+\newcommand{\system}{\textsc{Scan2VLA}}
 \newcommand{\todo}[1]{\textbf{[TODO: #1]}}
 \newcommand{\piHalf}{\ensuremath{\pi_{0.5}}}
 
-\title{\system: Scene-Native Gaussian Object Extraction for
-Real-Demonstration-Efficient VLA Adaptation}
+\title{\system: Scene-Native Vision-Language-Action Learning with
+Interactive Gaussian Digital Twins}
 
 \ifanonymous
   \author{Anonymous Authors}
@@ -40,33 +40,41 @@ Real-Demonstration-Efficient VLA Adaptation}
 \pagestyle{empty}
 
 \begin{abstract}
-Adapting vision-language-action (VLA) policies to a new robot embodiment remains
-data-intensive because both the action interface and deployment images differ
-from the policy's prior experience. Photorealistic simulation can supply labeled
-trajectories, but composing a reconstructed background with independently
-acquired foreground assets introduces appearance and alignment errors around the
-objects on which manipulation depends. We present \system{}, which treats one
-jointly reconstructed 3D Gaussian Splatting (3DGS) scene as both the static
-background and the source of movable object assets. \system{} fuses multi-view
-instance evidence into Gaussian labels, separately completes newly exposed
-background and unobserved object surfaces, and binds each visual asset to aligned
-watertight collision geometry. We evaluate \system{} with \piHalf{} and SmolVLA
-on an AgiBot G2 whose starting VLA checkpoints receive no G2-specific policy
-adaptation, from placing one beverage bottle into a picnic basket to a
-whole-body picnic-packing and trunk-placement task. Simulator construction still uses real-scene capture,
-robot models, and G2 calibration; ``zero real demonstrations'' refers only to
-VLA post-training trajectories. At zero real demonstrations, ScanArk-only
+Adapting a general-purpose vision-language-action (VLA) foundation model to a
+new robot embodiment remains data-intensive because its cameras, proprioception,
+and action semantics differ from pretraining. Photorealistic simulation can
+supply adaptation trajectories, but composing a reconstructed background with
+independently acquired foreground assets introduces appearance and alignment
+errors around the objects on which manipulation depends. We present \system{}, an
+embodiment-agnostic pipeline that turns a jointly reconstructed 3D Gaussian
+Splatting (3DGS) scene into an interactive Gaussian digital twin. \system{} fuses
+multi-view instance evidence into Gaussian labels, separately completes newly
+exposed background and unobserved object surfaces, and binds each visual asset to
+aligned watertight collision geometry. We evaluate two general-purpose VLA
+backbones, \piHalf{} and SmolVLA, on an AgiBot G2 that is absent from their
+pretraining and prior adaptation data before our study.
+Tasks range from placing one beverage bottle into a picnic basket to whole-body
+picnic packing and trunk placement. Simulator construction still uses real-scene
+capture, robot models, and G2 calibration; ``zero real demonstrations'' refers
+only to post-training adaptation data. At zero real demonstrations, \system-only
 achieves \todo{$S/N$ G2 successes with a 95\% confidence interval, versus the
-strongest matched simulation-only baseline's $S_b/N_b$}; at a prespecified
-real-world success threshold, it reduces the required real demonstrations by
-\todo{$X\%$ with a 95\% bootstrap confidence interval}. These results
-\todo{state the bounded conclusion supported across the evaluated tasks,
-scenes, and VLA backbones}.
+strongest matched simulation-only baseline's $S_b/N_b$}; a paired sim--real
+subset measures whether simulation performance predicts G2 performance, and at a
+prespecified real-world success threshold \system{} reduces required real
+demonstrations by \todo{$X\%$ with a 95\% bootstrap confidence interval}.
+These results \todo{state the bounded conclusion supported for this unseen
+embodiment, the evaluated tasks/scenes, and the two VLA backbones}.
 \end{abstract}
 
-% Target allocation under the ICRA 2027 eight-page total limit:
-% Introduction 1.2; Related Work 0.5; Method (including formulation) 2.6;
-% Experiments 2.7; Limitations/Conclusion 0.3; References 0.7 pages.
+% Target allocation under the ICRA 2027 eight-page total limit, including
+% references: Abstract + Introduction 1.15; Related Work 0.40; Method
+% (including formulation) 2.25; Experiments 3.20; Limitations + Conclusion
+% 0.30; References 0.70 pages. Within Experiments: setup/controls 0.45;
+% asset evidence 0.40; sim--real correlation 0.40; demonstration efficiency
+% 0.65; long-horizon results 0.65; ablations/generalization 0.35; and
+% efficiency/safety/statistics 0.30 pages. Move the 54-cell ledger,
+% paired-episode manifest, full per-object tables, and extended failures to
+% supplement.
 
 \section{Introduction}
 \label{sec:introduction}
@@ -110,26 +118,31 @@ scan-to-skill pipeline.
 \begin{figure*}[t]
   \centering
   \fbox{\parbox[c][3.0cm][c]{0.96\textwidth}{\centering
-    Teaser: real scene capture $\rightarrow$ native 3DGS decomposition
-    $\rightarrow$ movable scene-native object $\rightarrow$ simulated VLA
-    demonstrations $\rightarrow$ first-time AgiBot G2 adaptation. Include one
+    Teaser: general-purpose VLA foundation model $\rightarrow$ calibrated G2
+    scene capture $\rightarrow$ native interactive Gaussian twin
+    $\rightarrow$ simulation-only adaptation $\rightarrow$ first-time execution
+    on an unseen AgiBot G2. Include one
     side-by-side comparison with an independently scanned object, plus G2
     rollouts for the bottle-to-basket probe and primary picnic-to-trunk task.}}
   \caption{Given one calibrated capture, \system{} extracts movable objects and
   collision geometry from the same native 3DGS as the background. The matched
   baseline reconstructs the object independently before insertion. Policies are
-  post-trained on identical trajectories and evaluated on AgiBot G2 from a
+  post-trained on identical trajectories and evaluated on AgiBot G2, which is
+  absent from the foundation models' pretraining data, from a
   bottle-to-basket pick-and-place to picnic packing and trunk placement. The final panel
-  reports \todo{the representative ScanArk-only and strongest-baseline success
+  reports \todo{the representative Scan2VLA-only and strongest-baseline success
   rates, including trial counts}.}
   \label{fig:teaser}
 \end{figure*}
 
-We evaluate this hypothesis on the AgiBot G2 using \piHalf{} and SmolVLA. The
-starting VLA checkpoints receive no G2-specific policy adaptation; the robot
-models, calibration, action interface, and low-level controller are G2-specific
-but frozen across conditions. The task suite uses a beverage-bottle pick-and-place
-into a picnic basket as a diagnostic probe and centers on a long-horizon task that packs tabletop snack
+We evaluate this hypothesis on the AgiBot G2 using the general-purpose VLA
+foundation models \piHalf{} and SmolVLA. G2 is absent from their pretraining
+data, and the starting checkpoints receive no G2-specific policy adaptation data;
+the
+robot models, calibration, action interface, and low-level controller are
+G2-specific but frozen across conditions. The task suite uses a beverage-bottle
+pick-and-place into a picnic basket as a diagnostic probe and centers on a
+long-horizon task that packs tabletop snack
 items into a picnic basket before G2 uses whole-body motion to lift the loaded
 basket and place it in a car trunk. At zero real demonstrations, \system{} obtains
 \todo{$S/N$ end-to-end successes compared with $S_b/N_b$ for the strongest
@@ -137,18 +150,20 @@ matched simulation-only baseline}; along the real-data learning curve, it saves
 \todo{$X\%$ of real demonstrations at threshold $\tau$}. These experiments
 support three contributions:
 \begin{itemize}
-  \item A scene-native decomposition method that fuses multi-view instance
-  evidence into a jointly optimized 3DGS and extracts rigid objects without a
-  separate object scan or cross-asset appearance alignment.
-  \item A simulation-asset construction procedure that separately completes the
-  exposed background and unobserved object surfaces, preserves provenance for
-  observed and synthesized Gaussians, and produces aligned watertight collision
-  geometry. Physical-property estimation remains a fixed external input.
-  \item A controlled AgiBot G2 study that separates generic simulation-only
-  policy adaptation from the effect of scene-native asset provenance, and
-  measures the latter as zero-real-demonstration success and real-demonstration
-  saving across two VLA backbones on the primary long-horizon benchmark, with a
-  bottle-to-basket pick-and-place retained as a diagnostic probe.
+  \item An embodiment-agnostic scene-native decomposition method that fuses
+  multi-view instance evidence into a jointly optimized 3DGS and extracts rigid
+  objects without a separate object scan or cross-asset appearance alignment.
+  \item An interactive Gaussian digital-twin construction procedure that
+  separately completes the exposed background and unobserved object surfaces,
+  preserves provenance for observed and synthesized Gaussians, and produces
+  aligned watertight collision geometry. Physical-property estimation remains a
+  fixed external input.
+  \item An embodiment-agnostic adaptation formulation and a controlled AgiBot G2
+  study in which the target robot is absent from the VLA foundation models'
+  pretraining data. The study separates generic simulation-only policy
+  adaptation from the effect of scene-native asset provenance, and measures
+  zero-real-demonstration success, sim--real predictiveness, and
+  real-demonstration saving on the primary long-horizon benchmark.
 \end{itemize}
 
 \section{Related Work}
@@ -166,8 +181,10 @@ batched Gaussian rendering and rigid-body physics for visual RL
 ~\cite{jia2026gsplayground}, and LEGS used a native 3DGS background with a mesh
 foreground to fine-tune humanoid VLAs without teleoperation~\cite{kim2026legs}.
 These works advance simulator scope, rendering throughput, or downstream
-learning. \system{} instead studies how the provenance of interactive visual
-assets affects the value of VLA training data.
+learning. \system{} instead presents an embodiment-agnostic adaptation pipeline
+and studies how the provenance of interactive visual assets affects the value of
+data used to adapt a general-purpose VLA foundation model to an unseen target
+robot.
 
 \subsection{Real2Sim Assets and Interactive Digital Twins}
 Real2Render2Real reconstructs separately scanned rigid and articulated objects
@@ -203,11 +220,12 @@ hybrid-rendered data can train policies that transfer to hardware; their
 evaluations include fixed-budget, data-scale, and collection-cost comparisons.
 We ask a different question: after holding trajectories, physics, cameras,
 visual-calibration effort, and optimization fixed, how does asset provenance
-shift the complete mixed sim--real learning curve? This design estimates the
-real-demonstration equivalent of scene-native simulation data rather than only
-comparing one or two data budgets.
+shift the complete mixed sim--real learning curve when adapting a foundation
+model to an unseen embodiment? This design estimates the real-demonstration
+equivalent of scene-native simulation data rather than only comparing one or two
+data budgets.
 
-\section{\system}
+\section{\system: Scene-Native Interactive Gaussian Adaptation}
 \label{sec:method}
 
 \subsection{Problem Formulation}
@@ -228,7 +246,7 @@ where each Gaussian
 $g_i=(\boldsymbol{\mu}_i,\boldsymbol{\Sigma}_i,\alpha_i,
 \mathbf{c}_i,z_i,r_i)$ contains a mean, covariance, opacity, appearance
 coefficients, instance label $z_i$, and provenance label
-$r_i\in\{\mathrm{observed},\mathrm{synthesized}\}$. ScanArk infers $z_i$ and
+$r_i\in\{\mathrm{observed},\mathrm{synthesized}\}$. \system{} infers $z_i$ and
 constructs an interactive asset
 \begin{equation}
   \mathcal{A}_k =
@@ -241,15 +259,16 @@ estimator. The scene and assets are rigid, metrically scaled, and expressed in a
 common simulator frame. We assume calibrated cameras and do not model dynamic
 relighting, transparent objects, or deformable bodies.
 
-At time $t$, the VLA policy receives rendered camera observations $\mathbf{o}_t$,
-G2 proprioception $\mathbf{s}_t$, and a language instruction $\ell$. It predicts
+At time $t$, an embodiment-agnostic VLA policy receives rendered camera
+observations $\mathbf{o}_t$,
+target-robot proprioception $\mathbf{s}_t$, and a language instruction $\ell$. It predicts
 an $H$-step action chunk
 \begin{equation}
   \mathbf{a}_{t:t+H-1}
   = \pi_{\theta}(\mathbf{o}_t,\mathbf{s}_t,\ell).
   \label{eq:vla-policy}
 \end{equation}
-A frozen G2 execution stack $\mathcal{E}_{\mathrm{G2}}$ maps the first
+A frozen target-robot execution stack $\mathcal{E}_{\mathrm{robot}}$ maps the first
 $k\leq H$ actions to executable commands, applies the same low-level controller
 and safety checks in every condition, and then acquires a new observation. The
 special case $k=H$ corresponds to chunk-level replanning. \todo{Specify the
@@ -258,13 +277,13 @@ frequency, and safety checks used in the actual system.}
 
 Let $\mathcal{D}_{\mathrm{sim}}^m$ be the simulation-generated trajectories
 under asset condition $m$, and let $\mathcal{D}_{\mathrm{real}}(n)$ contain $n$
-real G2 demonstrations. For a target real-world success rate $\tau$,
+real target-robot demonstrations. For a target real-world success rate $\tau$,
 $N_{\mathrm{real}}^{m}(\tau)$ denotes the minimum $n$ for which post-training on
 $\mathcal{D}_{\mathrm{sim}}^m\cup\mathcal{D}_{\mathrm{real}}(n)$ reaches
-$\tau$. We measure the real-demonstration value of ScanArk data as
+$\tau$. We measure the real-demonstration value of Scan2VLA data as
 \begin{equation}
   \mathrm{Saving}(\tau) = 1 -
-  \frac{N_{\mathrm{real}}^{\mathrm{ScanArk}}(\tau)}
+  \frac{N_{\mathrm{real}}^{\mathrm{Scan2VLA}}(\tau)}
        {N_{\mathrm{real}}^{\mathrm{RealOnly}}(\tau)}.
   \label{eq:saving}
 \end{equation}
@@ -281,11 +300,12 @@ and background completion, records which primitives are observed or synthesized,
 and extracts collision geometry aligned to each movable Gaussian subset. Third,
 the simulator transforms visual and collision representations from the same
 object pose, generates synchronized image--language--state--action trajectories,
-and post-trains the VLA. The reconstruction and completion modules operate only
+  and post-trains the foundation-model VLA. The reconstruction and completion modules operate only
 during digital-twin construction; the VLA is the only learned component updated
 during policy post-training. Camera calibration, physical parameters, the G2
 action adapter, low-level controller, and safety stack remain fixed across all
-asset conditions.
+  asset conditions; the target-robot interface adapter and execution stack are
+  fixed deployment components rather than learned contributions.
 
 \begin{figure*}[t]
   \centering
@@ -294,7 +314,8 @@ asset conditions.
     native 3DGS; (2) multi-view instance evidence and Gaussian label fusion;
     (3) object/background completion with observed/synthesized provenance;
     (4) watertight collision geometry and physics binding; (5) synchronized
-    trajectory generation, VLA post-training, and frozen G2 execution. Mark
+    trajectory generation, foundation-model VLA post-training, and frozen G2
+    execution. Mark
     optimized, pretrained/fixed, and post-trained modules with distinct styles.}}
   \caption{Overview of \system{}. A single jointly optimized scene is
   decomposed into independently movable Gaussian assets. Geometry completion
@@ -305,7 +326,7 @@ asset conditions.
 
 \subsection{Native Scene Reconstruction}
 Independent object scans create separate coordinate and capture domains. To
-avoid this split, ScanArk captures the target workspace and all interactive
+avoid this split, \system{} captures the target workspace and all interactive
 objects together under the deployment appearance, then optimizes a single 3DGS
 $\mathcal{G}_{\mathrm{scene}}$ from $\mathcal{V}$. Camera poses define a shared
 scene frame; \todo{metric-scale source, such as a calibrated robot geometry or
@@ -322,7 +343,7 @@ error.}
 Moving an object requires instance labels on Gaussian primitives rather than
 view-specific pixels. Let $M_j^k$ be the 2D mask of instance $k$ in view $j$,
 $\Pi_j$ the camera projection, $v_{ij}$ a visibility indicator, and $w_{ij}$ a
-confidence weight. ScanArk aggregates the support for assigning Gaussian $i$ to
+  confidence weight. \system{} aggregates the support for assigning Gaussian $i$ to
 instance $k$ as
 \begin{equation}
   p_i(k)=
@@ -344,7 +365,7 @@ estimator, and whether any manual correction is permitted.}
 \subsection{Object and Background Completion}
 Extraction alone is insufficient: removing an object reveals a hole in the
 background, while rotating it reveals its previously occluded underside and
-rear surfaces. ScanArk therefore applies two completion operators with different
+  rear surfaces. \system{} therefore applies two completion operators with different
 supports,
 \begin{equation}
   \widehat{\mathcal{G}}_{\mathrm{bg}}
@@ -367,7 +388,7 @@ mechanism, and rejection criteria for failed completion.}
 
 \subsection{Collision Geometry and Physics Binding}
 Photorealistic Gaussians do not by themselves define stable contact geometry.
-For each completed object, ScanArk extracts a surface from
+For each completed object, \system{} extracts a surface from
 $\widehat{\mathcal{G}}_{\mathrm{obj}}^k$, removes low-confidence and disconnected
 components, closes remaining holes, and simplifies the resulting watertight mesh
 for collision decomposition. The visual subset and collision mesh share the
@@ -395,31 +416,32 @@ This transformation preserves captured radiance but does not perform
 physically correct relighting; shadows and highlights may remain baked into the
 representation.
 
-\subsection{VLA Data Generation and Post-Training}
+\subsection{General-Purpose VLA Adaptation and Post-Training}
 The simulator generates expert state--action trajectories using \todo{motion
 planning, simulation teleoperation, scripted skills, or the actual combination}.
 At every policy step it records
 $d_t=(\mathbf{o}_t,\mathbf{s}_t,\ell,
-\mathbf{a}_{t:t+H-1})$ with synchronized camera images, G2 state, instruction,
+\mathbf{a}_{t:t+H-1})$ with synchronized camera images, target-robot state,
+instruction,
 and action chunk. A trajectory is retained only under a prespecified validity
-rule; the same accepted state--action sequence is rendered with ScanArk,
+rule; the same accepted state--action sequence is rendered with \system{},
 Independent-GS, GS-background/mesh-object, and mesh/PBR assets. Thus the visual
 asset source changes while task states, actions, collision geometry, physical
 parameters, initial-state distribution, and frame count remain fixed.
 
-For each VLA backbone, post-training uses the same action representation,
+For each foundation-model backbone, post-training uses the same action representation,
 normalization, image and language preprocessing, augmentation, trainable
 parameters, optimizer steps, and checkpoint-selection rule. At deployment, the
-policy consumes real G2 observations and the frozen execution stack applies
+policy consumes real target-robot observations and the frozen execution stack applies
 Eq.~\eqref{eq:vla-policy} using the same action semantics as simulation.
 \todo{Report trajectory counts and duration, successful/failed trajectory
 ratio, train/validation split by scene and trajectory, optimizer and learning
 rate, batch size, training steps, model-selection split, and inference
 preprocessing.}
 
-Before applying any experimental treatment, verify that each starting VLA
-checkpoint has received no G2-specific policy-adaptation data. Record the exact
-checkpoint hash, training-data manifest and cutoff, and the operational
+Before applying any experimental treatment, verify that G2 is absent from each
+starting foundation model's pretraining and adaptation data. Record the exact
+checkpoint hash, pretraining-data manifest and cutoff, and the operational
 definition of ``G2-specific.'' Report all G2 information used outside the VLA,
 including calibration, URDF/geometry, action adapters, and low-level controller
 training. Base-zero-shot receives no optimization; it shares the same checkpoint
@@ -439,8 +461,9 @@ accurate, collision-ready object and background assets?
 movable object's scene-native Gaussian appearance improve paired sim--real
 visual consistency over independently reconstructed Gaussian and mesh-rendered
 assets, and does simulation performance predict real performance across paired
-validation groups? (iii)~\textbf{RQ3: Policy-data value.} Can simulation-generated \system{} trajectories adapt previously
-unadapted VLA policy checkpoints to the AgiBot G2 with zero real demonstrations,
+validation groups? (iii)~\textbf{RQ3: Policy-data value.} Can simulation-generated
+\system{} trajectories adapt a general-purpose VLA foundation model to an unseen
+AgiBot G2 with zero real demonstrations,
 and how many real demonstrations does it save at a fixed real-world success rate
 across \piHalf{} and SmolVLA? Finally, (iv)~\textbf{RQ4: Scope and failure.}
 Does the effect persist from a short-horizon bottle-to-basket task to whole-body,
@@ -456,7 +479,8 @@ counts. Each main figure and table is assigned to one of these questions.
 
 \subsection{Experimental Setup}
 \subsubsection{Robot and policy interface.}
-The target platform is the AgiBot G2. All VLA post-training runs on an NVIDIA
+The formulation is independent of the target embodiment; our real-robot
+evaluation uses the AgiBot G2. All VLA post-training runs on an NVIDIA
 RTX A6000 GPU; deployment inference runs on an NVIDIA RTX 5060 connected to the
 G2 execution system. We report the GPU software stack and whether the inference
 host is onboard or external, together with its communication interface. We also
@@ -466,8 +490,8 @@ action-adapter mapping, and the relationship between high-level policy updates
 and the low-level locomotion/manipulation controller. We also report policy and
 control frequencies, mean and P95 observation-to-action latency, action-chunk
 length, replanning interval, and all safety-stop conditions. A checkpoint and
-training-manifest audit establishes that the starting VLA policies have no
-G2-specific adaptation data; this claim explicitly excludes the frozen
+training-manifest audit establishes that G2 is absent from the foundation models'
+pretraining and adaptation data; this claim explicitly excludes the frozen
 G2-specific execution stack. \todo{Fill the remaining CPU, memory, CUDA/software,
 G2 action/control, latency, communication, and checkpoint-provenance values.}
 
@@ -531,22 +555,25 @@ defines the remaining process, quality, efficiency, and safety measurements.
 The three validation groups assigned to each model are independent paired
 evaluation groups, not training seeds. Three tasks, three scenes, and two VLA
 backbones define 18 task--scene--backbone models; three groups per model yield
-54 group-level sim--real units. Each group uses four real initial-state seeds,
-and the same four seeds appear unchanged in both simulation evaluation branches.
-Consequently, each model receives $3\times4=12$ real episodes. Each simulation
-branch receives $N_{\mathrm{sim}}=24$ episodes per model, allocated evenly as
-eight episodes per validation group: four paired seeds and four additional
-states from the same prespecified distribution. The complete protocol therefore
-contains $18\times12=216$ real episodes and
-$18\times24\times2=864$ simulation episodes, with 432 episodes in each
-simulation branch, for 1080 evaluation episodes in total.
-\todo{Name and define the two simulation branches.}
+54 real validation units. Each group contains four real initial-state seeds, so
+each model contributes $3\times4=12$ real episodes and the real evaluation pool
+contains $18\times12=216$ episodes. Sim--real correlation does not require
+simulating the entire real pool. Before observing simulation outcomes, we select
+a stratified subset $\mathcal{P}$ of the 216 episodes, preserving coverage of all
+tasks, scenes, backbones, and validation groups, and replay only those initial
+states in simulation. The same selected seed is used unchanged in both domains.
+The paired simulation cost is therefore $N_{\mathrm{pair}}=|\mathcal{P}|$, not
+an additional fixed multiple of 216. \todo{Prespecify $N_{\mathrm{pair}}$, its
+allocation across the 18 models and 54 groups, and the selection seed.}
 
-For model $m\in\{1,\ldots,18\}$ and simulation branch $b\in\{1,2\}$, we compute
+For model $m\in\{1,\ldots,18\}$, let $\mathcal{P}_m$ be its selected paired
+episodes and $n_m=|\mathcal{P}_m|$. We compute
 \begin{equation}
-  \widehat{p}^{\mathrm{real}}_m=\frac{S^{\mathrm{real}}_m}{12},
+  \widehat{p}^{\mathrm{real,pair}}_m
+    =\frac{1}{n_m}\sum_{i\in\mathcal{P}_m}y_i^{\mathrm{real}},
   \qquad
-  \widehat{p}^{\mathrm{sim}}_{m,b}=\frac{S^{\mathrm{sim}}_{m,b}}{24}.
+  \widehat{p}^{\mathrm{sim,pair}}_m
+    =\frac{1}{n_m}\sum_{i\in\mathcal{P}_m}y_i^{\mathrm{sim}}.
   \label{eq:sim-real-rates}
 \end{equation}
 The same task definition, initial-state distribution, success predicate, episode
@@ -573,10 +600,10 @@ real-robot evaluation time are reported separately.
 
 \subsection{Baselines and Controlled Comparisons}
 \begin{table*}[t]
-  \caption{Controlled training conditions. All post-trained conditions share
+  \caption{Controlled adaptation conditions. All post-trained conditions share
   starting VLA weights, trajectories, action labels, trainable parameters,
   optimizer budget, collision geometry, physical parameters, camera protocol,
-  initial-state distribution, and frozen G2 execution stack.}
+  initial-state distribution, and frozen target-robot execution stack.}
   \label{tab:conditions}
   \centering
   \small
@@ -588,11 +615,11 @@ real-robot evaluation time are reported separately.
     \midrule
     Base zero-shot & Real & Real & Unadapted G2 checkpoint \\
     Real-only & Real & Real & Real-data learning curve \\
-    ScanArk-only & Native 3DGS & In-situ native 3DGS & Zero-real-demo G2 adaptation \\
+    Scan2VLA-only & Native 3DGS & In-situ native 3DGS & Zero-real-demo G2 adaptation \\
     Independent-GS-only & Native 3DGS & Separately reconstructed GS & Inserted-asset control \\
     GS-BG + Mesh-Obj-only & Native 3DGS & Mesh/PBR & Foreground-representation control \\
     Mesh/PBR-only & Mesh/PBR & Mesh/PBR & Conventional zero-real-demo control \\
-    ScanArk + Real & Native 3DGS & In-situ native 3DGS & Real-data saving \\
+    Scan2VLA + Real & Native 3DGS & In-situ native 3DGS & Real-data saving \\
     Independent-GS + Real & Native 3DGS & Separately reconstructed GS & Asset-source learning curve \\
     GS-BG + Mesh-Obj + Real & Native 3DGS & Mesh/PBR & Object-appearance learning curve \\
     Mesh/PBR + Real & Mesh/PBR & Mesh/PBR & Conventional learning curve \\
@@ -646,35 +673,29 @@ camera poses. Each asset route renders the same held-out state set; LPIPS and
 DINO feature distance measure full-frame perceptual discrepancy, while a
 boundary-weighted error isolates the manipulated object and contact region.
 Results are stratified by observed versus synthesized surface and by translation
-and rotation from the captured pose. The strongest comparison is ScanArk versus
+and rotation from the captured pose. The strongest comparison is Scan2VLA versus
 Independent-GS because trajectories, collision geometry, and calibration effort
 are matched and only asset provenance changes. These metrics test consistency
 with the capture domain, not physically correct materials or relighting.
 \todo{Define the paired-state acquisition protocol, boundary band, pose bins,
 number of frames, and confidence interval.}
 
-Policy predictiveness uses the 54 validation groups nested within the 18 models
-in Eq.~\eqref{eq:sim-real-rates}. For each simulation branch, the primary
-descriptive summary is Spearman's rank correlation across the 18 model-level
-simulation/real success pairs; Pearson correlation is reported for comparison
-with prior sim--real studies. Correlation alone does not measure calibration, so
-we also report the sim--real success gap, mean absolute calibration error, and
-the slope and intercept of a binomial hierarchical calibration model fitted to
-all 54 groups. Confidence intervals resample the 18 task--scene--backbone models
-as clusters, retaining all three validation groups within each sampled model;
-the 54 groups are not treated as fully independent observations. On the four
-exactly matched seeds per group, a $2\times2$ success/failure table reports
-both-success, sim-only-success, real-only-success, and both-failure counts,
-together with agreement and Matthews correlation. This yields 216 paired
-episode outcomes per simulation branch. We do not compute a separate correlation
-from only three points for each model.
+Policy predictiveness uses the stratified paired subset in
+Eq.~\eqref{eq:sim-real-rates}. The main paper reports a compact scatter plot and
+Spearman's rank correlation across the 18 model-level simulation/real pairs;
+Pearson correlation and mean absolute calibration error are secondary summaries.
+Model-cluster bootstrap intervals preserve the three validation groups nested
+within each model. At episode level, a $2\times2$ success/failure table over the
+$N_{\mathrm{pair}}$ matched seeds reports both-success, sim-only-success,
+real-only-success, and both-failure. The complete 54-cell ledger, subset manifest,
+calibration model, and task/backbone-stratified results are supplementary.
 
 \subsection{Real-Demonstration Efficiency}
-First compare the unadapted Base-zero-shot checkpoint with ScanArk-only,
+First compare the unadapted Base-zero-shot checkpoint with Scan2VLA-only,
 Independent-GS-only, GS-BG + Mesh-Obj-only, and Mesh/PBR-only at
 $N_{\mathrm{real}}=0$. A supported gain for every post-trained condition over
 Base-zero-shot is evidence that simulation-generated trajectories can adapt the
-G2 VLA policy. A further ScanArk-only gain over the matched zero-real-data asset
+  G2 policy. A further Scan2VLA-only gain over the matched zero-real-data asset
 controls is needed to attribute the improvement to scene-native provenance.
 Report exact success counts, trial counts, and confidence intervals; do not
 summarize this result only with qualitative terms such as ``strong'' or
@@ -682,7 +703,7 @@ summarize this result only with qualitative terms such as ``strong'' or
 does not exclude the real-scene capture and calibration used to construct the
 simulator.
 
-For each backbone, train Real-only and ScanArk + Real policies with
+For each backbone, train Real-only and Scan2VLA + Real policies with
 \begin{equation}
   N_{\mathrm{real}} \in \{0,5,10,25,50\}, \qquad
   N_{\mathrm{sim}} = 500 \text{ per task}.
@@ -701,12 +722,12 @@ between \piHalf{} and SmolVLA.
     Main plot: real-robot success rate versus number of real demonstrations.
     Mark Base-zero-shot and all four simulation-only conditions at zero real
     demonstrations; show
-    Real-only, ScanArk + Real, Independent-GS + Real, and Mesh/PBR + Real
+    Real-only, Scan2VLA + Real, Independent-GS + Real, and Mesh/PBR + Real
     with 95\% confidence bands; mark the demonstration saving at threshold
     $\tau$.}}
   \caption{Primary result: real-data learning curves. The horizontal gap at a
   fixed real-world success rate defines the real demonstrations replaced by
-  ScanArk data.}
+  Scan2VLA data.}
   \label{fig:data-efficiency}
 \end{figure}
 
@@ -722,7 +743,7 @@ between \piHalf{} and SmolVLA.
     Training data & $N_{\mathrm{real}}$ & Success $\uparrow$ & Saving $\uparrow$ \\
     \midrule
     Base zero-shot & 0 & -- & -- \\
-    ScanArk-only & 0 & -- & -- \\
+    Scan2VLA-only & 0 & -- & -- \\
     Independent-GS-only & 0 & -- & -- \\
     GS-BG + Mesh-Obj-only & 0 & -- & -- \\
     Mesh/PBR-only & 0 & -- & -- \\
@@ -730,7 +751,7 @@ between \piHalf{} and SmolVLA.
     Mesh/PBR + Real & -- & -- & -- \\
     GS-BG + Mesh-Obj + Real & -- & -- & -- \\
     Independent-GS + Real & -- & -- & -- \\
-    ScanArk + Real & -- & -- & -- \\
+    Scan2VLA + Real & -- & -- & -- \\
     \bottomrule
   \end{tabular}
   }
@@ -762,12 +783,12 @@ hiding materially different execution quality or failure modes.
     Mesh/PBR-only & -- & -- & -- & -- & -- & -- \\
     GS-BG + Mesh-Obj-only & -- & -- & -- & -- & -- & -- \\
     Independent-GS-only & -- & -- & -- & -- & -- & -- \\
-    ScanArk-only & -- & -- & -- & -- & -- & -- \\
+    Scan2VLA-only & -- & -- & -- & -- & -- & -- \\
     \bottomrule
   \end{tabular}
 \end{table*}
 
-\todo{Write the result paragraph as: purpose; exact ScanArk and strongest
+\todo{Write the result paragraph as: purpose; exact Scan2VLA and strongest
 baseline successes/trials; percentage-point difference with uncertainty; effect
 on item completion, attempts/drops, basket stability, final pose error, and
 duration; stage at which the gap first appears; bounded interpretation; failure
@@ -818,11 +839,11 @@ outcomes. Method comparisons use a mixed-effects logistic model with asset condi
 budget as fixed effects and task, scene, object, and initial state as random
 effects~\cite{kressgazit2024empirical}; small paired samples additionally receive
 an exact paired or Fisher test as appropriate. Sim--real correlation uses the
-54 validation cells but preserves their nesting within 18 models: intervals are
-obtained by model-cluster bootstrap, and the binomial calibration model accounts
-for the unequal per-model denominators $N_{\mathrm{real}}=12$ and
-$N_{\mathrm{sim}}=24$ per simulation branch. Correlations, calibration errors, and paired
-episode agreement are reported per task and backbone before any pooled result.
+prespecified subset of paired real/simulation episodes and preserves the 54
+validation cells nested within 18 models. Intervals use model-cluster bootstrap;
+the supplementary hierarchical binomial model accounts for unequal selected
+subset sizes $n_m$. Correlation, calibration error, and paired-episode agreement
+are reported per task and backbone before any pooled result.
 Estimating
 Eq.~\eqref{eq:saving} bootstraps data sampling, policy training seed, real-robot
 episodes, and the complete learning-curve interpolation procedure. Statistical
@@ -833,18 +854,20 @@ sizes and uncertainty.
 \label{sec:limitations}
 The causal interpretation depends on both levels of control. A gain shared by
 all simulation-only conditions over Base zero-shot establishes the value of
-simulation-generated G2 trajectories; only an additional ScanArk-only gain over
+simulation-generated G2 trajectories; only an additional Scan2VLA-only gain over
 Independent-GS-only and mesh-foreground controls supports the scene-native
 asset-provenance hypothesis. Visual and policy gains should therefore be
 reported separately rather than attributing all adaptation to decomposition.
 
-``Zero real demonstrations'' does not mean zero real-world information: ScanArk
+``Zero real demonstrations'' does not mean zero real-world information: Scan2VLA
 uses a target-scene capture, camera/robot calibration, robot geometry, and a
-frozen G2 execution stack. The experiments adapt the VLA policy, not the full
-robot controller. Target-twin results measure adaptation to captured deployment
-scenes; held-out objects, backgrounds, lighting, language, and scenes are
-separate generalization claims and must not be inferred from target-scene
-success.
+frozen G2 execution stack. The experiments adapt the foundation-model policy, not
+the full robot controller. The formulation is embodiment-agnostic, but the
+reported evidence covers one genuinely unseen target embodiment, AgiBot G2;
+transfer to another robot requires a separate interface and execution audit.
+Target-twin results measure adaptation to captured deployment scenes; held-out
+objects, backgrounds, lighting, language, and scenes are separate generalization
+claims and must not be inferred from target-scene success.
 
 Native 3DGS preserves capture-conditioned appearance but does not separate
 material from illumination. Large object motions may expose synthesized regions
@@ -858,15 +881,17 @@ not automatically transfer to another embodiment or controller.
 
 \section{Conclusion}
 \label{sec:conclusion}
-We presented \system, which converts a jointly reconstructed native 3DGS scene
-into movable Gaussian object assets with separately completed background/object
-regions and aligned collision geometry. On AgiBot G2, the controlled evaluation
-separates generic simulation-only adaptation from the value of scene-native
-asset provenance across short- and long-horizon tasks. \todo{State the exact
-ScanArk-only successes/trials versus the strongest matched baseline and the
-real-demonstration saving with confidence intervals.} The evidence
-\todo{state only the bounded conclusion supported for the evaluated rigid
-objects, captured scenes, VLA backbones, and frozen G2 execution stack}.
+We presented \system, an embodiment-agnostic pipeline that converts a jointly
+reconstructed native 3DGS scene into an interactive Gaussian digital twin with
+movable object assets, completed background/object regions, and aligned collision
+geometry. On AgiBot G2, which is absent from the evaluated foundation models'
+pretraining data, the controlled study measures simulation-only adaptation,
+scene-native asset provenance, and sim--real predictiveness across short- and
+long-horizon tasks. \todo{State the exact Scan2VLA-only successes/trials versus
+the strongest matched baseline and the real-demonstration saving with confidence
+intervals.} The evidence \todo{state only the bounded conclusion supported for
+the evaluated rigid objects, captured scenes, unseen G2 embodiment, VLA
+backbones, and frozen execution stack}.
 
 \begin{thebibliography}{17}
 

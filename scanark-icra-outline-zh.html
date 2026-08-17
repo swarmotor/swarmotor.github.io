@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="ScanArk ICRA 论文中文大纲：从原生场景 3DGS 自动分解交互物体，并量化其对 VLA 真实演示数据效率的提升。">
+  <meta name="description" content="Scan2VLA ICRA 论文中文框架：面向通用 VLA 基模到未见 AgiBot G2 本体的场景原生交互式 Gaussian 数字孪生适配。">
   <meta name="theme-color" content="#fafaf9">
   <link rel="icon" href="data:,">
-  <title>ScanArk：面向真实演示高效 VLA 适配的场景原生 Gaussian 物体提取</title>
+  <title>Scan2VLA：Scene-Native Vision-Language-Action Learning with Interactive Gaussian Digital Twins</title>
   <style>
     :root {
       --bg: #fafaf9;
@@ -556,7 +556,7 @@
 
   <nav class="topbar" aria-label="页面导航">
     <div class="topbar-inner">
-      <a class="brand" href="#top">ScanArk 论文大纲</a>
+      <a class="brand" href="#top">Scan2VLA 论文框架</a>
       <div class="top-links">
         <a href="icra-paper-framework.tex">查看 TeX 版本</a>
         <a href="posts.html">返回文章列表</a>
@@ -566,8 +566,8 @@
 
   <header class="hero">
     <p class="eyebrow">ICRA 2027 · 中文论文框架</p>
-    <h1>ScanArk：面向真实演示高效 VLA 适配的场景原生 Gaussian 物体提取</h1>
-    <p class="subtitle">从一次原生场景 3DGS 中自动分解可交互物体，以零真实演示的仿真生成轨迹首次适配 AgiBot G2 VLA，并量化能够替代多少真实机器人演示。</p>
+    <h1>Scan2VLA：Scene-Native Vision-Language-Action Learning with Interactive Gaussian Digital Twins</h1>
+    <p class="subtitle">用一次场景原生 3DGS 重建构建交互式 Gaussian 数字孪生，将通用 VLA 基模适配到预训练中完全未出现的 AgiBot G2，并在零真实演示后训练下评估 sim-real 关联与长程执行。</p>
     <div class="hero-meta" role="group" aria-label="论文关键词">
       <span class="chip">原生 3DGS</span>
       <span class="chip">自动实例分解</span>
@@ -577,7 +577,7 @@
       <span class="chip">AgiBot G2</span>
     </div>
     <div class="thesis">
-      <strong>一句话主旨：</strong>ScanArk 不再把目标场景只当作静态背景，而是把一次联合重建的场景本身变成可交互资产库；在 VLA 检查点从未针对 AgiBot G2 适配的条件下，验证仿真生成的 Gaussian 轨迹能否以零真实演示完成首次策略适配，并提高每条仿真轨迹的“真实演示等价值”。
+      <strong>一句话主旨：</strong>Scan2VLA 将一次联合重建的场景转化为交互式 Gaussian 数字孪生，以通用 VLA 基模在预训练中完全未见 AgiBot G2 的条件下进行本体适配；scene-native 物体提取、双向补全和碰撞绑定是关键机制，零真实演示只指 VLA 后训练适配数据。
     </div>
   </header>
 
@@ -589,7 +589,7 @@
         <li><a href="#abstract">摘要</a></li>
         <li><a href="#introduction">引言</a></li>
         <li><a href="#related-work">相关工作</a></li>
-        <li><a href="#method">ScanArk 方法</a></li>
+        <li><a href="#method">Scan2VLA 方法</a></li>
         <li><a href="#experiments">实验</a></li>
         <li><a href="#limitations">局限性</a></li>
         <li><a href="#conclusion">结论</a></li>
@@ -598,7 +598,7 @@
     </aside>
 
     <main id="main-content">
-      <article aria-label="ScanArk ICRA 中文论文大纲">
+      <article aria-label="Scan2VLA ICRA 中文论文框架">
         <section class="paper-section" id="positioning">
           <span class="section-number">Writing Decision</span>
           <h2>标题与文章立意</h2>
@@ -616,25 +616,25 @@
                   <td>适合作为方向描述，不建议作为最终标题。</td>
                 </tr>
                 <tr>
-                  <td><em>ScanArk: Scene-Native Gaussian Digital Twins for Data-Efficient VLA Adaptation</em></td>
+                  <td><em>Scan2VLA: Scene-Native Gaussian Digital Twins for Data-Efficient VLA Adaptation</em></td>
                   <td>方法名、核心表示和可检验终点都清楚。</td>
                   <td>没有明确说明孪生是可移动、可碰撞、可生成交互数据的。</td>
                   <td>比宽泛标题更稳健。</td>
                 </tr>
                 <tr>
-                  <td><em>ScanArk: Scene-Native Interactive Gaussian Digital Twins for Data-Efficient VLA Adaptation</em></td>
+                  <td><em>Scan2VLA: Scene-Native Interactive Gaussian Digital Twins for Data-Efficient VLA Adaptation</em></td>
                   <td>保留场景原生与数据效率，同时补上交互性；标题与方法、实验主指标一致。</td>
                   <td>“Interactive Gaussian Digital Twins” 已与 High-Fidelity Digital Twin、GaussTwin 和 ArtiTwinSplat 处于同一类别，仍会稀释本文更窄的资产来源贡献。</td>
                   <td>可读，但不是最容易防守的标题。</td>
                 </tr>
                 <tr>
-                  <td><em>ScanArk: From Native 3DGS Scenes to Interactive Digital Twins for Data-Efficient VLA Adaptation</em></td>
+                  <td><em>Scan2VLA: From Native 3DGS Scenes to Interactive Digital Twins for Data-Efficient VLA Adaptation</em></td>
                   <td>最直接表达“场景重建转为交互资产”的技术路径。</td>
                   <td>弱化“scene-native”作为概念标签，也没有直接点出物体来源偏差。</td>
                   <td>适合作为备选机制型标题。</td>
                 </tr>
                 <tr>
-                  <td><strong><em>ScanArk: Scene-Native Gaussian Object Extraction for Real-Demonstration-Efficient VLA Adaptation</em></strong></td>
+                  <td><strong><em>Scan2VLA: Scene-Native Vision-Language-Action Learning with Interactive Gaussian Digital Twins</em></strong></td>
                   <td>直接点出最可区分的方法机制，并保留 VLA 真实数据效率这一实验终点。</td>
                   <td>“数字孪生”的系统感减弱，但避免与近一年通用 Gaussian twin 论文正面同类化。</td>
                   <td><strong>推荐。</strong></td>
@@ -642,7 +642,7 @@
               </tbody>
             </table>
           </div>
-          <div class="callout"><p><strong>推荐立意：</strong>本文不再主张“3DGS 可以训练 VLA”，因为近一年已有多篇论文证明这一点；本文要检验的是更窄且可证伪的命题：<strong>目标场景自身是否可以成为交互资产库，以及场景原生的资产来源能否在从未针对 AgiBot G2 适配的 VLA 检查点上实现零真实演示适配，并提高仿真数据的真实演示等价值。</strong>这里的“零真实演示”仅指 VLA 后训练轨迹；数字孪生仍使用真实场景采集、机器人模型与 G2 标定。</p></div>
+          <div class="callout"><p><strong>推荐立意：</strong>本文定位不是“又一个 Gaussian 仿真器”，而是<strong>通用 VLA 基模如何通过交互式 Gaussian 数字孪生适配到一个预训练中完全未出现的新机器人本体</strong>。Scan2VLA 的 scene-native 物体提取、物体/背景双向补全和碰撞绑定是实现这一适配的关键机制；AgiBot G2 是唯一真实部署本体，因此正文主张限定为“在一个真正未见的目标本体上验证通用适配框架”，而不是无证据地宣称已经覆盖所有机器人。这里的“零真实演示”仅指 VLA 后训练适配数据；数字孪生仍使用真实场景采集、机器人模型与 G2 标定。</p></div>
 
           <h3>主张—机制—证据矩阵</h3>
           <div class="table-wrap">
@@ -651,8 +651,8 @@
               <thead><tr><th scope="col">核心主张</th><th scope="col">方法机制</th><th scope="col">必要证据</th><th scope="col">结论边界</th></tr></thead>
               <tbody>
                 <tr><td>一次联合场景重建可以生成有效的可移动资产。</td><td>多视角 Gaussian 实例分解、物体/背景双向补全、对齐碰撞几何。</td><td>Mask/边界、补全、Chamfer、闭合率、碰撞误检与失败案例。</td><td>当前只覆盖刚体、已标定捕获和采集条件下的外观。</td></tr>
-                <tr><td>场景原生资产比独立插入资产提供更匹配的策略观测。</td><td>物体与背景共享坐标系和采集域，避免第二次外观对齐。</td><td>配对状态渲染；ScanArk 对 Independent-GS 的 LPIPS、DINO 与边界误差；observed/synthesized 分层。</td><td>只能说明采集域一致性，不能说明物理正确重光照。</td></tr>
-                <tr><td>场景原生轨迹提高 G2 VLA 的真实演示效率。</td><td>固定轨迹、物理、控制器和预算，只改变资产来源。</td><td>Base zero-shot 与四种 only 条件；真实数据学习曲线；两种 VLA；短/长时程端到端真机试验。</td><td>零真实演示不等于零真实信息；适配的是 VLA，不是冻结的 G2 执行栈。</td></tr>
+                <tr><td>场景原生资产比独立插入资产提供更匹配的策略观测。</td><td>物体与背景共享坐标系和采集域，避免第二次外观对齐。</td><td>配对状态渲染；Scan2VLA 对 Independent-GS 的 LPIPS、DINO 与边界误差；observed/synthesized 分层。</td><td>只能说明采集域一致性，不能说明物理正确重光照。</td></tr>
+                <tr><td>通用 VLA 基模可以适配预训练中未出现的 G2 本体。</td><td>交互式 Gaussian 数字孪生提供 G2 相机、状态、动作和场景交互轨迹；scene-native 资产减少前景/背景域差异。</td><td>π<sub>0.5</sub> 与 SmolVLA 的预训练 manifest 审计；Base zero-shot、仿真-only 适配、真实学习曲线；G2 真机短/长程结果。</td><td>真机证据只覆盖 AgiBot G2；通用性是 embodiment-agnostic formulation，不是多本体实证。</td></tr>
               </tbody>
             </table>
           </div>
@@ -661,28 +661,28 @@
           <div class="table-wrap">
             <table>
               <caption>2025 年 8 月至 2026 年 8 月的主要相邻进展；SplatSim、Re3Sim 和 Real2Render2Real 作为更早的必要基础工作在相关工作中另行保留。</caption>
-              <thead><tr><th scope="col">工作</th><th scope="col">主要问题</th><th scope="col">资产路线</th><th scope="col">ScanArk 应如何区分</th></tr></thead>
+              <thead><tr><th scope="col">工作</th><th scope="col">主要问题</th><th scope="col">资产路线</th><th scope="col">Scan2VLA 应如何区分</th></tr></thead>
               <tbody>
                 <tr><td><a href="https://arxiv.org/abs/2510.20813" target="_blank" rel="noopener noreferrer">GSWorld</a></td><td>闭环照片级模拟器、GSDF 资产格式、训练与评测。</td><td>背景/机器人重建，交互物体来自数据集或单独的自定义物体重建。</td><td>不竞争模拟器功能；研究一次联合场景重建能否直接提供可移动资产。</td></tr>
-                <tr><td><a href="https://arxiv.org/abs/2511.04665" target="_blank" rel="noopener noreferrer">Real-to-Sim Soft-Body Evaluation</a></td><td>软体与刚体任务中的配对仿真—真实策略性能相关性。</td><td>3DGS 外观、位置/颜色对齐与 PhysTwin 动力学结合，也包含刚体 T-block pushing。</td><td>其配对评测方法是直接先例；本文关注资产来源、未适配 G2 VLA 的零真实演示适配和完整真实数据学习曲线。</td></tr>
+                <tr><td><a href="https://arxiv.org/abs/2511.04665" target="_blank" rel="noopener noreferrer">Real-to-Sim Soft-Body Evaluation</a></td><td>软体与刚体任务中的配对仿真—真实策略性能相关性。</td><td>3DGS 外观、位置/颜色对齐与 PhysTwin 动力学结合，也包含刚体 T-block pushing。</td><td>其配对评测方法是直接先例；本文关注通用 VLA 基模到未见 G2 的适配、scene-native 资产来源和真实数据学习曲线。</td></tr>
                 <tr><td><a href="https://arxiv.org/abs/2601.03200" target="_blank" rel="noopener noreferrer">High-Fidelity Digital Twin</a></td><td>从稀疏 RGB 快速生成语义和碰撞几何，用于规划与真机执行。</td><td>场景级 3DGS 语义融合、去噪与 alpha-shape 碰撞 Mesh。</td><td>这是最接近的资产侧工作；需强调可移动原生 Gaussian、物体与背景双向补全及 VLA 学习曲线。</td></tr>
                 <tr><td><a href="https://arxiv.org/abs/2602.00096" target="_blank" rel="noopener noreferrer">Mirage2Matter</a></td><td>从视频构建物理落地的 Gaussian 世界并生成 VLA 数据。</td><td>场景和物体分别重建，生成碰撞 Mesh，再进行跨域对齐与放置。</td><td>核心对照是“独立物体分支 + 插入”与“同一场景中原位提取”。</td></tr>
                 <tr><td><a href="https://arxiv.org/abs/2603.05108" target="_blank" rel="noopener noreferrer">GaussTwin</a></td><td>刚体与绳索的在线物理预测—视觉校正及规划。</td><td>PBD/Cosserat rod 与 Gaussian 在线校正。</td><td>属于在线状态同步，不是离线场景资产分解；可借鉴其实验问题写法。</td></tr>
                 <tr><td><a href="https://arxiv.org/abs/2604.25459" target="_blank" rel="noopener noreferrer">GS-Playground</a></td><td>高吞吐批量 3DGS 渲染、并行物理和视觉强化学习。</td><td>场景重建加独立生成的物体 3DGS/Mesh；物性配置或随机化。</td><td>不宣称吞吐或新物理引擎；只把它作为平台级上界和外部资产路线。</td></tr>
-                <tr><td><a href="https://arxiv.org/abs/2606.01458" target="_blank" rel="noopener noreferrer">LEGS</a></td><td>无需遥操作地微调人形机器人 VLA。</td><td>原生 3DGS 静态背景加动态 Mesh 前景，并进行颜色校准。</td><td>它使宽泛的“VLA + Gaussian World”标题失去区分度；ScanArk 应突出动态前景本身来自原生场景 Gaussian。</td></tr>
-                <tr><td><a href="https://arxiv.org/abs/2606.24628" target="_blank" rel="noopener noreferrer">ArtiTwinSplat</a></td><td>从 RGB-D 视频自动发现关节并导出可交互 URDF。</td><td>静态与动态 RGB-D 序列、关节估计和 articulation-conditioned 3DGS。</td><td>它依赖观察到的关节运动并恢复刚性部件；ScanArk 从一次联合静态场景重建中提取可自由移动的刚体，并评估 VLA 数据价值。</td></tr>
-                <tr><td><a href="https://arxiv.org/abs/2607.08948" target="_blank" rel="noopener noreferrer">SplatCtrl</a></td><td>在线 Gaussian 场景更新与反应式避碰控制。</td><td>RGB-D 在线重建、Gaussian SDF 与控制障碍函数。</td><td>它研究感知—控制耦合；ScanArk 研究离线重建资产对训练数据价值的影响。</td></tr>
+                <tr><td><a href="https://arxiv.org/abs/2606.01458" target="_blank" rel="noopener noreferrer">LEGS</a></td><td>无需遥操作地微调人形机器人 VLA。</td><td>原生 3DGS 静态背景加动态 Mesh 前景，并进行颜色校准。</td><td>它使宽泛的“VLA + Gaussian World”标题失去区分度；Scan2VLA 应突出通用基模到未见目标本体的适配，以及动态前景本身来自原生场景 Gaussian。</td></tr>
+                <tr><td><a href="https://arxiv.org/abs/2606.24628" target="_blank" rel="noopener noreferrer">ArtiTwinSplat</a></td><td>从 RGB-D 视频自动发现关节并导出可交互 URDF。</td><td>静态与动态 RGB-D 序列、关节估计和 articulation-conditioned 3DGS。</td><td>它依赖观察到的关节运动并恢复刚性部件；Scan2VLA 从一次联合静态场景重建中提取可自由移动的刚体，并评估其对通用 VLA 新本体适配的数据价值。</td></tr>
+                <tr><td><a href="https://arxiv.org/abs/2607.08948" target="_blank" rel="noopener noreferrer">SplatCtrl</a></td><td>在线 Gaussian 场景更新与反应式避碰控制。</td><td>RGB-D 在线重建、Gaussian SDF 与控制障碍函数。</td><td>它研究感知—控制耦合；Scan2VLA 研究离线交互式数字孪生对通用 VLA 未见本体适配的数据价值。</td></tr>
               </tbody>
             </table>
           </div>
-          <div class="callout warning"><p><strong>最需要防守的先验工作：</strong>方法侧是 High-Fidelity Digital Twin，VLA 应用侧是 LEGS 与 Mirage2Matter，系统侧是 GSWorld 与 GS-Playground。最终实验必须用受控资产来源消融证明 ScanArk 不是这些系统的轻量组合。</p></div>
+          <div class="callout warning"><p><strong>最需要防守的先验工作：</strong>方法侧是 High-Fidelity Digital Twin，VLA 应用侧是 LEGS 与 Mirage2Matter，系统侧是 GSWorld 与 GS-Playground。最终实验必须用受控资产来源和未见 G2 基模适配证据证明 Scan2VLA 不是这些系统的轻量组合。</p></div>
         </section>
 
         <section class="paper-section" id="abstract">
           <span class="section-number">Abstract</span>
           <div class="abstract">
             <h2>摘要</h2>
-            <p>将视觉—语言—动作模型适配到新的机器人本体和操作任务仍然需要昂贵的真实机器人演示。照片级仿真能够降低这一负担，但近期 Gaussian Splatting 系统通常重建静态场景，再另外采集或生成交互物体，因而在策略最依赖物体边界和接触线索的位置引入资产来源差异。本文提出 <strong>ScanArk</strong>：把一次联合优化的原生 3D Gaussian Splatting 场景同时作为静态背景和可移动物体资产来源，通过多视角实例证据融合、物体与背景双向补全以及闭合碰撞几何绑定，将部分可见的场景物体转换为可交互仿真资产。提取物体保留部署场景的坐标系和采集条件下外观，不需要二次物体扫描或跨资产外观配准。我们使用 π<sub>0.5</sub> 和 SmolVLA，在 AgiBot G2 上以“抓取一个饮料瓶并放入野餐篮”为短程诊断任务，并以“逐件将桌面零食装入野餐篮，再通过全身动作端起篮子并放入汽车后备箱”为主要长程任务。起始 VLA 检查点不含 G2 专用策略适配；模拟器仍使用真实场景采集、机器人模型和 G2 标定，因此“零真实演示”只限定于 VLA 后训练轨迹。ScanArk-only 在零真实演示下达到<span class="todo">S/N 次端到端成功及 95% 置信区间，对照最强匹配仿真基线的 S<sub>b</sub>/N<sub>b</sub></span>，并在预设真实成功率阈值处减少<span class="todo">X% 的真实演示及 bootstrap 95% 置信区间</span>；最终结论仅覆盖<span class="todo">实际评估的场景、零食物体、姿态范围和两个 VLA 骨干</span>。</p>
+            <p>将通用视觉—语言—动作（VLA）基模适配到新的机器人本体仍然需要覆盖新相机、本体状态和动作语义的真实演示。照片级仿真能够生成适配轨迹，但静态背景与独立交互物体的拼接会在操作物体边界和接触区域引入外观差异。本文提出 <strong>Scan2VLA</strong>：一种与目标本体无关的适配框架，将一次联合优化的原生 3D Gaussian Splatting 场景转化为交互式 Gaussian 数字孪生。系统通过多视角实例证据融合、物体与背景双向补全以及闭合碰撞几何绑定，从同一场景得到可移动资产和 G2 交互轨迹。我们使用通用 VLA 基模 π<sub>0.5</sub> 和 SmolVLA，在其预训练数据完全不含 AgiBot G2 的条件下进行评估；任务包括“抓取一个饮料瓶并放入野餐篮”和“逐件将桌面零食装入野餐篮，再通过全身动作端起篮子并放入汽车后备箱”。模拟器仍使用真实场景采集、机器人模型和 G2 标定，因此“零真实演示”只限定于 VLA 后训练适配数据。Scan2VLA-only 在零真实演示下达到<span class="todo">S/N 次端到端成功及 95% 置信区间，对照最强匹配仿真基线的 S<sub>b</sub>/N<sub>b</sub></span>，并在预设真实成功率阈值处减少<span class="todo">X% 的真实演示及 bootstrap 95% 置信区间</span>；sim-real 配对子集用于估计仿真表现对 G2 表现的预测能力。结论仅覆盖<span class="todo">实际评估的场景、零食物体、姿态范围、未见 G2 本体和两个 VLA 基模</span>。</p>
           </div>
 
           <h3>八页篇幅建议</h3>
@@ -691,15 +691,31 @@
               <caption>ICRA 2027 八页总篇幅分配建议，包含参考文献</caption>
               <thead><tr><th scope="col">部分</th><th scope="col">建议页数</th></tr></thead>
               <tbody>
-                <tr><td>摘要与引言</td><td>1.2</td></tr>
-                <tr><td>相关工作</td><td>0.5</td></tr>
-                <tr><td>方法（含问题定义）</td><td>2.6</td></tr>
-                <tr><td>实验</td><td>2.7</td></tr>
-                <tr><td>局限性与结论</td><td>0.3</td></tr>
-                <tr><td>参考文献</td><td>0.7</td></tr>
+                <tr><td>摘要与引言</td><td>1.15</td></tr>
+                <tr><td>相关工作</td><td>0.40</td></tr>
+                <tr><td>方法（含问题定义）</td><td>2.25</td></tr>
+                <tr><td>实验</td><td>3.20</td></tr>
+                <tr><td>局限性与结论</td><td>0.30</td></tr>
+                <tr><td>参考文献</td><td>0.70</td></tr>
               </tbody>
             </table>
           </div>
+          <div class="table-wrap">
+            <table>
+              <caption>实验部分 3.20 页的内部预算；正文只保留支撑主张的证据。</caption>
+              <thead><tr><th scope="col">实验内容</th><th scope="col">页数</th><th scope="col">正文保留内容</th></tr></thead>
+              <tbody>
+                <tr><td>设置与公平对照</td><td>0.45</td><td>平台、任务、18 模型/54 验证单元、216 条真实数据、关键基线。</td></tr>
+                <tr><td>资产重建证据</td><td>0.40</td><td>一张紧凑定性图和核心分解/补全/碰撞指标。</td></tr>
+                <tr><td>Sim-real correlation</td><td>0.40</td><td>仿真配对子集协议、18 点散点图、Spearman ρ 与校准误差。</td></tr>
+                <tr><td>真实演示效率</td><td>0.65</td><td>零真实演示锚点和真实数据学习曲线。</td></tr>
+                <tr><td>长程 G2 主结果</td><td>0.65</td><td>严格 E2E、阶段完成度和关键连续质量指标。</td></tr>
+                <tr><td>消融与泛化</td><td>0.35</td><td>双向补全、资产来源和姿态/场景轴。</td></tr>
+                <tr><td>效率、安全与统计</td><td>0.30</td><td>RTX 5060 延迟、安全事件、主要 CI 和失败类型。</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="callout"><p><strong>补充材料：</strong>54 个验证单元的完整 ledger、216 条真实 episode 清单、抽中的仿真配对子集 manifest、逐 episode 成败表、完整 calibration model、按任务/场景/基模分层结果、全部消融、每物体结果、超参数、更多定性与失败视频。正文不能为省篇幅移走主长程结果、核心 correlation 图或最强基线。</p></div>
         </section>
 
         <section class="paper-section" id="introduction">
@@ -707,34 +723,34 @@
           <h2>引言</h2>
 
           <h3>研究动机</h3>
-          <p>VLA 模型通过大规模预训练获得了广泛的视觉与语义先验，但适配新的机器人、任务或部署场景时，仍依赖任务特定的真实演示。这类数据需要机器人本体、人工遥操作、物理复位和安全监督，采集成本高且难以扩展。</p>
+          <p>通用 VLA 基模通过大规模预训练获得了视觉与语义先验，但适配新的机器人本体时，仍需要覆盖新相机、本体状态、动作空间和任务的示范数据。这类数据需要机器人本体、人工遥操作、物理复位和安全监督，采集成本高且难以扩展。</p>
           <p>仿真能够提供规模化训练数据，但当渲染观测与部署相机域不匹配时，仿真数据对真实策略的价值会显著下降。</p>
-          <p>本文在 AgiBot G2 上研究这一问题。实验开始前，起始 VLA 策略检查点没有接受任何 G2 专用图像、本体状态、动作或演示适配。执行仍可能需要 G2 专用标定、机器人模型、动作接口和低层控制器，但这些组件在所有条件中冻结，且不宣称由 ScanArk 学得。该设定将通用 VLA 先验与策略适配分开：ScanArk-only 后训练后的真机表现衡量仿真生成的 Gaussian 轨迹在没有真实 G2 演示时能够贡献什么。</p>
+          <p>本文在 AgiBot G2 上研究这一问题。实验开始前，π<sub>0.5</sub> 与 SmolVLA 的预训练数据和已有适配数据均不包含 G2 的图像、本体状态、动作或机器人演示；checkpoint hash、数据 manifest 和 cutoff 版本需要审计记录。执行仍需要 G2 标定、机器人模型、动作接口和低层控制器，但这些组件在所有条件中冻结，且不宣称由 Scan2VLA 学得。该设定将通用 VLA 基模先验与新本体适配分开：Scan2VLA-only 后训练后的 G2 真机表现衡量交互式 Gaussian 数字孪生在零真实 G2 演示下贡献什么。本文的 formulation 面向一般目标本体，但实证结论只覆盖这个真正未见的 AgiBot G2。</p>
 
           <h3>现有方法缺口</h3>
           <p>SplatSim、GSWorld 与 GS-Playground 等工作将 3DGS 与物理引擎结合，推动零样本迁移、闭环评测和高吞吐视觉学习；LEGS 与 Mirage2Matter 已进一步使用 Gaussian 世界生成 VLA 训练数据。因此，“3DGS 仿真能否训练 VLA”不再足以构成本文立意。</p>
           <p>这些系统中的动态前景仍常来自独立物体扫描、外部 Mesh、生成资产或跨表示对齐。近期场景级数字孪生工作也能将语义标签和碰撞几何从 3DGS 中提取出来，并验证从感知、规划到真机执行的闭环流程；但它没有在受控轨迹和物理条件下研究：把物体原生 Gaussian 外观直接变成可移动资产，是否会提高 VLA 仿真数据的真实数据等价值。</p>
 
           <h3>核心洞见</h3>
-          <p>交互物体不应作为外部资产插入，而应直接从其实际使用的目标场景中恢复。ScanArk 只进行一次原生 3DGS 场景重建，为场景 Gaussian 自动赋予实例身份，并将物体提取为可独立运动的 Gaussian 子集。随后，系统补全不可见的物体和背景区域，生成闭合碰撞 Mesh，并将视觉资产绑定到物理引擎。</p>
-          <div class="callout"><p><strong>贡献边界：</strong>ScanArk 不是新的通用模拟器、物理引擎或 VLA 架构。本文隔离并检验一项资产来源假设：联合重建的目标场景应当同时提供静态背景与动态物体，而减少资产来源差异应当使同一批状态—动作轨迹更有训练价值。</p></div>
+          <p>交互物体不应作为外部资产插入，而应直接从其实际使用的目标场景中恢复。Scan2VLA 只进行一次原生 3DGS 场景重建，为场景 Gaussian 自动赋予实例身份，并将物体提取为可独立运动的 Gaussian 子集。随后，系统补全不可见的物体和背景区域，生成闭合碰撞 Mesh，将视觉资产绑定到物理引擎，并把通用 VLA 基模适配到目标本体的相机、状态与动作接口。</p>
+          <div class="callout"><p><strong>贡献边界：</strong>Scan2VLA 不是新的 VLA 预训练架构，也不把冻结的 G2 低层控制器作为学习贡献。本文提出的是面向新本体的交互式 Gaussian 数字孪生适配流程，隔离并检验 scene-native 资产来源是否提高通用 VLA 基模在未见 G2 上的仿真适配价值。AgiBot G2 是实证验证的目标本体，不能据此宣称已完成多本体泛化。</p></div>
 
           <figure class="figure-placeholder" aria-labelledby="fig-teaser-caption">
-            <div class="pipeline" role="group" aria-label="ScanArk 从扫描到技能的流程">
+            <div class="pipeline" role="group" aria-label="Scan2VLA 从扫描到技能的流程">
               <div class="pipeline-step"><span class="step-index">01</span><strong>真实场景采集</strong><span>同一相机、曝光和部署环境</span></div>
               <div class="pipeline-step"><span class="step-index">02</span><strong>原生 3DGS</strong><span>一次联合场景优化</span></div>
               <div class="pipeline-step"><span class="step-index">03</span><strong>实例级分解</strong><span>背景、机器人与交互物体</span></div>
               <div class="pipeline-step"><span class="step-index">04</span><strong>仿真数据</strong><span>完整几何、物理绑定与轨迹</span></div>
               <div class="pipeline-step"><span class="step-index">05</span><strong>真实部署</strong><span>VLA 后训练与真实成功率</span></div>
             </div>
-            <figcaption id="fig-teaser-caption"><strong>图 1 占位：</strong>真实场景采集 → 原生 3DGS 分解 → 可移动的场景原生物体 → VLA 仿真演示 → AgiBot G2 首次本体适配。加入与“独立扫描后插入物体”的并排比较，并展示“单个饮料瓶抓取入篮”短任务和主要长程任务“桌面零食逐件装篮—全身端起与搬运—后备箱放置”的真机 rollout。</figcaption>
+            <figcaption id="fig-teaser-caption"><strong>图 1 占位：</strong>通用 VLA 基模 → G2 场景采集 → 场景原生交互式 Gaussian 数字孪生 → 仿真适配轨迹 → 未见 AgiBot G2 真机执行。加入与“独立扫描后插入物体”的并排比较，并展示“单个饮料瓶抓取入篮”短任务和主要长程任务“桌面零食逐件装篮—全身端起与搬运—后备箱放置”的真机 rollout。</figcaption>
           </figure>
 
           <h3>主要贡献</h3>
           <ol>
             <li><strong>场景原生分解：</strong>在联合优化的原生 3DGS 场景中自动分离背景、机器人和交互物体，避免人工裁剪与独立物体重建。</li>
             <li><strong>可仿真资产生成：</strong>补全被遮挡的物体与背景区域，并生成与 Gaussian 对齐的闭合碰撞几何。物性估计来自另一项已有工作，不作为本文贡献。</li>
-            <li><strong>新本体零真实演示适配与真实演示效率：</strong>在从未针对 AgiBot G2 适配的 VLA 策略上，检验仿真生成的场景原生 Gaussian 轨迹能否以零真实演示完成首次策略适配，再在 π<sub>0.5</sub> 与 SmolVLA 上测量能够替代多少真实演示。</li>
+            <li><strong>通用基模到未见本体的适配：</strong>在预训练中完全没有 AgiBot G2 数据的 π<sub>0.5</sub> 与 SmolVLA 上，检验交互式 Gaussian 数字孪生生成的轨迹能否以零真实 G2 演示完成策略适配，并用 sim-real correlation 和真实数据学习曲线量化适配可靠性与演示节省。</li>
           </ol>
         </section>
 
@@ -743,21 +759,21 @@
           <h2>相关工作</h2>
 
           <h3>机器人仿真与照片级 Gaussian 渲染</h3>
-          <p>传统机器人仿真主要在物理吞吐与图像真实性之间权衡。3DGS 通过显式 Gaussian 原语提供实时新视角渲染，使照片级场景能够与物理引擎结合。SplatSim 首先展示了 Gaussian 渲染的 RGB 操作策略零样本迁移；Re3Sim 将照片级场景与域随机化及混合资产结合；GSWorld 进一步提出 GSDF 资产格式和覆盖训练、评测、DAgger 的闭环套件。近一年，GS-Playground 将批量 Gaussian 渲染和刚体物理扩展到大规模视觉强化学习，LEGS 则以 3DGS 背景和 Mesh 前景微调无需遥操作的人形机器人 VLA。上述工作主要推进平台能力、吞吐或下游迁移，ScanArk 则研究交互视觉资产的来源是否改变训练数据价值。</p>
+          <p>传统机器人仿真主要在物理吞吐与图像真实性之间权衡。3DGS 通过显式 Gaussian 原语提供实时新视角渲染，使照片级场景能够与物理引擎结合。SplatSim 首先展示了 Gaussian 渲染的 RGB 操作策略零样本迁移；Re3Sim 将照片级场景与域随机化及混合资产结合；GSWorld 进一步提出 GSDF 资产格式和覆盖训练、评测、DAgger 的闭环套件。近一年，GS-Playground 将批量 Gaussian 渲染和刚体物理扩展到大规模视觉强化学习，LEGS 则以 3DGS 背景和 Mesh 前景微调无需遥操作的人形机器人 VLA。上述工作主要推进平台能力、吞吐或下游迁移，Scan2VLA 则研究交互式 Gaussian 数字孪生如何服务于通用 VLA 基模到未见 G2 本体的适配，以及 scene-native 资产来源是否改变训练数据价值。</p>
 
           <h3>Real2Sim 资产与交互式数字孪生</h3>
-          <p>Real2Render2Real 从单独扫描的刚体或关节物体和一个人类视频生成大量机器人演示，但主动放弃动力学仿真。Mirage2Matter 分别重建场景与物体 Gaussian，再对齐生成的碰撞 Mesh，用于物理仿真和 VLA 训练。High-Fidelity Digital Twin 从场景 3DGS 融合多视角语义并提取碰撞 Mesh，用于规划与真机执行。ScanArk 的区别不只是“也能生成 Mesh”，而是仅依赖一次联合场景重建，同时得到静态背景与可移动原生 Gaussian 物体，并分别补全移走物体后暴露的背景和物体自身未观察表面。</p>
+          <p>Real2Render2Real 从单独扫描的刚体或关节物体和一个人类视频生成大量机器人演示，但主动放弃动力学仿真。Mirage2Matter 分别重建场景与物体 Gaussian，再对齐生成的碰撞 Mesh，用于物理仿真和 VLA 训练。High-Fidelity Digital Twin 从场景 3DGS 融合多视角语义并提取碰撞 Mesh，用于规划与真机执行。Scan2VLA 的区别不只是“也能生成 Mesh”，而是仅依赖一次联合场景重建，同时得到静态背景与可移动原生 Gaussian 物体，并分别补全移走物体后暴露的背景和物体自身未观察表面，再把通用基模适配到未见 G2。</p>
 
           <h3>物理属性、软体、关节与在线校正</h3>
-          <p>Scalable Real2Sim 通过机器人交互自动估计刚体惯性参数；Real-to-Sim Soft-Body Evaluation 将 3DGS、位置/颜色对齐与 PhysTwin 结合，并在软体任务和刚体 T-block pushing 上验证配对仿真—真实策略相关性；GaussTwin 使用物理预测—视觉校正维护刚体与绳索数字孪生；ArtiTwinSplat 从静态与动态 RGB-D 序列恢复关节参数；SplatCtrl 将在线 Gaussian 重建直接连接到反应式避碰。ScanArk 将物理参数视作已有模块提供的固定输入，从一次联合静态场景重建中提取可自由移动的刚体，并评估其 VLA 数据价值。</p>
+          <p>Scalable Real2Sim 通过机器人交互自动估计刚体惯性参数；Real-to-Sim Soft-Body Evaluation 将 3DGS、位置/颜色对齐与 PhysTwin 结合，并在软体任务和刚体 T-block pushing 上验证配对仿真—真实策略相关性；GaussTwin 使用物理预测—视觉校正维护刚体与绳索数字孪生；ArtiTwinSplat 从静态与动态 RGB-D 序列恢复关节参数；SplatCtrl 将在线 Gaussian 重建直接连接到反应式避碰。Scan2VLA 将物理参数视作已有模块提供的固定输入，从一次联合静态场景重建中提取可自由移动的刚体，并评估交互式数字孪生对通用 VLA 未见本体适配的数据价值。</p>
 
-          <h3>用于 VLA 适配的仿真数据</h3>
-          <p>π<sub>0.5</sub> 与 SmolVLA 均支持在任务特定机器人数据上进行后训练。Real2Render2Real、Mirage2Matter 与 LEGS 已证明重建或混合渲染数据可以训练并迁移策略，其实验也包含固定预算、数据规模和采集成本比较。本文提出不同问题：固定状态—动作轨迹、碰撞几何、物理参数、相机、视觉校准投入和优化预算后，交互资产来源会怎样移动完整的仿真—真实混合数据学习曲线？该设计估计场景原生仿真数据的“真实演示等价值”，而不是只比较一两个数据预算。</p>
+          <h3>用于通用 VLA 本体适配的仿真数据</h3>
+          <p>π<sub>0.5</sub> 与 SmolVLA 是通用 VLA 基模，但将其部署到预训练中未出现的 G2 仍需要新本体接口和适配数据。Real2Render2Real、Mirage2Matter 与 LEGS 已证明重建或混合渲染数据可以训练并迁移策略；本文进一步问：在 G2 完全不出现在基模预训练数据中的条件下，交互式 Gaussian 数字孪生能否完成首次仿真适配，且仿真成功率是否能预测 G2 真机成功率？固定状态—动作轨迹、碰撞几何、物理参数、相机、视觉校准投入和优化预算后，scene-native asset provenance 的增益将由受控基线、配对 sim-real 子集和真实数据学习曲线共同检验。</p>
         </section>
 
         <section class="paper-section" id="method">
           <span class="section-number">Section III</span>
-          <h2>ScanArk 方法</h2>
+          <h2>Scan2VLA 方法</h2>
 
           <h3>问题定义</h3>
           <p>将重建场景表示为 Gaussian 原语集合：</p>
@@ -770,19 +786,19 @@
             <span class="equation-label">(2)</span>
             A<sub>k</sub> = (G<sup>k</sup><sub>obj</sub>, M<sub>k</sub>, P<sub>k</sub>)
           </div>
-          <p>其中 <code>M<sub>k</sub></code> 是闭合碰撞 Mesh，<code>P<sub>k</sub></code> 是传给模拟器的物理参数。本文的目标是推断实例标签，并生成与原生 Gaussian 对齐的可交互资产。</p>
+          <p>其中 <code>M<sub>k</sub></code> 是闭合碰撞 Mesh，<code>P<sub>k</sub></code> 是传给模拟器的物理参数。Scan2VLA 的目标是推断实例标签、生成与原生 Gaussian 对齐的可交互资产，并用这些资产生成适配未见目标本体的 VLA 训练轨迹。</p>
           <p>对目标真实成功率 <code>τ</code>，令 <code>N<sup>m</sup><sub>real</sub>(τ)</code> 表示训练方案 <code>m</code> 达到该成功率所需的真实演示数量：</p>
           <div class="equation" role="math" aria-label="真实演示节省率公式">
             <span class="equation-label">(3)</span>
-            Saving(τ) = 1 − N<sup>ScanArk</sup><sub>real</sub>(τ) / N<sup>RealOnly</sup><sub>real</sub>(τ)
+            Saving(τ) = 1 − N<sup>Scan2VLA</sup><sub>real</sub>(τ) / N<sup>RealOnly</sup><sub>real</sub>(τ)
           </div>
-          <p>该指标将“真实数据效率”与某一个策略达到的最高绝对分数区分开来。将问题定义放入方法首节，也使后续模块和实验能够直接引用统一符号。</p>
+          <p>该指标将“真实数据效率”与某一个基模达到的最高绝对分数区分开来。将问题定义放入方法首节，也使后续模块和实验能够直接引用统一符号。</p>
 
           <h3>系统概览</h3>
-          <p>给定完成标定的多视角 RGB 观测，ScanArk 生成原生 3DGS 场景、实例级 Gaussian 标签、补全后的视觉资产和碰撞几何。资产与模拟器绑定后，生成图像、语言、机器人本体状态与动作序列，用于 VLA 后训练。</p>
+          <p>给定完成标定的多视角 RGB 观测，Scan2VLA 生成原生 3DGS 场景、实例级 Gaussian 标签、补全后的视觉资产和碰撞几何。资产与模拟器绑定后，系统按目标本体的相机、状态和动作接口生成图像、语言、机器人状态与动作序列，用于通用 VLA 基模的本体适配后训练。</p>
 
           <figure class="figure-placeholder" aria-labelledby="fig-method-caption">
-            <div class="pipeline" role="group" aria-label="ScanArk 方法的五个模块">
+            <div class="pipeline" role="group" aria-label="Scan2VLA 方法的五个模块">
               <div class="pipeline-step"><span class="step-index">模块 A</span><strong>场景重建</strong><span>多视角标定、尺度恢复、原生 3DGS</span></div>
               <div class="pipeline-step"><span class="step-index">模块 B</span><strong>实例分解</strong><span>多视角证据与 Gaussian 标签融合</span></div>
               <div class="pipeline-step"><span class="step-index">模块 C</span><strong>双向补全</strong><span>物体不可见面与背景空洞</span></div>
@@ -821,7 +837,7 @@
 
           <h3>VLA 数据生成与后训练</h3>
           <p>交代专家轨迹来自运动规划、仿真遥操作还是脚本控制器。每条数据应包含同步相机观测、机器人状态、语言指令和动作块。所有视觉基线使用相同的状态—动作轨迹、动作空间、归一化、增强、优化预算和 checkpoint 选择规则。</p>
-          <p>在施加任何实验处理前，应确认起始 VLA 检查点没有接受 G2 专用策略适配数据，并记录准确的 checkpoint hash、训练数据清单与截止版本，以及“G2 专用”的操作定义。还需披露 VLA 之外使用的全部 G2 信息，包括标定、URDF/几何、动作适配器和低层控制器训练。Base zero-shot 不执行优化，只与后训练条件共享同一检查点架构和冻结执行接口；所有后训练条件才使用相同的可训练参数范围与优化预算。</p>
+          <p>在施加任何实验处理前，应审计 π<sub>0.5</sub> 与 SmolVLA 的 checkpoint hash、预训练/适配数据清单和 cutoff，确认其中没有 AgiBot G2 的图像、本体状态、动作或机器人演示；这一定义只声称 G2 对基模预训练和策略适配数据不可见。还需披露 VLA 之外使用的全部 G2 信息，包括标定、URDF/几何、动作适配器和低层控制器训练。Base zero-shot 不执行优化，只与后训练条件共享同一基模 checkpoint 架构和冻结执行接口；所有后训练条件才使用相同的可训练参数范围与优化预算。</p>
         </section>
 
         <section class="paper-section" id="experiments">
@@ -829,7 +845,7 @@
           <h2>实验</h2>
 
           <h3>研究问题</h3>
-          <p>本节验证 ScanArk 框架。为分析其性能，我们设计一组实验回答以下问题：<strong>(i)</strong> 自动场景分解与双向补全能否生成准确、可碰撞的物体和背景资产？<strong>(ii)</strong> 与独立重建的 Gaussian 或 Mesh 渲染资产相比，保留可移动物体的场景原生 Gaussian 外观能否提高配对的仿真—真实视觉一致性，并且仿真策略表现能否预测对应真实表现？<strong>(iii)</strong> ScanArk 仿真生成轨迹能否在零真实演示下把从未针对 G2 适配的 VLA 检查点适配到 AgiBot G2，并且在 π<sub>0.5</sub> 与 SmolVLA 上节省多少真实演示？最后，<strong>(iv)</strong> 这一效应能否从“单个饮料瓶抓取入篮”延伸到主要长程任务，并承受逐件抓取、装篮、全身端起与搬运及后备箱放置所造成的误差累积；哪些组件与场景变化驱动增益，场景原生假设又会在何处失效？</p>
+          <p>本节验证 Scan2VLA 框架。为分析其性能，我们设计一组实验回答以下问题：<strong>(i)</strong> 自动场景分解与双向补全能否生成准确、可碰撞的物体和背景资产？<strong>(ii)</strong> 与独立重建的 Gaussian 或 Mesh 渲染资产相比，保留可移动物体的场景原生 Gaussian 外观能否提高配对的仿真—真实视觉一致性，并且仿真策略表现能否预测对应真实表现？<strong>(iii)</strong> Scan2VLA 仿真生成轨迹能否在零真实演示下把预训练数据完全不含 G2 的通用 VLA 基模适配到 AgiBot G2，并且在 π<sub>0.5</sub> 与 SmolVLA 上节省多少真实演示？最后，<strong>(iv)</strong> 这一效应能否从“单个饮料瓶抓取入篮”延伸到主要长程任务，并承受逐件抓取、装篮、全身端起与搬运及后备箱放置所造成的误差累积；哪些组件与场景变化驱动增益，场景原生假设又会在何处失效？</p>
 
           <h3>章节结构与证据顺序</h3>
           <div class="table-wrap">
@@ -838,9 +854,9 @@
               <thead><tr><th scope="col">小节</th><th scope="col">内容</th><th scope="col">核心输出</th></tr></thead>
               <tbody>
                 <tr><td>IV-A</td><td>Experimental Setup</td><td>G2、A6000/5060、VLA 接口、主任务、数据划分和成功标准。</td></tr>
-                <tr><td>IV-B</td><td>Baselines and Controls</td><td>Base、Real-only、ScanArk、Independent-GS、GS + Mesh 与 PBR 的公平对照。</td></tr>
+                <tr><td>IV-B</td><td>Baselines and Controls</td><td>Base、Real-only、Scan2VLA、Independent-GS、GS + Mesh 与 PBR 的公平对照。</td></tr>
                 <tr><td>IV-C</td><td>Asset Reconstruction Quality</td><td>分解、双向补全、碰撞几何证据，回答 RQ1。</td></tr>
-                <tr><td>IV-D</td><td>Asset-Source Visual and Policy Consistency</td><td>配对状态视觉误差、18 个模型级表现对、54 个验证单元及 216 个相同 seed episode，回答 RQ2。</td></tr>
+                <tr><td>IV-D</td><td>Asset-Source Visual and Policy Consistency</td><td>配对状态视觉误差、从 216 条真实数据预注册抽取的仿真配对子集及 18 个模型级表现对，回答 RQ2。</td></tr>
                 <tr><td>IV-E</td><td>Real-Demonstration Efficiency</td><td>零真实演示锚点和真实数据学习曲线，回答 RQ3。</td></tr>
                 <tr><td>IV-F</td><td>Long-Horizon G2 Results</td><td>装篮、端起/搬运、后备箱放置及严格 E2E 成功率，回答 RQ4。</td></tr>
                 <tr><td>IV-G</td><td>Ablations and Generalization</td><td>实例标签、双向补全、碰撞几何、姿态与场景轴。</td></tr>
@@ -851,7 +867,7 @@
           </div>
 
           <h3>实验设置</h3>
-          <p><strong>机器人与计算平台。</strong>目标机器人为 AgiBot G2；所有 VLA 后训练使用 NVIDIA RTX A6000，部署推理使用 NVIDIA RTX 5060，并由 G2 真机执行。论文需补充<span class="todo">推理机位于机载还是外置、CPU、内存、CUDA/框架版本和通信接口</span>，并报告 G2 相机、本体状态、动作空间、移动—操作控制栈、各 VLA 的接口适配层、控制频率及 RTX 5060 上平均/P95 观测—动作延迟。通过 checkpoint 与训练清单审计证明起始 VLA 策略没有 G2 专用策略适配数据；该声明不包含所有条件共享且冻结的 G2 标定、机器人模型、动作适配器和低层执行栈。</p>
+          <p><strong>机器人与计算平台。</strong>Scan2VLA 的适配 formulation 不绑定某一个目标本体；本实验的真实部署目标为 AgiBot G2。所有 VLA 后训练使用 NVIDIA RTX A6000，部署推理使用 NVIDIA RTX 5060，并由 G2 真机执行。论文需补充<span class="todo">推理机位于机载还是外置、CPU、内存、CUDA/框架版本和通信接口</span>，并报告 G2 相机、本体状态、动作空间、移动—操作控制栈、各 VLA 的接口适配层、控制频率及 RTX 5060 上平均/P95 观测—动作延迟。通过 checkpoint 与预训练/适配数据 manifest 审计证明 π<sub>0.5</sub> 与 SmolVLA 的基础数据中没有 G2 图像、本体状态、动作或机器人演示；该声明不包含所有条件共享且冻结的 G2 标定、机器人模型、动作适配器和低层执行栈。真机证据只支持一个未见目标本体 G2，不直接等价于多本体实证泛化。</p>
           <p><strong>任务。</strong>短程诊断任务要求 G2 从桌面抓取一个饮料瓶并放入野餐篮；只有正确饮料瓶被稳定抬起、释放在篮子目标体积内并保持<span class="todo">T 秒</span>，且没有人工干预、超时、禁止碰撞、掉落或安全中止，才记为成功。主要 benchmark 是全身长程野餐收纳：G2 从摆放零食物品的桌面开始，识别并逐件抓取目标零食，将所有目标物装入野餐篮，再通过全身协调端起并搬运已装载的篮子，最后把篮子稳定放入汽车后备箱。短任务只用于隔离基础抓取与放置能力，不与主任务同等支撑长程结论。</p>
           <div class="table-wrap">
             <table>
@@ -881,7 +897,7 @@
               </tbody>
             </table>
           </div>
-          <p><strong>成对 sim-real 验证组。</strong>3 个任务、3 个场景和 2 个 VLA 基模构成 18 个任务—场景—基模模型；一个模型只执行其对应任务的验证。每个模型设置 3 个独立的成对验证组，因此形成 54 个验证单元；这 3 组不是训练种子，也不会把模型数量改写成 54。每组包含 4 个真机初始状态种子，两条仿真验证分支均原样复用这 4 个种子。每个模型由此执行 <code>3 × 4 = 12</code> 个真机 episode；每条仿真分支取 <code>N<sub>sim</sub> = 24 / 模型</code>，即每组 8 个 episode，其中 4 个与真机严格配对、4 个从相同预注册分布额外抽样。完整协议共包含 <code>18 × 12 = 216</code> 个真机 episode，以及 <code>18 × 24 × 2 = 864</code> 个仿真 episode，每条仿真分支各 432 个，总计 <strong>1080 个评测 episode</strong>。<span class="todo">给两条仿真验证分支填写正式名称和差异定义</span>。</p>
+          <p><strong>成对 sim-real 验证组。</strong>3 个任务、3 个场景和 2 个 VLA 基模构成 18 个任务—场景—基模模型；一个模型只执行其对应任务的验证。每个模型设置 3 个独立验证组，每组含 4 个真实初始状态，因此形成 54 个验证单元和 <code>18 × 3 × 4 = 216</code> 条真实评测数据。这 3 组不是训练种子。Sim-real correlation 不要求把 216 条全部在仿真中重放：在查看仿真结果之前，从 216 条中按任务、场景、基模和验证组分层预注册抽取子集 <code>𝒫</code>，只在仿真中重放这些完全相同的 seed。仿真验证开销因此是 <code>N<sub>pair</sub> = |𝒫|</code>，而不是默认追加 864 条。<span class="todo">正式评测前固定 N<sub>pair</sub>、18 个模型/54 个组之间的分配，以及抽样 seed</span>。</p>
           <div class="table-wrap">
             <table>
               <caption>Sim-real correlation 的模型、验证单元与 rollout 数量。</caption>
@@ -889,18 +905,17 @@
               <tbody>
                 <tr><td>训练模型</td><td>3 任务 × 3 场景 × 2 基模</td><td>18</td><td>任务—场景—基模组合。</td></tr>
                 <tr><td>成对验证单元</td><td>18 模型 × 3 验证组</td><td>54</td><td>用于组级仿真—真实表现关联。</td></tr>
-                <tr><td>真机 episode</td><td>18 模型 × 3 组 × 4 seeds</td><td>216</td><td>每模型 12 次；4 个 seeds 与两条仿真分支完全一致。</td></tr>
-                <tr><td>仿真分支 A</td><td>18 模型 × 24</td><td>432</td><td>每模型 3 组 × 8 次，其中每组 4 次严格配对。</td></tr>
-                <tr><td>仿真分支 B</td><td>18 模型 × 24</td><td>432</td><td>采用相同验证组和 4 个配对 seeds。</td></tr>
-                <tr><td>仿真合计</td><td>432 + 432</td><td>864</td><td>每模型共 48 个仿真 episode。</td></tr>
-                <tr><td>全部评测</td><td>216 real + 864 sim</td><td>1080</td><td>不含训练轨迹和资产重建图像。</td></tr>
+                <tr><td>真实评测池</td><td>18 模型 × 3 组 × 4 seeds</td><td>216</td><td>每模型 12 条真实数据。</td></tr>
+                <tr><td>仿真配对子集</td><td>从 216 条中分层抽取</td><td>N<sub>pair</sub></td><td>每条都与一条真实 episode 的任务、场景、模型和 seed 完全相同。</td></tr>
+                <tr><td>Correlation 主单元</td><td>每模型聚合一个 paired estimate</td><td>18 对</td><td>用于 Spearman/Pearson；每模型必须至少有配对样本。</td></tr>
+                <tr><td>验证组层级</td><td>18 模型 × 3 组</td><td>54</td><td>用于分层抽样与层次不确定性，不视为 54 个完全独立点。</td></tr>
               </tbody>
             </table>
           </div>
-          <div class="equation" role="math" aria-label="每个模型的仿真与真实成功率">
+          <div class="equation" role="math" aria-label="仿真配对子集上的模型级成功率">
             <span class="equation-label">(5)</span>
-            p̂<sup>real</sup><sub>m</sub> = S<sup>real</sup><sub>m</sub> / 12, &nbsp;&nbsp;
-            p̂<sup>sim</sup><sub>m,b</sub> = S<sup>sim</sup><sub>m,b</sub> / 24, &nbsp;&nbsp; m = 1, …, 18; b ∈ {A, B}
+            p̂<sup>real,pair</sup><sub>m</sub> = (1 / n<sub>m</sub>) Σ<sub>i∈𝒫<sub>m</sub></sub> y<sup>real</sup><sub>i</sub>, &nbsp;&nbsp;
+            p̂<sup>sim,pair</sup><sub>m</sub> = (1 / n<sub>m</sub>) Σ<sub>i∈𝒫<sub>m</sub></sub> y<sup>sim</sup><sub>i</sub>
           </div>
           <p><strong>协议与划分。</strong>所有资产条件冻结同一个 G2 控制器和动作适配器，并匹配专家轨迹、任务分解、复位、物性、相机和成功轨迹筛选。训练、验证和测试按轨迹与场景划分；物体位姿、干扰物和方法顺序从预设分布随机化。训练种子若重复，应作为另一个独立实验因素，不能称为验证组。报告<span class="todo">数字孪生数、物体数、仿真训练轨迹数和训练种子数</span>，并说明零食、篮子和后备箱位姿由<span class="todo">标定标签、动捕、机器人感知或盲法视频标注</span>中的哪种方式测得，以及测量分辨率和缺失数据处理；不得把图像帧当作独立统计样本。</p>
 
@@ -912,13 +927,13 @@
                 <tr><th scope="col">条件</th><th scope="col">背景外观</th><th scope="col">交互物体外观</th><th scope="col">回答的问题</th></tr>
               </thead>
               <tbody>
-                <tr><td>Base zero-shot</td><td>真实</td><td>真实</td><td>未适配 G2 检查点</td></tr>
+                <tr><td>Base zero-shot</td><td>真实</td><td>真实</td><td>预训练中未见 G2 的通用基模</td></tr>
                 <tr><td>Real-only</td><td>真实</td><td>真实</td><td>真实数据学习曲线</td></tr>
-                <tr><td>ScanArk-only</td><td>原生 3DGS</td><td>原位原生 3DGS</td><td>零真实演示 G2 适配</td></tr>
+                <tr><td>Scan2VLA-only</td><td>原生 3DGS</td><td>原位原生 3DGS</td><td>零真实演示未见 G2 本体适配</td></tr>
                 <tr><td>Independent-GS-only</td><td>原生 3DGS</td><td>单独重建后插入</td><td>外部资产零真实演示对照</td></tr>
                 <tr><td>GS-BG + Mesh-Obj-only</td><td>原生 3DGS</td><td>Mesh/PBR</td><td>前景表示零真实演示对照</td></tr>
                 <tr><td>Mesh/PBR-only</td><td>Mesh/PBR</td><td>Mesh/PBR</td><td>传统零真实演示对照</td></tr>
-                <tr><td>ScanArk + Real</td><td>原生 3DGS</td><td>原位原生 3DGS</td><td>真实演示节省率</td></tr>
+                <tr><td>Scan2VLA + Real</td><td>原生 3DGS</td><td>原位原生 3DGS</td><td>真实演示节省率</td></tr>
                 <tr><td>Independent-GS + Real</td><td>原生 3DGS</td><td>单独重建后插入</td><td>资产来源学习曲线</td></tr>
                 <tr><td>GS-BG + Mesh-Obj + Real</td><td>原生 3DGS</td><td>Mesh/PBR</td><td>物体外观学习曲线</td></tr>
                 <tr><td>Mesh/PBR + Real</td><td>Mesh/PBR</td><td>Mesh/PBR</td><td>传统仿真学习曲线</td></tr>
@@ -926,7 +941,7 @@
               </tbody>
             </table>
           </div>
-          <div class="callout"><p>Mesh/PBR 必须进行合理的相机、材质和灯光校准，不能设置成故意较弱的基线。Independent-GS 应使用同一个物体和目标场景，但先单独扫描物体，再完成插入；它必须获得与 ScanArk 相同的碰撞 Mesh、对齐流程、颜色校准投入、相机模型和人工处理预算，从而尽可能匹配独立场景—物体路线。该条件只是受控的“独立资产来源”基线，不宣称端到端复现 GSWorld 或 Mirage2Matter。所有 only 条件使用相同的仿真轨迹数量和后训练预算。</p></div>
+          <div class="callout"><p>Mesh/PBR 必须进行合理的相机、材质和灯光校准，不能设置成故意较弱的基线。Independent-GS 应使用同一个物体和目标场景，但先单独扫描物体，再完成插入；它必须获得与 Scan2VLA 相同的碰撞 Mesh、对齐流程、颜色校准投入、相机模型和人工处理预算，从而尽可能匹配独立场景—物体路线。该条件只是受控的“独立资产来源”基线，不宣称端到端复现 GSWorld 或 Mirage2Matter。所有 only 条件使用相同的仿真轨迹数量和后训练预算。</p></div>
 
           <h3>资产重建质量</h3>
           <div class="metric-grid">
@@ -948,26 +963,26 @@
           </figure>
 
           <h3>光度一致性</h3>
-          <p>在仿真与真实环境中重放配对状态和相机位姿，比较 ScanArk、Independent-GS、GS-BG + Mesh-Obj 和 Mesh/PBR。指标包括 LPIPS、DINO 特征距离以及物体边界区域误差，并按真实观测区域、补全区域和相对扫描姿态的移动幅度分层统计。</p>
-          <p><strong>策略层 sim-real correlation。</strong>对每条仿真分支，先以公式 (5) 的 18 个模型级仿真—真实成功率对计算 Spearman ρ，并报告 Pearson r 以便与已有工作比较。相关系数只衡量共同变化，不等于数值校准，因此同时报告仿真—真实成功率差、mean absolute calibration error，以及 binomial hierarchical calibration model 的斜率和截距。54 个验证单元嵌套在 18 个模型内，不能当作 54 个完全独立样本；置信区间以模型为 cluster bootstrap，并在每次抽样中保留该模型的 3 个验证组。</p>
-          <p><strong>逐 episode 一致性。</strong>每个验证组的 4 个相同 seeds 形成严格配对的 sim-real outcome，因此每条仿真分支有 <code>54 × 4 = 216</code> 对。报告 both-success、sim-only-success、real-only-success 和 both-failure 的 2 × 2 表，以及 agreement rate 和 Matthews correlation coefficient。不得对单个模型仅有的 3 个验证点单独计算相关系数。</p>
+          <p>在仿真与真实环境中重放配对状态和相机位姿，比较 Scan2VLA、Independent-GS、GS-BG + Mesh-Obj 和 Mesh/PBR。指标包括 LPIPS、DINO 特征距离以及物体边界区域误差，并按真实观测区域、补全区域和相对扫描姿态的移动幅度分层统计。</p>
+          <p><strong>策略层 sim-real correlation。</strong>正文用公式 (5) 在预注册配对子集上形成 18 个模型级仿真—真实表现对，绘制一张紧凑散点/校准图，报告 Spearman ρ、Pearson r 和 mean absolute calibration error。54 个验证单元嵌套在 18 个模型内，不能当作 54 个完全独立样本；置信区间以模型为 cluster bootstrap，并在每次抽样中保留该模型的验证组结构。完整 calibration model 与任务/场景/基模分层结果放补充材料。</p>
+          <p><strong>逐 episode 一致性。</strong>对 <code>N<sub>pair</sub></code> 条完全相同 seeds，报告 both-success、sim-only-success、real-only-success 和 both-failure 的 2 × 2 表，以及 agreement rate。完整逐 episode ledger 和 Matthews correlation coefficient 放补充材料。不得对单个模型仅有的 3 个验证点单独计算相关系数，也不得在观察仿真结果后挑选“更相关”的子集。</p>
 
           <h3>真实演示数据效率</h3>
-          <p>首先在 <code>N<sub>real</sub> = 0</code> 比较未适配的 Base zero-shot、ScanArk-only、Independent-GS-only、GS-BG + Mesh-Obj-only 与 Mesh/PBR-only。所有后训练条件相对 Base zero-shot 的受支持提升，说明仿真生成轨迹能够适配 G2 VLA；只有 ScanArk-only 进一步优于匹配的零真实演示资产对照，才能把增益归因于场景原生资产来源。正文必须报告成功次数、总试验数和置信区间，不能只写“惊艳”“显著”或“强”。“零真实演示”仅指 VLA 策略后训练，不排除构建模拟器使用的真实场景采集与标定。</p>
-          <p>对每个 VLA 骨干训练 Real-only 与 ScanArk + Real 数据曲线：</p>
+          <p>首先在 <code>N<sub>real</sub> = 0</code> 比较未适配的 Base zero-shot、Scan2VLA-only、Independent-GS-only、GS-BG + Mesh-Obj-only 与 Mesh/PBR-only。所有后训练条件相对 Base zero-shot 的受支持提升，说明交互式 Gaussian 数字孪生轨迹能够适配未见 G2；只有 Scan2VLA-only 进一步优于匹配的零真实演示资产对照，才能把增益归因于 scene-native 资产来源。正文必须报告成功次数、总试验数和置信区间，不能只写“惊艳”“显著”或“强”。“零真实演示”仅指 VLA 策略后训练，不排除构建数字孪生使用的真实场景采集与标定。</p>
+          <p>对每个通用 VLA 基模训练 Real-only 与 Scan2VLA + Real 数据曲线：</p>
           <div class="equation" role="math" aria-label="真实和仿真演示数据预算">
             <span class="equation-label">(6)</span>
             N<sub>real</sub> ∈ {0, 5, 10, 25, 50}, &nbsp;&nbsp; N<sub>sim</sub> = 500 / 任务
           </div>
           <p><span class="todo">运行完整训练网格前确认真实与仿真数据预算</span></p>
-          <p>使用学习曲线插值和 bootstrap 置信区间估计公式 (3) 的节省率。两个 VLA 的绝对成功率不直接比较；重点比较每个骨干内部加入 ScanArk 数据后的处理效应。</p>
+          <p>使用学习曲线插值和 bootstrap 置信区间估计公式 (3) 的节省率。两个通用 VLA 基模的绝对成功率不直接比较；重点比较每个基模内部加入 Scan2VLA 数据后的处理效应。</p>
 
           <figure class="figure-placeholder" aria-labelledby="fig-curve-caption">
             <div class="metric-grid">
               <div class="metric-card"><h4>横轴</h4><p>目标任务真实演示数量。</p></div>
               <div class="metric-card"><h4>纵轴</h4><p>真实机器人成功率及 95% 置信区间。</p></div>
               <div class="metric-card"><h4>零真实演示锚点</h4><p>Base zero-shot 与四种 only 后训练条件的 G2 真机成功率。</p></div>
-              <div class="metric-card"><h4>主要曲线</h4><p>Real-only、ScanArk + Real、Independent-GS + Real、Mesh/PBR + Real。</p></div>
+              <div class="metric-card"><h4>主要曲线</h4><p>Real-only、Scan2VLA + Real、Independent-GS + Real、Mesh/PBR + Real。</p></div>
               <div class="metric-card"><h4>核心读数</h4><p>固定成功率阈值 τ 下的水平距离，即真实演示节省量。</p></div>
             </div>
             <figcaption id="fig-curve-caption"><strong>图 4 占位：</strong>全文最重要的结果图应是“真实成功率—真实演示数量”学习曲线，而不是单纯展示 3DGS 图像更逼真。</figcaption>
@@ -979,14 +994,14 @@
               <thead><tr><th scope="col">训练数据</th><th scope="col">N<sub>real</sub></th><th scope="col">真实成功率 ↑</th><th scope="col">演示节省率 ↑</th></tr></thead>
               <tbody>
                 <tr><td>Base zero-shot</td><td>0</td><td>—</td><td>—</td></tr>
-                <tr><td>ScanArk-only</td><td>0</td><td>—</td><td>—</td></tr>
+                <tr><td>Scan2VLA-only</td><td>0</td><td>—</td><td>—</td></tr>
                 <tr><td>Independent-GS-only</td><td>0</td><td>—</td><td>—</td></tr>
                 <tr><td>GS-BG + Mesh-Obj-only</td><td>0</td><td>—</td><td>—</td></tr>
                 <tr><td>Mesh/PBR-only</td><td>0</td><td>—</td><td>—</td></tr>
                 <tr><td>Real-only</td><td>—</td><td>—</td><td>—</td></tr>
                 <tr><td>Mesh/PBR + Real</td><td>—</td><td>—</td><td>—</td></tr>
                 <tr><td>Independent-GS + Real</td><td>—</td><td>—</td><td>—</td></tr>
-                <tr><td>ScanArk + Real</td><td>—</td><td>—</td><td>—</td></tr>
+                <tr><td>Scan2VLA + Real</td><td>—</td><td>—</td><td>—</td></tr>
               </tbody>
             </table>
           </div>
@@ -1002,11 +1017,11 @@
                 <tr><td>Mesh/PBR-only</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
                 <tr><td>GS-BG + Mesh-Obj-only</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
                 <tr><td>Independent-GS-only</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
-                <tr><td>ScanArk-only</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+                <tr><td>Scan2VLA-only</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
               </tbody>
             </table>
           </div>
-          <p><span class="todo">结果段必须同时填写：ScanArk 与最强匹配基线的精确 E2E successes/trials、百分点评差及 CI；物品完成度、每件抓取尝试/掉落、篮子 roll/pitch 与内容物保持率、后备箱位姿误差、任务时长和安全事件；差异首次出现的阶段、受支持的有限解释及失败条件。</span></p>
+          <p><span class="todo">结果段必须同时填写：Scan2VLA 与最强匹配基线的精确 E2E successes/trials、百分点评差及 CI；物品完成度、每件抓取尝试/掉落、篮子 roll/pitch 与内容物保持率、后备箱位姿误差、任务时长和安全事件；差异首次出现的阶段、受支持的有限解释及失败条件。</span></p>
 
           <h3>消融与泛化</h3>
           <ul>
@@ -1024,7 +1039,7 @@
           <p>每个失败 episode 只分配一个首要阶段和原因：错选/感知、抓取、装篮、篮子端起/搬运、后备箱放置、VLA 超时、低层跟踪、安全拒绝或硬件/通信。报告计数、比例、是否能在动作前发现，以及错误是否发生在真实观测或补全 Gaussian 区域；禁止碰撞、命令拒绝、陈旧状态超时、急停和人工干预均保留为任务失败。</p>
 
           <h3>统计分析</h3>
-          <p>独立统计单位是 episode，不是图像帧。在仿真和真实环境中使用配对初始状态，并报告每个条件的精确 successes/trials。预注册严格长程 E2E 成功为主终点，将物品完成度、掉落次数、篮子稳定性、后备箱最终位姿误差和任务时长设为关键次终点，其余过程量用于诊断；确认性次终点说明多重比较校正。二元结果使用精确 binomial confidence interval；连续指标报告单位、聚合层级、效应量和 bootstrap 置信区间；方法比较使用 mixed-effects model，将数据条件和预算作为固定效应，将场景、物体和初始状态作为随机效应。Sim-real correlation 保留 54 个验证单元在 18 个模型内的嵌套结构，以模型为 cluster bootstrap；binomial calibration model 显式处理每模型真机分母 12 与每条仿真分支分母 24 的差异，并先按任务和基模报告结果，再给 pooled estimate。估计真实演示节省率时，对数据抽样、训练种子、真机 episode 和完整学习曲线插值过程联合 bootstrap。</p>
+          <p>独立统计单位是 episode，不是图像帧。在仿真和真实环境中使用配对初始状态，并报告每个条件的精确 successes/trials。预注册严格长程 E2E 成功为主终点，将物品完成度、掉落次数、篮子稳定性、后备箱最终位姿误差和任务时长设为关键次终点，其余过程量用于诊断；确认性次终点说明多重比较校正。二元结果使用精确 binomial confidence interval；连续指标报告单位、聚合层级、效应量和 bootstrap 置信区间；方法比较使用 mixed-effects model，将数据条件和预算作为固定效应，将场景、物体和初始状态作为随机效应。Sim-real correlation 只使用预注册的 <code>N<sub>pair</sub></code> 条配对 episode，并保留 54 个验证单元在 18 个模型内的嵌套结构，以模型为 cluster bootstrap；补充材料中的 binomial calibration model 显式处理各模型配对子集大小 <code>n<sub>m</sub></code> 不同。估计真实演示节省率时，对数据抽样、训练种子、真机 episode 和完整学习曲线插值过程联合 bootstrap。</p>
         </section>
 
         <section class="paper-section" id="limitations">
@@ -1042,8 +1057,8 @@
         <section class="paper-section" id="conclusion">
           <span class="section-number">Section VI</span>
           <h2>结论</h2>
-          <p>本文提出 ScanArk：通过自动分解场景原生物体并生成完整、可碰撞的资产，将联合重建的原生 3DGS 场景转换为交互式数字孪生。实验将检验消除独立物体采集和资产插入后，生成的仿真 VLA 数据能否在零真实演示下适配从未适配的 AgiBot G2，并进一步量化达到目标真实成功率所需真实演示数量的下降。</p>
-          <div class="callout warning"><p><span class="todo">待最终结果完成后填写</span> 用得到统计支持的 ScanArk-only G2 成功率和真实演示节省率收束全文，附试验数与置信区间，同时明确饮料瓶抓取入篮、全身长程任务、场景和物体范围，不引入新的结论。</p></div>
+          <p>本文提出 Scan2VLA：通过自动分解场景原生物体、双向补全并绑定碰撞几何，将联合重建的原生 3DGS 场景转换为交互式 Gaussian 数字孪生，用于把预训练中完全没有 AgiBot G2 数据的通用 VLA 基模适配到未见 G2 本体。实验将检验零真实 G2 演示下的仿真适配、scene-native 资产来源、sim-real correlation 以及长程全身执行质量。</p>
+          <div class="callout warning"><p><span class="todo">待最终结果完成后填写</span> 用得到统计支持的 Scan2VLA-only G2 成功率、sim-real correlation 和真实演示节省率收束全文，附试验数与置信区间，同时明确饮料瓶抓取入篮、全身长程任务、场景和物体范围，不把单一本体结果扩写为多本体泛化结论。</p></div>
         </section>
 
         <section class="paper-section" id="references">
@@ -1075,6 +1090,6 @@
   </div>
 
   <a class="back-top" href="#top">返回顶部</a>
-  <footer>ScanArk ICRA 中文论文大纲 · 与 <a href="icra-paper-framework.tex">TeX 版本</a>同步维护</footer>
+  <footer>Scan2VLA ICRA 中文论文框架 · 与 <a href="icra-paper-framework.tex">TeX 版本</a>同步维护</footer>
 </body>
 </html>

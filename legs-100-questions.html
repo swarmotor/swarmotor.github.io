@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="LEGS 论文 100 问：基于 arXiv 2606.01458 整理，覆盖混合仿真器设计、两大解耦、两阶段颜色校准、过程式数据生成、人形 VLA 微调与低成本场景重渲染。">
+  <meta name="theme-color" content="#fafaf9">
+  <link rel="icon" href="data:,">
+  <title>LEGS 论文 100 问</title>
+  <style>
+    :root {
+      --bg: #fafaf9;
+      --surface: #ffffff;
+      --text: #1a1a1a;
+      --secondary: #525252;
+      --muted: #737373;
+      --accent: #0f4c5c;
+      --accent-light: #e8f4f6;
+      --border: #e5e5e5;
+      --todo-text: #8a5a16;
+      --todo-bg: #fff7e6;
+      --shadow: 0 12px 32px color-mix(in srgb, var(--accent) 10%, transparent);
+      --radius: 16px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 80px;
+    }
+
+    body {
+      margin: 0;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 8% 0%, color-mix(in srgb, var(--accent-light) 72%, transparent), transparent 32%),
+        linear-gradient(180deg, var(--bg), color-mix(in srgb, var(--accent-light) 24%, var(--bg)) 52%, var(--bg));
+      font-family: "DM Sans", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+      font-size: 16px;
+      line-height: 1.75;
+      text-rendering: optimizeLegibility;
+    }
+
+    a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+    a:hover { text-decoration-thickness: 2px; }
+
+    a:focus-visible,
+    summary:focus-visible {
+      outline: 3px solid color-mix(in srgb, var(--accent) 44%, var(--surface));
+      outline-offset: 3px;
+      border-radius: 4px;
+    }
+
+    .skip-link {
+      position: fixed;
+      top: 8px;
+      left: 8px;
+      z-index: 20;
+      padding: 8px 12px;
+      color: var(--surface);
+      background: var(--accent);
+      transform: translateY(-160%);
+      transition: transform 160ms ease;
+    }
+
+    .skip-link:focus { transform: translateY(0); }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      border-bottom: 1px solid color-mix(in srgb, var(--accent) 14%, var(--border));
+      background: color-mix(in srgb, var(--bg) 88%, transparent);
+      backdrop-filter: blur(16px);
+    }
+
+    .topbar-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: min(1000px, calc(100% - 32px));
+      min-height: 56px;
+      margin: 0 auto;
+      gap: 16px;
+    }
+
+    .brand {
+      color: var(--text);
+      font-family: "Crimson Pro", "Noto Serif SC", "Source Han Serif SC", Georgia, serif;
+      font-size: 20px;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .top-links { display: flex; align-items: center; gap: 16px; font-size: 14px; }
+
+    .hero {
+      width: min(1000px, calc(100% - 32px));
+      margin: 48px auto 32px;
+      padding: 48px;
+      border: 1px solid color-mix(in srgb, var(--accent) 18%, var(--border));
+      border-radius: var(--radius);
+      background:
+        linear-gradient(135deg, color-mix(in srgb, var(--accent-light) 82%, var(--surface)), var(--surface) 56%),
+        var(--surface);
+      box-shadow: var(--shadow);
+    }
+
+    .eyebrow {
+      margin: 0 0 12px;
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    h1, h2 {
+      font-family: "Crimson Pro", "Noto Serif SC", "Source Han Serif SC", "Songti SC", Georgia, serif;
+      text-wrap: balance;
+    }
+
+    h1 {
+      max-width: 840px;
+      margin: 0;
+      font-size: 44px;
+      line-height: 1.16;
+      letter-spacing: -.025em;
+    }
+
+    .subtitle {
+      max-width: 760px;
+      margin: 16px 0 0;
+      color: var(--secondary);
+      font-size: 20px;
+      line-height: 1.6;
+    }
+
+    .hero-meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 24px; }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      min-height: 32px;
+      padding: 4px 12px;
+      border: 1px solid color-mix(in srgb, var(--accent) 22%, var(--border));
+      border-radius: 999px;
+      color: var(--accent);
+      background: color-mix(in srgb, var(--accent-light) 68%, var(--surface));
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .thesis {
+      margin-top: 32px;
+      padding: 20px 24px;
+      border-left: 4px solid var(--accent);
+      border-radius: 0 12px 12px 0;
+      background: var(--surface);
+      color: var(--secondary);
+    }
+
+    .thesis strong { color: var(--text); }
+
+    .page {
+      display: grid;
+      grid-template-columns: 224px minmax(0, 1fr);
+      align-items: start;
+      width: min(1000px, calc(100% - 32px));
+      margin: 0 auto 64px;
+      gap: 32px;
+    }
+
+    .toc {
+      position: sticky;
+      top: 80px;
+      padding: 20px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: color-mix(in srgb, var(--surface) 92%, transparent);
+      box-shadow: 0 8px 24px color-mix(in srgb, var(--accent) 7%, transparent);
+    }
+
+    .toc h2 {
+      margin: 0 0 12px;
+      font-family: inherit;
+      font-size: 14px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .toc ul {
+      margin: 0;
+      padding-left: 0;
+      list-style: none;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .toc li { margin: 5px 0; }
+    .toc a { color: var(--secondary); text-decoration: none; }
+    .toc a:hover { color: var(--accent); }
+
+    article { min-width: 0; }
+
+    .qa-group {
+      margin-bottom: 48px;
+      padding: 32px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: color-mix(in srgb, var(--surface) 96%, transparent);
+      box-shadow: 0 8px 24px color-mix(in srgb, var(--accent) 6%, transparent);
+    }
+
+    .group-number {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    h2 {
+      margin: 0 0 24px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid color-mix(in srgb, var(--accent) 24%, var(--border));
+      font-size: 28px;
+      line-height: 1.3;
+    }
+
+    p { margin: 0 0 16px; color: var(--secondary); }
+    ul, ol { margin: 12px 0 20px; padding-left: 24px; color: var(--secondary); }
+    li { margin: 8px 0; }
+    strong { color: var(--text); }
+
+    .qa {
+      margin: 12px 0;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--surface);
+      overflow: hidden;
+    }
+
+    .qa summary {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      padding: 14px 18px;
+      cursor: pointer;
+      list-style: none;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .qa summary::-webkit-details-marker { display: none; }
+    .qa summary::after { content: "＋"; margin-left: auto; color: var(--muted); font-weight: 400; }
+    .qa[open] summary::after { content: "－"; }
+    .qa summary:hover { background: color-mix(in srgb, var(--accent-light) 40%, var(--surface)); }
+
+    .qa-body {
+      padding: 4px 18px 16px;
+      border-top: 1px dashed var(--border);
+      color: var(--secondary);
+    }
+
+    .qa-body p:last-child,
+    .qa-body ul:last-child,
+    .qa-body ol:last-child { margin-bottom: 0; }
+
+    .qnum {
+      flex: none;
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: .04em;
+    }
+
+    code {
+      padding: 2px 6px;
+      border: 1px solid color-mix(in srgb, var(--accent) 16%, var(--border));
+      border-radius: 4px;
+      color: var(--accent);
+      background: var(--accent-light);
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      font-size: .9em;
+    }
+
+    .callout {
+      margin: 24px 0;
+      padding: 20px 24px;
+      border-left: 4px solid var(--accent);
+      border-radius: 0 12px 12px 0;
+      background: color-mix(in srgb, var(--accent-light) 68%, var(--surface));
+    }
+
+    .callout p:last-child { margin-bottom: 0; }
+
+    footer {
+      width: min(1000px, calc(100% - 32px));
+      margin: 0 auto 48px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    @media (max-width: 860px) {
+      .page { grid-template-columns: 1fr; }
+      .toc { position: static; }
+      .hero { padding: 32px 24px; }
+      h1 { font-size: 32px; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">跳到正文</a>
+
+  <nav class="topbar" aria-label="页面导航">
+    <div class="topbar-inner">
+      <a class="brand" href="#top">LEGS 100 问</a>
+      <div class="top-links">
+        <a href="gsworld-100-questions.html">GSWorld 100 问</a>
+        <a href="scanark-icra-100-questions.html">Scan2VLA 100 问</a>
+        <a href="scanark-icra-outline-zh.html">Scan2VLA 论文框架</a>
+        <a href="posts.html">返回文章列表</a>
+      </div>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <p class="eyebrow">LEGS · arXiv:2606.01458 · 论文 100 问</p>
+    <h1>把 LEGS 论文讲成 100 个问题</h1>
+    <p class="subtitle">基于 arXiv 2606.01458 v1（Kim et al., Stanford, 2026）公开版本整理：混合仿真器设计、两大解耦、两阶段颜色校准、过程式数据生成、Unitree G1 上的人形 VLA 微调与低成本场景重渲染。标注「作者解读」的是延伸推断，供与 Scan2VLA / GSWorld 对照阅读。</p>
+    <div class="hero-meta" role="group" aria-label="关键词">
+      <span class="chip">100 问</span>
+      <span class="chip">免遥操作</span>
+      <span class="chip">人形 loco-manipulation</span>
+      <span class="chip">3DGS 背景</span>
+      <span class="chip">Mesh 前景</span>
+      <span class="chip">颜色校准</span>
+      <span class="chip">Unitree G1</span>
+    </div>
+    <div class="thesis">
+      <strong>一句话主旨：</strong>LEGS 用「3DGS 照片级背景 + Mesh 前景 + 过程式运动原语 + 两阶段颜色校准」生成免遥操作的人形 loco-manipulation 训练数据——纯仿真微调的 VLA 匹配或超过遥操作训练，且运动与外观解耦使新场景覆盖成本比遥操作低 15 倍以上。
+    </div>
+  </header>
+
+  <div class="page">
+    <aside class="toc" aria-label="问答目录">
+      <h2>目录</h2>
+      <ul>
+        <li><a href="#g1">一、论文定位与立意 (01–10)</a></li>
+        <li><a href="#g2">二、背景与动机 (11–20)</a></li>
+        <li><a href="#g3">三、框架总览与两大解耦 (21–30)</a></li>
+        <li><a href="#g4">四、视觉前端与颜色校准 (31–42)</a></li>
+        <li><a href="#g5">五、物理后端与过程式数据生成 (43–54)</a></li>
+        <li><a href="#g6">六、实验设置 (55–64)</a></li>
+        <li><a href="#g7">七、实验结果 (65–76)</a></li>
+        <li><a href="#g8">八、重渲染与低成本适配 (77–86)</a></li>
+        <li><a href="#g9">九、局限、结论与对比 (87–100)</a></li>
+      </ul>
+    </aside>
+
+    <main id="main-content">
+      <article aria-label="LEGS 论文 100 问">
+
+        <section class="qa-group" id="g1">
+          <span class="group-number">Part I</span>
+          <h2>一、论文定位与立意</h2>
+
+          <details class="qa" open id="q01"><summary><span class="qnum">01</span>LEGS 是什么？</summary>
+            <div class="qa-body"><p>Loco-manipulation via Embodied Gaussian Splatting：一种混合仿真器，把 Mesh 前景（机器人、物体、props）叠加在从手持场景采集重建的照片级 3DGS 背景上，生成无需真实机器人数据的人形 loco-manipulation 训练数据。</p></div>
+          </details>
+
+          <details class="qa" open id="q02"><summary><span class="qnum">02</span>解决什么问题？</summary>
+            <div class="qa-body"><p>人形 loco-manipulation 的 VLA 微调受限于遥操作演示的高成本与高复杂度；而此前在仿真中微调的 VLA 在人形 loco-manipulation 任务上始终无法有效迁移到真机。</p></div>
+          </details>
+
+          <details class="qa" open id="q03"><summary><span class="qnum">03</span>核心主张是什么？</summary>
+            <div class="qa-body"><p>纯 LEGS 仿真数据微调的策略，在 Unitree G1 上所有任务与三个 VLA 主干上都匹配或超过人类遥操作训练；且胜过 mesh-only 基线——照片级渲染是合成数据迁移的关键使能（key enabler）。</p></div>
+          </details>
+
+          <details class="qa" open id="q04"><summary><span class="qnum">04</span>论文贡献有哪几条？</summary>
+            <div class="qa-body"><ol>
+              <li>过程式仿真器替代人形遥操作：无需任何人类演示，纯 LEGS 数据匹配或超过遥操作（含 budget-matched 50 演示比较与长程任务遥操作完全失败的情况）；</li>
+              <li>可大规模并行的增强工作流：运动与外观解耦，重渲染到新场景 / 相机，无需额外操作者输入；</li>
+              <li>三个 SOTA VLA × 四种数据条件 × 1,110 次真机评测，结论跨主干复现。</li>
+            </ol></div>
+          </details>
+
+          <details class="qa" open id="q05"><summary><span class="qnum">05</span>为什么选人形本体？</summary>
+            <div class="qa-body"><p>人形与人类共享形态，可直接使用人类建造的环境、工具与基础设施，无需改造——但这也意味着它需要同时覆盖操作（manipulation）与移动（locomotion）技能的微调数据。</p></div>
+          </details>
+
+          <details class="qa" open id="q06"><summary><span class="qnum">06</span>LEGS 与 Scan2VLA 是什么关系？</summary>
+            <div class="qa-body"><p>LEGS 是 Scan2VLA 论文中「VLA 应用侧最需要防守的先验」：用原生 3DGS 静态背景 + 动态 Mesh 前景做颜色校准后微调人形 VLA。Scan2VLA 要突出的是「动态前景本身也来自原生场景 Gaussian」，这正是标题区分度的来源。</p></div>
+          </details>
+
+          <details class="qa" open id="q07"><summary><span class="qnum">07</span>「Teleop-Free」到底免了什么？</summary>
+            <div class="qa-body"><p>无遥操作、无种子演示、无人类视频、无逐任务手工 reward——四种常见人工监督全部免除；只保留预训练 VLA 的微调。</p></div>
+          </details>
+
+          <details class="qa" open id="q08"><summary><span class="qnum">08</span>一句话总结 LEGS？</summary>
+            <div class="qa-body"><p>3DGS 照片级背景 + Mesh 前景 + 过程式运动原语 + 两阶段颜色校准 = 免遥操作的人形 loco-manipulation VLA 微调数据工厂，且运动与外观解耦使新场景覆盖成本比遥操作低 15 倍以上。</p></div>
+          </details>
+
+          <details class="qa" open id="q09"><summary><span class="qnum">09</span>论文出处？</summary>
+            <div class="qa-body"><p>Hojune Kim et al., Stanford University；arXiv:2606.01458（2026-05-31，CC BY 4.0）；项目页 legsvla.github.io。</p></div>
+          </details>
+
+          <details class="qa" open id="q10"><summary><span class="qnum">10</span>目标机器人本体？</summary>
+            <div class="qa-body"><p>Unitree G1 人形机器人，配合 SONIC 低层全身控制器。</p></div>
+          </details>
+        </section>
+
+        <section class="qa-group" id="g2">
+          <span class="group-number">Part II</span>
+          <h2>二、背景与动机</h2>
+
+          <details class="qa" open id="q11"><summary><span class="qnum">11</span>人形 loco-manipulation 数据采集难在哪？</summary>
+            <div class="qa-body"><p>遥操作把数据绑定到操作者劳动与机器人占用时间；人类演示重定向仍需逐场景 egocentric 采集；任何部署外观偏移都需要为每个新 episode 投入人工，成本随长会话的操作者与硬件疲劳而超线性增长。</p></div>
+          </details>
+
+          <details class="qa" open id="q12"><summary><span class="qnum">12</span>遥操作的成本量级？</summary>
+            <div class="qa-body"><p>表 1：50 个 Task 3 演示约 1.5 小时操作者时间；每新增一个外观条件仍要 &gt;1.5 小时（操作者 + 硬件疲劳），且必须重采。</p></div>
+          </details>
+
+          <details class="qa" open id="q13"><summary><span class="qnum">13</span>人类演示重定向的局限？</summary>
+            <div class="qa-body"><p>把机器人移出采集回路，但仍需逐场景的人工捕获，扩展成本高、逐场景依赖强。</p></div>
+          </details>
+
+          <details class="qa" open id="q14"><summary><span class="qnum">14</span>传统仿真器的视觉差距？</summary>
+            <div class="qa-body"><p>Mesh 渲染的图像分布偏离真实相机；即使是基于 SAM3D 重建的强 mesh-synthetic 管线，也受材质着色不匹配、简化光照与混叠影响，偏置视觉编码器。</p></div>
+          </details>
+
+          <details class="qa" open id="q15"><summary><span class="qnum">15</span>为什么 3DGS 能缩小视觉差距？</summary>
+            <div class="qa-body"><p>3DGS 以最小化对目标场景真实照片的渲染误差为目标训练，因此新视角渲染是照片级的，直接对齐部署相机的图像分布。</p></div>
+          </details>
+
+          <details class="qa" open id="q16"><summary><span class="qnum">16</span>域随机化的局限？</summary>
+            <div class="qa-body"><p>传统域随机化是在非照片级渲染器上做扰动，没有解决渲染器本身的视觉差距，只是试图用方差覆盖它。</p></div>
+          </details>
+
+          <details class="qa" open id="q17"><summary><span class="qnum">17</span>相关免遥操作人形工作？</summary>
+            <div class="qa-body"><p>sim-augmented BC（需要单条种子演示）、privileged RL teacher 蒸馏（需要手写 reward）、reference-tracking RL（需要手设计轨迹）——每条都移除操作者，但仍需逐任务人工监督。LEGS 全部免除。</p></div>
+          </details>
+
+          <details class="qa" open id="q18"><summary><span class="qnum">18</span>与固定基座 3DGS 仿真的区别？</summary>
+            <div class="qa-body"><p>3DGS 已被用作固定基座操作、高吞吐 RL（locomotion/桌面）、无人机视觉导航、空中操作的仿真主干，但没有一个针对「微调预训练 VLA 做人体 loco-manipulation」。</p></div>
+          </details>
+
+          <details class="qa" open id="q19"><summary><span class="qnum">19</span>SAM3D 强基线的意义？</summary>
+            <div class="qa-body"><p>SAM3D mesh-synthetic 是最强的非 3DGS 基线；LEGS 与它除了渲染前端（3DGS 背景 + 颜色校准）外完全一致，因此任何差异都可归因于渲染后端。</p></div>
+          </details>
+
+          <details class="qa" open id="q20"><summary><span class="qnum">20</span>LEGS 与 Scan2VLA 的共同点？</summary>
+            <div class="qa-body"><p>都用 Gaussian 世界生成 VLA 训练数据并做零样本 sim2real。差异在资产路线：LEGS 是「背景 3DGS + 前景 Mesh」跨表示合成（需颜色校准），Scan2VLA 是前景背景同域的原生 Gaussian。</p></div>
+          </details>
+        </section>
+
+        <section class="qa-group" id="g3">
+          <span class="group-number">Part III</span>
+          <h2>三、框架总览与两大解耦</h2>
+
+          <details class="qa" open id="q21"><summary><span class="qnum">21</span>框架围绕哪两个解耦？</summary>
+            <div class="qa-body"><p>① <strong>物理与渲染解耦</strong>：MuJoCo 后端在 Mesh 几何上求解动力学，独立渲染前端产生图像观测；② <strong>静态背景与动态前景解耦</strong>：背景是固定 3DGS 场（仅外观），前景是随物理移动的栅格化 Mesh。</p></div>
+          </details>
+
+          <details class="qa" open id="q22"><summary><span class="qnum">22</span>为什么物理与渲染解耦？</summary>
+            <div class="qa-body"><p>物理在几何（Mesh）上求解更稳健，渲染单独用 3DGS 保证照片级——两者各自用最合适的技术，互不拖累。</p></div>
+          </details>
+
+          <details class="qa" open id="q23"><summary><span class="qnum">23</span>为什么背景与前景解耦？</summary>
+            <div class="qa-body"><p>运动记录独立于渲染输入（场景外观），因此同一个运动数据集可以重渲染到新的背景与物体 Mesh 下——这是低成本场景适配的根基。</p></div>
+          </details>
+
+          <details class="qa" open id="q24"><summary><span class="qnum">24</span>每帧如何合成？</summary>
+            <div class="qa-body"><p>前景 Mesh 栅格化后与 3DGS 背景通过深度测试逐帧合成（depth-test compositing），得到最终观测图像。</p></div>
+          </details>
+
+          <details class="qa" open id="q25"><summary><span class="qnum">25</span>背景如何重建？</summary>
+            <div class="qa-body"><p>约 1–2 分钟手持视频 → COLMAP 估计位姿 → 3DGS 优化；因为 3DGS 对真实照片最小化渲染误差，新视角照片级。</p></div>
+          </details>
+
+          <details class="qa" open id="q26"><summary><span class="qnum">26</span>前景 Mesh 来源？</summary>
+            <div class="qa-body"><p>机器人来自厂商 URDF；物体与 props 由 SAM3D 从单张手持图像重建并提取带纹理 Mesh。</p></div>
+          </details>
+
+          <details class="qa" open id="q27"><summary><span class="qnum">27</span>合成观测是什么？</summary>
+            <div class="qa-body"><p>照片级 3DGS 背景 + 物理驱动的 Mesh 前景 + 两阶段颜色校准后的合成帧，供 VLA 直接消费。</p></div>
+          </details>
+
+          <details class="qa" open id="q28"><summary><span class="qnum">28</span>与 Scan2VLA 的合成方式对比？</summary>
+            <div class="qa-body"><p>LEGS 前景（Mesh）与背景（3DGS）来自不同表示与采集，必须做颜色校准弥合；Scan2VLA 的物体与背景同属一次联合重建的原生 Gaussian，天然同域——这是「资产来源」主张的对照点。</p></div>
+          </details>
+
+          <details class="qa" open id="q29"><summary><span class="qnum">29</span>可重渲染性的前提？</summary>
+            <div class="qa-body"><p>人形运动以命令流（command stream）形式记录，独立于渲染输入；重渲染只需 GPU 计算，无需重新采集运动。</p></div>
+          </details>
+
+          <details class="qa" open id="q30"><summary><span class="qnum">30</span>数据生成的定位？</summary>
+            <div class="qa-body"><p>过程式运动原语生成器（procedural motion-primitive generator）在仿真中合成带标注的演示——免遥操作、免人类视频、免逐任务 reward。</p></div>
+          </details>
+        </section>
+
+        <section class="qa-group" id="g4">
+          <span class="group-number">Part IV</span>
+          <h2>四、视觉前端与颜色校准</h2>
+
+          <details class="qa" open id="q31"><summary><span class="qnum">31</span>视觉前端由什么组成？</summary>
+            <div class="qa-body"><p>3DGS 背景渲染器 + Mesh 前景栅格化 + 两阶段颜色校准 + 深度合成——把三种颜色空间对齐到部署相机。</p></div>
+          </details>
+
+          <details class="qa" open id="q32"><summary><span class="qnum">32</span>相机如何设置？</summary>
+            <div class="qa-body"><p>关闭自动曝光与自动白平衡（扫描设备与部署相机都关），使从合成到部署的颜色映射保持平稳（stationary），可被静态校准矩阵描述。</p></div>
+          </details>
+
+          <details class="qa" open id="q33"><summary><span class="qnum">33</span>为什么颜色校准必要？</summary>
+            <div class="qa-body"><p>合成帧混合三种颜色空间：扫描设备 ISP（3DGS 背景）、SAM3D 回归的 albedo（Mesh 前景）、部署相机 RealSense D435 ISP——三者必须映射到同一个目标空间。</p></div>
+          </details>
+
+          <details class="qa" open id="q34"><summary><span class="qnum">34</span>校准的数学形式？</summary>
+            <div class="qa-body"><p><code>cd ≈ M [R(cm) ⊔ cb]</code>：cm 是 Mesh 顶点色，cb 是背景 3DGS 像素，R 是逐 mesh 的对角缩放（线性 RGB），⊔ 是深度合成，M 是全局 3×3 颜色校正矩阵（最小二乘）。</p></div>
+          </details>
+
+          <details class="qa" open id="q35"><summary><span class="qnum">35</span>Stage 1 做什么？</summary>
+            <div class="qa-body"><p>mesh-to-deployment albedo 匹配：在 PBR 光照下渲染 mesh 内部视图，取 alpha&gt;200 像素的每通道线性 RGB 均值 μS；与 iPhone 图像中 SAM2 mask 内均值 μT 配对，计算对角缩放 <code>s(c) = clip(μT/μS, 0.5, 3.0)</code> 乘入顶点色。</p></div>
+          </details>
+
+          <details class="qa" open id="q36"><summary><span class="qnum">36</span>为什么用对角缩放而不是全 3×3？</summary>
+            <div class="qa-body"><p>全协方差拟合病态：需要超过 6 的条目才能匹配 iPhone 更大的区域间方差，会裁掉顶点色并偏移色相；对角线在条件良好区间内工作。</p></div>
+          </details>
+
+          <details class="qa" open id="q37"><summary><span class="qnum">37</span>Stage 2 做什么？</summary>
+            <div class="qa-body"><p>iPhone-to-RealSense 颜色校正矩阵：用 24 色块 ColorChecker 双相机拍照，sRGB 线性化后做最小二乘 <code>M* = (QᵀQ)⁻¹QᵀP</code>，把合成帧从 iPhone 空间映射到 RealSense 空间。</p></div>
+          </details>
+
+          <details class="qa" open id="q38"><summary><span class="qnum">38</span>为什么在合成层应用 M 而不是逐物体？</summary>
+            <div class="qa-body"><p>在合成后的完整帧上应用全局矩阵，保持 Mesh 前景与 3DGS 背景空间一致，不引入边界伪影。</p></div>
+          </details>
+
+          <details class="qa" open id="q39"><summary><span class="qnum">39</span>glTF 2.0 顶点色的约定？</summary>
+            <div class="qa-body"><p>glTF 2.0 以线性 RGB 存顶点色，校准后的颜色以线性 RGB 写出，渲染器 gamma-encode 恢复目标 sRGB 外观——避免双重编码。</p></div>
+          </details>
+
+          <details class="qa" open id="q40"><summary><span class="qnum">40</span>SAM3D 与 teleop 是否做颜色校准？</summary>
+            <div class="qa-body"><p>不做；RealSense 运行默认自动曝光 / 自动白平衡。只有 LEGS 固定部署相机参数（曝光 100μs、白平衡 3000K），使校准映射成立。</p></div>
+          </details>
+
+          <details class="qa" open id="q41"><summary><span class="qnum">41</span>校准评测的意义？</summary>
+            <div class="qa-body"><p>LEGS（3DGS + 校准）vs SAM3D（无校准全 Mesh）的唯一差异就是渲染前端，使「照片级渲染是否关键」可被直接归因。</p></div>
+          </details>
+
+          <details class="qa" open id="q42"><summary><span class="qnum">42</span>为什么称「确定性两阶段」校准？</summary>
+            <div class="qa-body"><p>不含任何学习：Stage 1 是逐 mesh 统计匹配，Stage 2 是色块最小二乘——全部可复现、可解释、可审计。</p></div>
+          </details>
+        </section>
+
+        <section class="qa-group" id="g5">
+          <span class="group-number">Part V</span>
+          <h2>五、物理后端与过程式数据生成</h2>
+
+          <details class="qa" open id="q43"><summary><span class="qnum">43</span>物理后端？</summary>
+            <div class="qa-body"><p>MuJoCo 在 Mesh 几何上求解动力学，配合 CoACD 碰撞分解。</p></div>
+          </details>
+
+          <details class="qa" open id="q44"><summary><span class="qnum">44</span>控制器接口？</summary>
+            <div class="qa-body"><p>SONIC 低层全身控制器（WBC），消费共享的 18 维高层命令流（末端执行器 + base），同一命令流同时驱动仿真与真机。</p></div>
+          </details>
+
+          <details class="qa" open id="q45"><summary><span class="qnum">45</span>过程式生成器如何组织？</summary>
+            <div class="qa-body"><p>每个 pick-and-place 任务分解为三个高层运动 Walk / Pick / Place，每个高层运动由更细的运动原语组成；场景配置声明 task_plan，管理器按序执行。</p></div>
+          </details>
+
+          <details class="qa" open id="q46"><summary><span class="qnum">46</span>Walk 原语？</summary>
+            <div class="qa-body"><p>Align → Approach → Align：先对齐物体，走近，再对齐；持物时先执行 Stepback；最终 Align 用 base yaw 把头部朝向活动臂，使目标落入更好的可达角度。</p></div>
+          </details>
+
+          <details class="qa" open id="q47"><summary><span class="qnum">47</span>Pick / Place 原语？</summary>
+            <div class="qa-body"><p>共用开口：Stand / Squat 按物体高度调整骨盆高度，Reach 把末端插值到目标位姿初估；Pick 随后用 Adapt 以 commanded-vs-actual 腕部偏移闭环校正抓取。</p></div>
+          </details>
+
+          <details class="qa" open id="q48"><summary><span class="qnum">48</span>验证原语？</summary>
+            <div class="qa-body"><p>VerifyHold（Pick 后）与 VerifyPlace（Place 后）确认成功后才记录 episode，失败不计数。</p></div>
+          </details>
+
+          <details class="qa" open id="q49"><summary><span class="qnum">49</span>失败处理？</summary>
+            <div class="qa-body"><p>原语级重试（如 Approach 用偏移 waypoint 重试）；验证失败或原语失败则丢弃 episode，不计入预算。</p></div>
+          </details>
+
+          <details class="qa" open id="q50"><summary><span class="qnum">50</span>为什么 Adapt 只用在校准生成阶段？</summary>
+            <div class="qa-body"><p>它依赖 privileged 仿真信号（commanded-vs-actual 偏移），部署时不可用；只用来提高生成数据的质量，不进入策略输入。</p></div>
+          </details>
+
+          <details class="qa" open id="q51"><summary><span class="qnum">51</span>数据预算？</summary>
+            <div class="qa-body"><p>每任务保留成功 episode 至 200 条（LEGS 主条件）；另有 budget-matched 的 50 条比较，避免「数据量碾压」的质疑。</p></div>
+          </details>
+
+          <details class="qa" open id="q52"><summary><span class="qnum">52</span>Task 3 长程任务如何展开？</summary>
+            <div class="qa-body"><p>Walk（到橙子）→ Pick → Turn → Walk（到矮桌）→ Squat → Place，由 Walk / Pick / Place 高层运动及其原语实现——全文最长任务视界。</p></div>
+          </details>
+
+          <details class="qa" open id="q53"><summary><span class="qnum">53</span>与 Scan2VLA 数据生成的对比？</summary>
+            <div class="qa-body"><p>LEGS 用过程式原语合成（免任何人类输入）；Scan2VLA 的轨迹来源标注待填写（运动规划 / 仿真遥操作 / 脚本控制器）——若用类似过程式生成，可借鉴 LEGS 的原语分解与验证协议。</p></div>
+          </details>
+
+          <details class="qa" open id="q54"><summary><span class="qnum">54</span>运动学随机化？</summary>
+            <div class="qa-body"><p>每次 reset 均匀采样：机器人 xy 偏移 ±10cm（仅任务 2–3）、heading ±10°；物体 xy ±5cm、yaw ±180°。</p></div>
+          </details>
+        </section>
+
+        <section class="qa-group" id="g6">
+          <span class="group-number">Part VI</span>
+          <h2>六、实验设置</h2>
+
+          <details class="qa" open id="q55"><summary><span class="qnum">55</span>机器人平台？</summary>
+            <div class="qa-body"><p>Unitree G1 人形机器人，配 SONIC 低层全身控制。</p></div>
+          </details>
+
+          <details class="qa" open id="q56"><summary><span class="qnum">56</span>任务？</summary>
+            <div class="qa-body"><p>三个 pick-and-place 任务，全身难度递增；Task 3 是最长程任务（Walk–Pick–Turn–Walk–Squat–Place）。</p></div>
+          </details>
+
+          <details class="qa" open id="q57"><summary><span class="qnum">57</span>VLA 主干？</summary>
+            <div class="qa-body"><p>ψ0、π0.5（DROID 预训练 checkpoint）、GR00T N1.6（3B）——从公开 checkpoint 微调，覆盖不同规模与架构。</p></div>
+          </details>
+
+          <details class="qa" open id="q58"><summary><span class="qnum">58</span>数据条件？</summary>
+            <div class="qa-body"><p>LEGS（200 条）、LEGS（50 条）、SAM3D（200 条）、Teleop（50 条），总计 1,110 次真机试验。</p></div>
+          </details>
+
+          <details class="qa" open id="q59"><summary><span class="qnum">59</span>如何隔离数据源变量？</summary>
+            <div class="qa-body"><p>所有 backbone 共享 SONIC 控制器与 18-D 动作命令，backbone 内部比较只差数据来源——差异归因于数据而非控制器。</p></div>
+          </details>
+
+          <details class="qa" open id="q60"><summary><span class="qnum">60</span>微调的共同配置？</summary>
+            <div class="qa-body"><p>bf16 混合精度、20,000 优化步、4×H100 80GB、峰值学习率 1e-4（1k warmup cosine 调度）、flow-matching loss。</p></div>
+          </details>
+
+          <details class="qa" open id="q61"><summary><span class="qnum">61</span>各主干微调差异？</summary>
+            <div class="qa-body"><p>ψ0：仅 action head，chunk 30，有效 batch 256；π0.5：全量（VLM+head），chunk 16，batch 128；GR00T N1.6：仅 action head，chunk 16，batch 24。</p></div>
+          </details>
+
+          <details class="qa" open id="q62"><summary><span class="qnum">62</span>遥操作如何采集？</summary>
+            <div class="qa-body"><p>SONIC 的 VR 全身遥操作界面（vr3pt 模式）：PICO VR 头显 + 双手柄提供头部与双腕位姿，扳机设抓取，摇杆设 4-D base 命令（vx, vy, ωz, h）；摔倒或安全触发丢弃重采，保持 50 条平衡预算。</p></div>
+          </details>
+
+          <details class="qa" open id="q63"><summary><span class="qnum">63</span>成功指标？</summary>
+            <div class="qa-body"><p>真机每条件 10 次试验，报告 stage-wise cumulative success（每阶段仍成功的占比），最终阶段即整体成功率——可定位失败发生在哪一步。</p></div>
+          </details>
+
+          <details class="qa" open id="q64"><summary><span class="qnum">64</span>与 Scan2VLA 评测风格对比？</summary>
+            <div class="qa-body"><p>LEGS 用 10 trials + 阶段累计成功；Scan2VLA 强调 successes/trials + 精确 CI、预注册配对子集与 cluster bootstrap（作者解读：Scan2VLA 统计更严，LEGS 更轻量）。</p></div>
+          </details>
+        </section>
+
+        <section class="qa-group" id="g7">
+          <span class="group-number">Part VII</span>
+          <h2>七、实验结果</h2>
+
+          <details class="qa" open id="q65"><summary><span class="qnum">65</span>主结果？</summary>
+            <div class="qa-body"><p>纯 LEGS 数据微调的策略，在所有三个任务与三个 VLA 主干上匹配或超过遥操作训练的策略。</p></div>
+          </details>
+
+          <details class="qa" open id="q66"><summary><span class="qnum">66</span>与 SAM3D 对比？</summary>
+            <div class="qa-body"><p>在所有数据集规模下 LEGS 全胜 mesh-only 基线——证明照片级渲染（3DGS 背景 + 颜色校准）是合成数据迁移的关键使能。</p></div>
+          </details>
+
+          <details class="qa" open id="q67"><summary><span class="qnum">67</span>是否只是预算伪影？</summary>
+            <div class="qa-body"><p>不是：budget-matched 的 50 演示比较中 LEGS 仍匹配或超过遥操作；长程任务上 teleop 甚至完全失败。</p></div>
+          </details>
+
+          <details class="qa" open id="q68"><summary><span class="qnum">68</span>3DGS 背景的贡献如何验证？</summary>
+            <div class="qa-body"><p>消融 mesh-only（SAM3D）基线：除渲染前端外其余完全一致（生成器、MuJoCo 物理、CoACD、SONIC、动作/状态空间、200 预算），差异全部归因于 3DGS 背景与颜色校准。</p></div>
+          </details>
+
+          <details class="qa" open id="q69"><summary><span class="qnum">69</span>阶段分析？</summary>
+            <div class="qa-body"><p>LEGS 在操作阶段（近物、抓取、放置）保持最高成功；teleop 在这些阶段常塌向 0；SAM3D 平台期低于 LEGS——照片级背景在近距离任务中优势明显。</p></div>
+          </details>
+
+          <details class="qa" open id="q70"><summary><span class="qnum">70</span>三个主干的一致性？</summary>
+            <div class="qa-body"><p>同一结论在 ψ0、π0.5、GR00T N1.6 上复现，说明是数据管道的性质而非某个 VLA 的特例。</p></div>
+          </details>
+
+          <details class="qa" open id="q71"><summary><span class="qnum">71</span>长程任务？</summary>
+            <div class="qa-body"><p>Task 3 上 teleop 完全失败（误差累积 + 数据量受限），而 LEGS 成功——合成数据在长视界任务上反而更稳。</p></div>
+          </details>
+
+          <details class="qa" open id="q72"><summary><span class="qnum">72</span>数据规模效应？</summary>
+            <div class="qa-body"><p>各规模（50 / 200）下 LEGS 均胜 mesh-only；50 演示的 budget-matched 比较排除了数据量优势的解释。</p></div>
+          </details>
+
+          <details class="qa" open id="q73"><summary><span class="qnum">73</span>1,110 次试验构成？</summary>
+            <div class="qa-body"><p>3 主干 × 4 数据条件 × 3 任务 × 10 trials 的组合评测（含全部条件），是「三个 SOTA VLA × 四条件」的全面真机证据。</p></div>
+          </details>
+
+          <details class="qa" open id="q74"><summary><span class="qnum">74</span>近距渲染差距？</summary>
+            <div class="qa-body"><p>图 8：LEGS 的 3DGS 背景把房间渲染得照片级，SAM3D 渲染相对平坦统一；teleop 用自动曝光 / 白平衡采集，与 LEGS 固定 ISP 不可像素级直接比较。</p></div>
+          </details>
+
+          <details class="qa" open id="q75"><summary><span class="qnum">75</span>与 Scan2VLA 结果预期的对比？</summary>
+            <div class="qa-body"><p>两者都主张「仿真数据（零真实演示）适配匹配或超过真实数据」；Scan2VLA 还要求 sim-real correlation 与学习曲线定量证据，比 LEGS 的端点成功率更进一步（作者解读）。</p></div>
+          </details>
+
+          <details class="qa" open id="q76"><summary><span class="qnum">76</span>消融归因？</summary>
+            <div class="qa-body"><p>渲染前端（3DGS 背景 + 颜色校准）是唯一被消融的变量，物理、生成器、预算、动作空间全部一致——结论干净可归因。</p></div>
+          </details>
+        </section>
+
+        <section class="qa-group" id="g8">
+          <span class="group-number">Part VIII</span>
+          <h2>八、重渲染与低成本适配</h2>
+
+          <details class="qa" open id="q77"><summary><span class="qnum">77</span>为什么能低成本覆盖新场景？</summary>
+            <div class="qa-body"><p>运动与外观解耦：同一记录的运动数据集在 GPU 上重渲染到新背景、新物体 Mesh，甚至新相机条件——只花计算钱，不花操作者时间。</p></div>
+          </details>
+
+          <details class="qa" open id="q78"><summary><span class="qnum">78</span>成本数字？</summary>
+            <div class="qa-body"><p>初始 50 条：teleop 1.5 小时（操作者）vs LEGS 0.5 小时（计算）；每新增一个外观条件：teleop &gt;1.5 小时 vs LEGS ~0.1 小时 GPU（RTX 4090 + 20 CPU 核）。</p></div>
+          </details>
+
+          <details class="qa" open id="q79"><summary><span class="qnum">79</span>相比遥操作低多少？</summary>
+            <div class="qa-body"><p>每个新增外观条件 15 倍以上（&gt;1.5 hr 人工 → ~0.1 hr GPU），且不需要机器人占用与操作者疲劳管理。</p></div>
+          </details>
+
+          <details class="qa" open id="q80"><summary><span class="qnum">80</span>LEGS-AUG 是什么？</summary>
+            <div class="qa-body"><p>重渲染增强数据集：把记录的运动在交换后的背景与物体 Mesh（如橙色物体、盘子、苹果、盒子、木/蓝桌子）下重新渲染，覆盖物体 + 场景外观的联合偏移。</p></div>
+          </details>
+
+          <details class="qa" open id="q81"><summary><span class="qnum">81</span>外观与提示词交换？</summary>
+            <div class="qa-body"><p>换背景 3DGS 场景、换物体 Mesh、换相机条件；语言提示词随目标物体同步更新，运动轨迹本身不变。</p></div>
+          </details>
+
+          <details class="qa" open id="q82"><summary><span class="qnum">82</span>联合偏移下的结果？</summary>
+            <div class="qa-body"><p>在物体 + 场景外观联合偏移下，用 LEGS-AUG 数据训练的策略保持任务成功，而用遥操作数据训练的基线完全失败。</p></div>
+          </details>
+
+          <details class="qa" open id="q83"><summary><span class="qnum">83</span>为什么「增强优于规模」？</summary>
+            <div class="qa-body"><p>在物体与提示词同时偏移时，覆盖外观多样性（重渲染增强）比单纯增加同一分布的数据量更有效——泛化来自覆盖而非重复。</p></div>
+          </details>
+
+          <details class="qa" open id="q84"><summary><span class="qnum">84</span>SAM3D 重渲染成本？</summary>
+            <div class="qa-body"><p>每条件 ~0.2 小时（全 Mesh 场景重着色，比 LEGS 略贵）；仍远低于 teleop，但贵于 LEGS 的 3DGS 背景。</p></div>
+          </details>
+
+          <details class="qa" open id="q85"><summary><span class="qnum">85</span>运动记录如何独立于外观？</summary>
+            <div class="qa-body"><p>人形运动被记录为命令流（高层 18-D 命令），与渲染输入（背景、物体 Mesh、相机）完全无关——重渲染不重跑物理。</p></div>
+          </details>
+
+          <details class="qa" open id="q86"><summary><span class="qnum">86</span>对 Scan2VLA 的启示？</summary>
+            <div class="qa-body"><p>重渲染增强（运动与外观解耦）思想可直接借鉴到 Scan2VLA 的场景多样性实验；但 LEGS 前景仍依赖 SAM3D 单图 Mesh，与背景不同源——Scan2VLA 的场景原生前景无需跨域校准（作者解读）。</p></div>
+          </details>
+        </section>
+
+        <section class="qa-group" id="g9">
+          <span class="group-number">Part IX</span>
+          <h2>九、局限、结论与对比</h2>
+
+          <details class="qa" open id="q87"><summary><span class="qnum">87</span>主要局限（作者解读 + 论文可见事实）？</summary>
+            <div class="qa-body"><p>① 前景依赖 SAM3D 单图重建，mesh 质量有限；② 3DGS 背景静态，大幅环境变化（物体移走）不更新；③ 需逐场景采集（~1–2 分钟视频 + 物体照片）；④ 颜色校准依赖固定 ISP（关自动曝光/白平衡）。</p></div>
+          </details>
+
+          <details class="qa" open id="q88"><summary><span class="qnum">88</span>前景 Mesh 的局限？</summary>
+            <div class="qa-body"><p>SAM3D 回归的是表面 albedo 而非 ISP 色调曲线，颜色被系统性地压淡（muted），需要 Stage 1 逐 mesh 校正；材质与简化光照仍不完美（作者解读）。</p></div>
+          </details>
+
+          <details class="qa" open id="q89"><summary><span class="qnum">89</span>背景静态的限制？</summary>
+            <div class="qa-body"><p>3DGS 背景只做外观渲染且固定；环境布局变化、物体被移走后暴露的背景洞不会更新——长期交互场景需重新采集（作者解读）。</p></div>
+          </details>
+
+          <details class="qa" open id="q90"><summary><span class="qnum">90</span>需要什么采集投入？</summary>
+            <div class="qa-body"><p>每场景约 1–2 分钟手持视频（重建 3DGS 背景）+ 每个物体的单张手持照片（SAM3D Mesh）；无机器人占用、无操作者全程劳动。</p></div>
+          </details>
+
+          <details class="qa" open id="q91"><summary><span class="qnum">91</span>对比 Scan2VLA（应用侧）？</summary>
+            <div class="qa-body"><p>LEGS 是「背景 3DGS + 前景 Mesh」的跨表示合成；Scan2VLA 强调动态前景也来自原生场景 Gaussian——这是两篇论文在资产来源主张上的关键分野，也是 Scan2VLA 标题与实验需要防守的地方。</p></div>
+          </details>
+
+          <details class="qa" open id="q92"><summary><span class="qnum">92</span>对比 GSWorld？</summary>
+            <div class="qa-body"><p>GSWorld 是系统级闭环仿真套件（GSDF 资产、IL/RL/DAgger、可复现基准）；LEGS 聚焦人形 loco-manipulation 的 VLA 微调数据生成，两者资产路线也不同（GSWorld 物体单独扫描，LEGS 物体 SAM3D 单图重建）。</p></div>
+          </details>
+
+          <details class="qa" open id="q93"><summary><span class="qnum">93</span>对比 Real2Render2Real？</summary>
+            <div class="qa-body"><p>R2R2R 从真实视频生成演示但主动放弃动力学仿真；LEGS 保留完整物理（MuJoCo）与可交互前景，能生成闭环可验证的演示。</p></div>
+          </details>
+
+          <details class="qa" open id="q94"><summary><span class="qnum">94</span>对比 Mirage2Matter？</summary>
+            <div class="qa-body"><p>Mirage2Matter 分别重建场景与物体 Gaussian 并生成碰撞 Mesh；LEGS 背景 3DGS + 前景 SAM3D Mesh，侧重免遥操作人形 VLA 微调与重渲染增强。</p></div>
+          </details>
+
+          <details class="qa" open id="q95"><summary><span class="qnum">95</span>结论如何收束？</summary>
+            <div class="qa-body"><p>过程式数据 + 照片级渲染使纯仿真微调匹配或超过遥操作；运动与外观解耦使场景适配成本降低 15 倍以上，增强数据在联合外观偏移下仍保持成功。</p></div>
+          </details>
+
+          <details class="qa" open id="q96"><summary><span class="qnum">96</span>通用性声明？</summary>
+            <div class="qa-body"><p>LEGS 产出通用的人形 loco-manipulation 演示数据集，同一份记录 + 增强数据可以微调任意 VLA——不绑定某个模型。</p></div>
+          </details>
+
+          <details class="qa" open id="q97"><summary><span class="qnum">97</span>审稿人可能攻击的点（作者解读）？</summary>
+            <div class="qa-body"><p>真机每条件仅 10 trials、依赖 SONIC/VR 基础设施、SAM3D 前景质量有限、背景静态、颜色校准依赖固定 ISP、任务仅 pick-and-place。</p></div>
+          </details>
+
+          <details class="qa" open id="q98"><summary><span class="qnum">98</span>下一步方向（作者解读）？</summary>
+            <div class="qa-body"><p>动态 / 可更新背景、前景也场景原生（对齐 Scan2VLA 路线）、更多任务类型（非 pick-and-place）、更多本体、在线 DAgger 闭环迭代。</p></div>
+          </details>
+
+          <details class="qa" open id="q99"><summary><span class="qnum">99</span>一句话记忆点？</summary>
+            <div class="qa-body"><p>照片级渲染是合成数据迁移的关键使能；运动与外观解耦让「一条运动数据，任意场景外观」——免遥操作 + 15 倍低成本场景覆盖。</p></div>
+          </details>
+
+          <details class="qa" open id="q100"><summary><span class="qnum">100</span>与 Scan2VLA / GSWorld 共读要点？</summary>
+            <div class="qa-body"><p>三篇构成「Gaussian 世界 × VLA」的对照谱系：LEGS 证明 3DGS 背景照片级是关键（前景 Mesh 独立扫描）；GSWorld 提供闭环系统与可移植 GSDF 资产（物体单独扫描）；Scan2VLA 进一步问——如果前景物体也来自同一场景的原生 Gaussian，数据价值是否更高。</p></div>
+          </details>
+
+          <div class="callout">
+            <p><strong>说明：</strong>本页基于 arXiv:2606.01458 v1（2026-05-31）公开版本整理，用于与 <a href="gsworld-100-questions.html">GSWorld 100 问</a>、<a href="scanark-icra-100-questions.html">Scan2VLA 100 问</a> 对照阅读。标注「作者解读」的内容为延伸推断；实验数字与细节以原文（含附录）为准。</p>
+          </div>
+        </section>
+
+      </article>
+    </main>
+  </div>
+
+  <footer>
+    LEGS 论文 100 问 · arXiv:2606.01458 · 与 <a href="gsworld-100-questions.html">GSWorld 100 问</a>、<a href="scanark-icra-100-questions.html">Scan2VLA 100 问</a> 对照阅读
+  </footer>
+</body>
+</html>
