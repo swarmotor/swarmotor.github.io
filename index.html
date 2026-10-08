@@ -1,9 +1,22 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SWARMOTOR - 简历</title>
+    <script>
+        // English is the default language; only an explicit Chinese choice switches the page.
+        (function () {
+            try {
+                if (localStorage.getItem('swarmotor-lang-v2') === 'zh') {
+                    document.documentElement.classList.add('lang-zh');
+                    document.documentElement.lang = 'zh-CN';
+                }
+            } catch (error) {
+                /* storage unavailable: stay on the English default */
+            }
+        })();
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;500;600&family=Noto+Sans+SC:wght@300;400;500;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -331,12 +344,13 @@
             font-weight: 600;
         }
 
-        [data-lang="en"] { display: none !important; }
-        body.lang-en [data-lang="zh"] { display: none !important; }
-        body.lang-en [data-lang="en"] { display: block !important; }
-        body.lang-en a.button-link[data-lang="en"] { display: inline-flex !important; }
-        body.lang-en li[data-lang="en"] { display: list-item !important; }
-        body.lang-en span[data-lang="en"] { display: inline !important; }
+        /* English is the default; html.lang-zh switches the whole page to Chinese. */
+        [data-lang="zh"] { display: none !important; }
+        html.lang-zh [data-lang="en"] { display: none !important; }
+        html.lang-zh [data-lang="zh"] { display: block !important; }
+        html.lang-zh a.button-link[data-lang="zh"] { display: inline-flex !important; }
+        html.lang-zh li[data-lang="zh"] { display: list-item !important; }
+        html.lang-zh span[data-lang="zh"] { display: inline !important; }
 
         @media (max-width: 900px) {
             .hero,
@@ -372,8 +386,8 @@
     <canvas id="game-of-life"></canvas>
 
     <div class="lang-toggle" aria-label="Language switcher">
-        <button class="lang-btn active" onclick="setLang('zh')">中文</button>
-        <button class="lang-btn" onclick="setLang('en')">EN</button>
+        <button class="lang-btn active" onclick="setLang('en')">EN</button>
+        <button class="lang-btn" onclick="setLang('zh')">中文</button>
     </div>
 
     <div class="game-toggle" aria-label="Background mode switcher">
@@ -395,8 +409,8 @@
         <header class="hero">
             <div>
                 <div class="eyebrow">SWARMOTOR</div>
-                <h1 data-lang="zh">张景</h1>
-                <h1 data-lang="en">Jing Zhang</h1>
+                <h1 data-lang="zh">张俊</h1>
+                <h1 data-lang="en">ZHANG Jun</h1>
                 <p class="lead" data-lang="zh">我聚焦具身智能数据闭环，研究真实—仿真数据生成、质量评估与训练反馈；以 VLM、VLA、WAM 为研究对象和工具，连接数据、策略学习与机器人评测。</p>
                 <p class="lead" data-lang="en">I focus on embodied-AI data loops across real-to-sim generation, quality evaluation, and training feedback, studying and using VLMs, VLAs, and WAMs to connect data, policy learning, and robot evaluation.</p>
                 <div class="hero-actions">
@@ -473,6 +487,10 @@
             <div class="highlight-grid">
                 <div class="stacked-list">
                     <div class="pub-item">
+                        <div class="pub-title">Scan2VLA: Robot-Executable VLA Demonstration Generation Based on Interactive Gaussian Digital Twins</div>
+                        <div class="pub-meta"><span data-lang="zh">第一作者 · ICRA 2026 · 审稿中</span><span data-lang="en">First Author · ICRA 2026 · Under Review</span></div>
+                    </div>
+                    <div class="pub-item">
                         <div class="pub-title">Instantaneous Strong Connectivity: A Novel Perceptual Paradigm for Swarm Guidance in Communication-Denied Environments</div>
                         <div class="pub-meta"><span data-lang="zh">第一作者 · IEEE Transactions on Control of Network Systems · 审稿中 · 2026</span><span data-lang="en">First Author · IEEE Transactions on Control of Network Systems · Under Review · 2026</span></div>
                     </div>
@@ -490,6 +508,13 @@
                     </div>
                 </div>
                 <div class="stacked-list">
+                    <div class="project-item">
+                        <div class="project-title" data-lang="zh">Scan2VLA：把交互式高斯数字孪生变成可执行的 VLA 演示数据</div>
+                        <div class="project-title" data-lang="en">Scan2VLA: Interactive Gaussian Digital Twins as a Source of Robot-Executable VLA Demonstrations</div>
+                        <div class="project-meta">Real-to-Sim-to-Real · 3DGS · Isaac Sim · LeRobot · 2026</div>
+                        <p data-lang="zh">后续新工作：以真实扫描的高斯数字孪生为数据来源，自动生成机器人可执行的演示数据，并把重建保真度与真机可迁移性放在同一条链路上评估。</p>
+                        <p data-lang="en">Follow-up work: using a Gaussian digital twin scanned from a real scene as the data source for robot-executable demonstrations, evaluating reconstruction fidelity and physical-robot transferability within one pipeline.</p>
+                    </div>
                     <div class="project-item">
                         <div class="project-title" data-lang="zh">OpenPI / pi0.5 ALOHA 后训练链路验证</div>
                         <div class="project-title" data-lang="en">OpenPI / pi0.5 ALOHA Post-Training Pipeline Validation</div>
@@ -755,16 +780,27 @@
         })();
 
         function setLang(lang) {
-            localStorage.setItem('swarmotor-lang', lang);
-            document.body.classList.toggle('lang-en', lang === 'en');
+            const isZh = lang === 'zh';
+            try {
+                localStorage.setItem('swarmotor-lang-v2', isZh ? 'zh' : 'en');
+            } catch (error) {
+                /* storage unavailable: language still applies for this page view */
+            }
+            document.documentElement.classList.toggle('lang-zh', isZh);
+            document.documentElement.lang = isZh ? 'zh-CN' : 'en';
             document.querySelectorAll('.lang-btn').forEach((btn) => {
-                btn.classList.toggle('active', (btn.textContent === 'EN' && lang === 'en') || (btn.textContent === '中文' && lang === 'zh'));
+                btn.classList.toggle('active', (btn.textContent === 'EN') === !isZh);
             });
         }
 
         (function initLang() {
-            const saved = localStorage.getItem('swarmotor-lang');
-            if (saved) setLang(saved);
+            let saved = null;
+            try {
+                saved = localStorage.getItem('swarmotor-lang-v2');
+            } catch (error) {
+                /* storage unavailable: fall through to the English default */
+            }
+            setLang(saved === 'zh' ? 'zh' : 'en');
         })();
     </script>
 </body>
