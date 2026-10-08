@@ -438,12 +438,12 @@
                     <div>
                         <dt data-lang="zh">机构</dt>
                         <dt data-lang="en">Affiliation</dt>
-                        <dd>SUPMICROTECH-ENSMM · FEMTO-ST Laboratory</dd>
+                        <dd>SUPMICROTECH (UMLP) · FEMTO-ST Laboratory</dd>
                     </div>
                     <div>
                         <dt data-lang="zh">教育</dt>
                         <dt data-lang="en">Education</dt>
-                        <dd>SUPMICROTECH-ENSMM · Anhui University</dd>
+                        <dd>SUPMICROTECH (UMLP) · Anhui University</dd>
                     </div>
                     <div>
                         <dt data-lang="zh">关键词</dt>
@@ -493,7 +493,7 @@
             <div class="stacked-list">
                 <div class="pub-item">
                     <div class="pub-title">Scan2VLA: Robot-Executable VLA Demonstration Generation Based on Interactive Gaussian Digital Twins</div>
-                    <div class="pub-meta"><span data-lang="zh">第一作者 · ICRA 2026 · 审稿中</span><span data-lang="en">First Author · ICRA 2026 · Under Review</span></div>
+                    <div class="pub-meta"><span data-lang="zh">第一作者 · ICRA 2027 · 审稿中</span><span data-lang="en">First Author · ICRA 2027 · Under Review</span></div>
                     <p class="pub-note" data-lang="zh">后续新工作：以真实扫描的高斯数字孪生为数据来源，自动生成机器人可执行的演示数据，并把重建保真度与真机可迁移性放在同一条链路上评估。</p>
                     <p class="pub-note" data-lang="en">Follow-up work: using a Gaussian digital twin scanned from a real scene as the data source for robot-executable demonstrations, evaluating reconstruction fidelity and physical-robot transferability within one pipeline.</p>
                 </div>
@@ -510,8 +510,8 @@
                     <div class="pub-meta"><span data-lang="zh">本科生第一作者 · ROBOMECH · 已录用 · 2026</span><span data-lang="en">Undergraduate First Author · ROBOMECH · Accepted · 2026</span></div>
                 </div>
                 <div class="pub-item">
-                    <div class="pub-title"><a href="https://www.sciencedirect.com/science/article/pii/S2405896325020579" target="_blank" rel="noopener">Bio-inspired Neighbor Selection Mechanism and Performance Evaluation for UAV Swarms</a></div>
-                    <div class="pub-meta"><span data-lang="zh">第一作者 · IFAC-ACA 2025 · 已发表</span><span data-lang="en">First Author · IFAC-ACA 2025 · Published</span></div>
+                    <div class="pub-title"><a href="https://doi.org/10.1016/j.ifacol.2025.11.381" target="_blank" rel="noopener">Bio-inspired Neighbor Selection Mechanism and Performance Evaluation for UAV Swarms</a></div>
+                    <div class="pub-meta"><span data-lang="zh">第一作者 · IFAC-ACA 2025 · 已发表 · 口头报告</span><span data-lang="en">First Author · IFAC-ACA 2025 · Published · Oral Presentation</span></div>
                 </div>
             </div>
         </section>
@@ -519,6 +519,23 @@
         <section>
             <h2><span class="section-title" data-lang="zh">科研与项目经验</span><span class="section-title" data-lang="en">Research & Project Experience</span></h2>
             <div class="details-grid">
+                <div class="project-item">
+                    <div class="project-title" data-lang="zh">轮足 / 点足机器人强化学习 Locomotion</div>
+                    <div class="project-title" data-lang="en">RL Locomotion for Wheeled-Legged and Point-Foot Robots</div>
+                    <div class="project-meta">2025-2026 · Isaac Lab · PPO + GAE · Domain Randomization · Curriculum Learning · Sim-to-Real</div>
+                    <ul>
+                        <li data-lang="zh">独立负责人：从零搭建 Isaac Lab 足式机器人 RL 训练全流程，覆盖轮足与点足双模态动力学建模。</li>
+                        <li data-lang="zh">ELO Curriculum：自适应难度课程与动态域随机化联合训练，成功率从 35% 提升至 92% 以上。</li>
+                        <li data-lang="zh">诊断驱动 DR：发现策略依赖仿真摩擦力辅助刹车（捷径行为），据此针对性设计域随机化破坏捷径，而非盲目叠加扰动。</li>
+                        <li data-lang="zh">PPO + GAE 实现动态平衡行走：速度跟踪、粗糙地形容错，支持下蹲 / 站立 / 轮式滚动 / 足式踏步多模态切换。</li>
+                        <li data-lang="zh">Sim-to-Real：通过系统辨识建模 actuator dynamics，并用域随机化覆盖动力学参数，应对 sensing gap 等问题。</li>
+                        <li data-lang="en">Independent lead: built the full Isaac Lab RL training pipeline from scratch for legged robots, covering wheeled-legged and point-foot dynamics.</li>
+                        <li data-lang="en">ELO Curriculum: adaptive difficulty curriculum trained jointly with dynamic domain randomization, raising success from 35% to above 92%.</li>
+                        <li data-lang="en">Diagnosis-driven DR: found a policy exploiting simulated friction as a braking shortcut, then designed targeted randomization to break the shortcut instead of adding blind perturbations.</li>
+                        <li data-lang="en">PPO + GAE for dynamic balanced walking: velocity tracking and rough-terrain tolerance, with crouch / stand / wheeled rolling / stepping mode switching.</li>
+                        <li data-lang="en">Sim-to-Real: system identification for actuator dynamics plus domain randomization over dynamics parameters to address the sensing gap.</li>
+                    </ul>
+                </div>
                 <div class="project-item">
                     <div class="project-title" data-lang="zh">OpenPI / pi0.5 ALOHA 后训练链路验证</div>
                     <div class="project-title" data-lang="en">OpenPI / pi0.5 ALOHA Post-Training Pipeline Validation</div>
@@ -531,18 +548,51 @@
                     </ul>
                 </div>
                 <div class="project-item">
-                    <div class="project-title" data-lang="zh">拓扑保持的群体感知研究</div>
-                    <div class="project-title" data-lang="en">Topology-Preserving Swarm Perception</div>
-                    <div class="project-meta">SUPMICROTECH-ENSMM · FEMTO-ST Laboratory · 2025-Present</div>
+                    <div class="project-title" data-lang="zh">分布式系统容错：通信拒止下的拓扑鲁棒性</div>
+                    <div class="project-title" data-lang="en">Distributed Fault Tolerance: Topology Robustness under Communication Denial</div>
+                    <div class="project-meta">2025-2026 · Lyapunov 稳定性分析 · 图论 · 去中心化架构</div>
                     <ul>
-                        <li data-lang="zh">提出保证动态交互图中即时强连通性的拓扑保持感知范式。</li>
-                        <li data-lang="zh">建立通信约束下结构信息传播的理论保证，防止网络分裂。</li>
-                        <li data-lang="zh">用 Lyapunov 方法证明收敛性与稳定性。</li>
-                        <li data-lang="zh">展示相对传统 KNN 拓扑策略的鲁棒性优势。</li>
-                        <li data-lang="en">Formulated a topology-preserving perceptual paradigm guaranteeing instantaneous strong connectivity in dynamic interaction graphs.</li>
-                        <li data-lang="en">Established structural information propagation guarantees that prevent network fragmentation under communication constraints.</li>
-                        <li data-lang="en">Proved convergence and stability properties via Lyapunov-based analysis.</li>
-                        <li data-lang="en">Demonstrated robustness advantages over conventional KNN-based topology strategies.</li>
+                        <li data-lang="zh">设计去中心化架构，在通信中断下保证系统完整性、避免网络分裂。</li>
+                        <li data-lang="zh">提出即时强连通的拓扑保持感知范式，用 Lyapunov 方法严格证明收敛性与稳定性。</li>
+                        <li data-lang="zh">该工作已投稿 IEEE TCNS（在审）。</li>
+                        <li data-lang="en">Designed a decentralized architecture that preserves system integrity and prevents network fragmentation under communication loss.</li>
+                        <li data-lang="en">Formulated a topology-preserving perceptual paradigm with instantaneous strong connectivity, with a rigorous Lyapunov proof of convergence and stability.</li>
+                        <li data-lang="en">Submitted to IEEE TCNS (under review).</li>
+                    </ul>
+                </div>
+                <div class="project-item">
+                    <div class="project-title" data-lang="zh">端到端 RL：Genesis 多智能体无人机集群训练</div>
+                    <div class="project-title" data-lang="en">End-to-End RL: Multi-Agent UAV Swarm Training in Genesis</div>
+                    <div class="project-meta">2024-2026 · Genesis · Isaac Sim · PyTorch · CUDA · 大规模并行训练</div>
+                    <ul>
+                        <li data-lang="zh">共同负责人：从零搭建 Genesis 物理仿真 pipeline，实现无人机「感知 → 决策 → 控制」端到端训练闭环。</li>
+                        <li data-lang="zh">设计通信约束下基于注意力机制的去中心化策略网络，支持大规模群体协调（RL 与分布式系统的交叉能力）。</li>
+                        <li data-lang="zh">开发通信受限多智能体分布式训练框架，验证可扩展性与收敛稳定性。</li>
+                        <li data-lang="en">Co-lead: built the Genesis physics simulation pipeline from scratch, closing the perception → decision → control training loop for UAVs.</li>
+                        <li data-lang="en">Designed a decentralized attention-based policy network under communication constraints for large-scale swarm coordination, spanning RL and distributed systems.</li>
+                        <li data-lang="en">Developed a distributed training framework for communication-constrained multi-agent systems, validating scalability and convergence stability.</li>
+                    </ul>
+                </div>
+                <div class="project-item">
+                    <div class="project-title" data-lang="zh">GNN + MAPPO 动态网络拓扑强化学习</div>
+                    <div class="project-title" data-lang="en">GNN + MAPPO Reinforcement Learning for Dynamic Network Topology</div>
+                    <div class="project-meta">2024-2026 · PyG · PettingZoo · MAPPO · CUDA</div>
+                    <ul>
+                        <li data-lang="zh">负责人：提出用 GNN 实时建模动态通信拓扑，由拓扑感知注意力自动调整链路优先级与带宽分配。</li>
+                        <li data-lang="zh">搭建 PyG + PettingZoo + MAPPO 多智能体 RL 框架，支持大规模自组织节点。</li>
+                        <li data-lang="en">Lead: proposed real-time dynamic communication topology modeling with GNNs, where topology-aware attention adjusts link priority and bandwidth allocation automatically.</li>
+                        <li data-lang="en">Built a PyG + PettingZoo + MAPPO multi-agent RL framework supporting large-scale self-organizing nodes.</li>
+                    </ul>
+                </div>
+                <div class="project-item">
+                    <div class="project-title" data-lang="zh">基于视觉的抗风无人机稳定控制</div>
+                    <div class="project-title" data-lang="en">Vision-Based Wind-Resistant UAV Stabilization</div>
+                    <div class="project-meta">2024-2025</div>
+                    <ul>
+                        <li data-lang="zh">设计抗扰动无人机的视觉状态估计算法。</li>
+                        <li data-lang="zh">量化气动扰动下的稳定性性能。</li>
+                        <li data-lang="en">Designed visual state-estimation algorithms for disturbance-resilient UAV control.</li>
+                        <li data-lang="en">Quantified stability performance under aerodynamic perturbations.</li>
                     </ul>
                 </div>
                 <div class="project-item">
@@ -560,51 +610,40 @@
                     </ul>
                 </div>
                 <div class="project-item">
-                    <div class="project-title" data-lang="zh">基于 Genesis 的无人机端到端强化学习</div>
-                    <div class="project-title" data-lang="en">End-to-End RL for UAV Navigation via Genesis</div>
-                    <div class="project-meta">2024-Present · Isaac Sim · Genesis · PyTorch · GAIL · CUDA</div>
+                    <div class="project-title" data-lang="zh">自主感知与导航 — RoboMaster 2025</div>
+                    <div class="project-title" data-lang="en">Autonomous Perception & Navigation — RoboMaster 2025</div>
+                    <div class="project-meta">2023-2025 · MID-360 · FAST-LIO2 · TensorRT · 实时系统</div>
                     <ul>
-                        <li data-lang="zh">构建基于物理的 Isaac Sim + Genesis 仿真环境，实现无人机从感知到决策的端到端训练。</li>
-                        <li data-lang="zh">设计通信受限环境下基于注意力机制的策略网络，支持去中心化群体协调。</li>
-                        <li data-lang="zh">开发通信约束多智能体系统的去中心化强化学习框架。</li>
-                        <li data-lang="zh">在大规模仿真中评估可扩展性与收敛稳定性。</li>
-                        <li data-lang="en">Built a physics-based Isaac Sim + Genesis environment for end-to-end UAV training from perception to decision-making.</li>
-                        <li data-lang="en">Designed an attention-based policy network for decentralized swarm coordination under communication constraints.</li>
-                        <li data-lang="en">Developed a decentralized RL framework for communication-constrained multi-agent systems.</li>
-                        <li data-lang="en">Evaluated scalability and convergence stability in large-scale simulations.</li>
-                    </ul>
-                </div>
-                <div class="project-item">
-                    <div class="project-title" data-lang="zh">基于 GNN 的自组织无人机群拓扑强化学习框架</div>
-                    <div class="project-title" data-lang="en">GNN-Based Self-Organizing Swarm Topology Reinforcement Learning</div>
-                    <div class="project-meta">2024-Present · PyTorch · PyG · PettingZoo · MAPPO · CUDA</div>
-                    <ul>
-                        <li data-lang="zh">提出基于图神经网络的动态拓扑表示学习方法，实现通信拓扑的自适应优化。</li>
-                        <li data-lang="zh">结合拓扑感知注意力机制设计图强化学习框架，支持可扩展的群体协同。</li>
-                        <li data-lang="en">Proposed a GNN-based dynamic topology representation for adaptive communication topology optimization.</li>
-                        <li data-lang="en">Designed a graph reinforcement learning framework with topology-aware attention for scalable swarm coordination.</li>
-                    </ul>
-                </div>
-                <div class="project-item">
-                    <div class="project-title" data-lang="zh">基于视觉的抗风无人机稳定控制</div>
-                    <div class="project-title" data-lang="en">Vision-Based Wind-Resistant UAV Stabilization</div>
-                    <div class="project-meta">2024-2025</div>
-                    <ul>
-                        <li data-lang="zh">设计抗扰动无人机的视觉状态估计算法。</li>
-                        <li data-lang="zh">量化气动扰动下的稳定性性能。</li>
-                        <li data-lang="en">Designed visual state-estimation algorithms for disturbance-resilient UAV control.</li>
-                        <li data-lang="en">Quantified stability performance under aerodynamic perturbations.</li>
-                    </ul>
-                </div>
-                <div class="project-item">
-                    <div class="project-title" data-lang="zh">自主感知与导航（RoboMaster 2025）</div>
-                    <div class="project-title" data-lang="en">Autonomous Perception & Navigation (RoboMaster 2025)</div>
-                    <div class="project-meta">2023-2025</div>
-                    <ul>
-                        <li data-lang="zh">实现实时视觉检测与基于 LiDAR 的导航系统（MID-360 + FAST-LIO2）。</li>
+                        <li data-lang="zh">算法组长：搭建实时视觉检测 + LiDAR SLAM 系统（MID-360 + FAST-LIO2），支撑高速对抗下的全自主导航。</li>
                         <li data-lang="zh">通过 TensorRT 优化将推理效率从 40 FPS 提升至 90 FPS。</li>
-                        <li data-lang="en">Implemented real-time visual detection and a LiDAR-based navigation stack (MID-360 + FAST-LIO2).</li>
+                        <li data-lang="zh">获 RoboMaster 2025 全国三等奖。</li>
+                        <li data-lang="en">Algorithm lead: built the real-time visual detection + LiDAR SLAM stack (MID-360 + FAST-LIO2) enabling fully autonomous navigation in high-speed matches.</li>
                         <li data-lang="en">Improved inference throughput from 40 FPS to 90 FPS via TensorRT optimization.</li>
+                        <li data-lang="en">Awarded the RoboMaster 2025 National Third Prize.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2><span class="section-title" data-lang="zh">实习经历</span><span class="section-title" data-lang="en">Internships</span></h2>
+            <div class="details-grid">
+                <div class="project-item">
+                    <div class="project-title" data-lang="zh">上海景立构科技 Scanark — 算法工程师</div>
+                    <div class="project-title" data-lang="en">Scanark (Shanghai Jingligou Technology) — Algorithm Engineer</div>
+                    <div class="project-meta">2026.04 - 2026.09</div>
+                    <p class="pub-note" data-lang="zh">工作内容整理中，后续补充。</p>
+                    <p class="pub-note" data-lang="en">Details to be added.</p>
+                </div>
+                <div class="project-item">
+                    <div class="project-title" data-lang="zh">上海创智学院 创业计划 — 算法研究实习</div>
+                    <div class="project-title" data-lang="en">Shanghai Innovation Institute (Entrepreneurship Program) — Algorithm Research Intern</div>
+                    <div class="project-meta">2025.07 - 2025.08 · Isaac Lab · 无人机自主巡航 RL</div>
+                    <ul>
+                        <li data-lang="zh">基于 Isaac Lab 搭建城市户外场景无人机巡航仿真与 RL 自主巡航训练 pipeline。</li>
+                        <li data-lang="zh">负责仿真环境搭建、算法对比、训练调优与奖励塑形。</li>
+                        <li data-lang="en">Built a city-outdoor UAV cruise simulation and an RL autonomous-cruise training pipeline in Isaac Lab.</li>
+                        <li data-lang="en">Owned simulation setup, algorithm comparison, training tuning, and reward shaping.</li>
                     </ul>
                 </div>
             </div>
@@ -613,10 +652,14 @@
         <section>
             <h2><span class="section-title" data-lang="zh">技术栈</span><span class="section-title" data-lang="en">Technical Stack</span></h2>
             <div class="skills-grid">
-                <div class="skill-card"><strong data-lang="zh">编程语言</strong><strong data-lang="en">Languages</strong><p>Python, C/C++, MATLAB, Java</p></div>
-                <div class="skill-card"><strong data-lang="zh">AI 与机器人</strong><strong data-lang="en">AI & Robotics</strong><p>OpenPI, LeRobot, LoRA, ROS2, PyTorch, TensorRT, OpenCV</p></div>
-                <div class="skill-card"><strong data-lang="zh">仿真与评测</strong><strong data-lang="en">Simulation & Evaluation</strong><p>Isaac Sim, Isaac Lab, MuJoCo, Genesis, Gazebo</p></div>
-                <div class="skill-card"><strong data-lang="zh">理论基础</strong><strong data-lang="en">Theory</strong><p>Distributed Optimization, Graph Theory, Lyapunov Stability, MARL</p></div>
+                <div class="skill-card"><strong data-lang="zh">编程语言</strong><strong data-lang="en">Languages</strong><p>Python, C/C++, MATLAB, Java, LaTeX</p></div>
+                <div class="skill-card"><strong data-lang="zh">机器人与仿真</strong><strong data-lang="en">Robotics & Simulation</strong><p>Isaac Lab, Isaac Sim, ROS2, Genesis, Gazebo, FAST-LIO2, MID-360 LiDAR</p></div>
+                <div class="skill-card"><strong data-lang="zh">RL 与深度学习</strong><strong data-lang="en">RL & Deep Learning</strong><p>PyTorch, TensorRT, CUDA, PPO/GAE, MAPPO, GNN (PyG), PettingZoo</p></div>
+                <div class="skill-card">
+                    <strong data-lang="zh">系统与工程</strong><strong data-lang="en">Systems & Engineering</strong>
+                    <p data-lang="zh">Linux, Docker, Git, Sim-to-Real 部署, Curriculum Learning, Domain Randomization</p>
+                    <p data-lang="en">Linux, Docker, Git, Sim-to-Real deployment, Curriculum Learning, Domain Randomization</p>
+                </div>
             </div>
         </section>
 
@@ -625,8 +668,10 @@
             <div class="details-grid">
                 <div class="skill-card">
                     <strong data-lang="zh">教育经历</strong><strong data-lang="en">Education</strong>
-                    <p>SUPMICROTECH-ENSMM · 2025-2026</p>
-                    <p data-lang="zh">安徽大学 · 2023-2025</p><p data-lang="en">Anhui University · 2023-2025</p>
+                    <p data-lang="zh">国立高等机械与微技术学院 SUPMICROTECH (UMLP) · 硕士 · 系统科学与机器人工程 · 2025-2028</p>
+                    <p data-lang="en">SUPMICROTECH (UMLP) · Master's · Systems Science & Robotics Engineering · 2025-2028</p>
+                    <p data-lang="zh">安徽大学 · 本科 · 自动化 · 2023-2027</p>
+                    <p data-lang="en">Anhui University · Bachelor's · Automation · 2023-2027</p>
                 </div>
                 <div class="skill-card">
                     <strong data-lang="zh">竞赛荣誉</strong><strong data-lang="en">Competition Honors</strong>

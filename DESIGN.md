@@ -27,7 +27,8 @@
 - Focus: three to four current research/engineering directions.
 - Publications: the resume's paper list as full-width entries, newest or most relevant first.
 - Research & Project Experience: project cards in a two-column grid, merged from the resume's research and project entries.
-- Skills: condensed technical stack grouped by purpose.
+- Internships: role, organisation, dates, and contribution lines from the resume.
+- Skills: condensed technical stack grouped by purpose, mirroring the resume's skill list.
 - Writing: secondary links to the technical blog articles.
 - Contact: email, phone/WeChat from the resume source.
 
