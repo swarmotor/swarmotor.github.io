@@ -318,6 +318,12 @@
         .pub-meta,
         .project-meta { margin-top: 0.35rem; color: var(--text-muted); font-size: 0.88rem; }
 
+        .pub-note {
+            margin-top: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.92rem;
+        }
+
         .project-item ul {
             margin: 0.7rem 0 0 1.1rem;
             color: var(--text-secondary);
@@ -483,49 +489,29 @@
         </section>
 
         <section>
-            <h2><span class="section-title" data-lang="zh">精选成果</span><span class="section-title" data-lang="en">Selected Work</span></h2>
-            <div class="highlight-grid">
-                <div class="stacked-list">
-                    <div class="pub-item">
-                        <div class="pub-title">Scan2VLA: Robot-Executable VLA Demonstration Generation Based on Interactive Gaussian Digital Twins</div>
-                        <div class="pub-meta"><span data-lang="zh">第一作者 · ICRA 2026 · 审稿中</span><span data-lang="en">First Author · ICRA 2026 · Under Review</span></div>
-                    </div>
-                    <div class="pub-item">
-                        <div class="pub-title">Instantaneous Strong Connectivity: A Novel Perceptual Paradigm for Swarm Guidance in Communication-Denied Environments</div>
-                        <div class="pub-meta"><span data-lang="zh">第一作者 · IEEE Transactions on Control of Network Systems · 审稿中 · 2026</span><span data-lang="en">First Author · IEEE Transactions on Control of Network Systems · Under Review · 2026</span></div>
-                    </div>
-                    <div class="pub-item">
-                        <div class="pub-title">Adaptive Encirclement Control Strategy for Swarm Robots Based on Multi-Sensor Dynamic Fusion</div>
-                        <div class="pub-meta"><span data-lang="zh">本科生第一作者 · Control Engineering of China · 已录用 · 2026</span><span data-lang="en">Undergraduate First Author · Control Engineering of China · Accepted · 2026</span></div>
-                    </div>
-                    <div class="pub-item">
-                        <div class="pub-title">Multi-robot Capture Strategy for Observation-Limited Scenarios</div>
-                        <div class="pub-meta"><span data-lang="zh">本科生第一作者 · ROBOMECH · 已录用 · 2026</span><span data-lang="en">Undergraduate First Author · ROBOMECH · Accepted · 2026</span></div>
-                    </div>
-                    <div class="pub-item">
-                        <div class="pub-title"><a href="https://www.sciencedirect.com/science/article/pii/S2405896325020579" target="_blank" rel="noopener">Bio-inspired Neighbor Selection Mechanism and Performance Evaluation for UAV Swarms</a></div>
-                        <div class="pub-meta"><span data-lang="zh">第一作者 · IFAC-ACA 2025 · 已发表</span><span data-lang="en">First Author · IFAC-ACA 2025 · Published</span></div>
-                    </div>
+            <h2><span class="section-title" data-lang="zh">发表论文</span><span class="section-title" data-lang="en">Publications</span></h2>
+            <div class="stacked-list">
+                <div class="pub-item">
+                    <div class="pub-title">Scan2VLA: Robot-Executable VLA Demonstration Generation Based on Interactive Gaussian Digital Twins</div>
+                    <div class="pub-meta"><span data-lang="zh">第一作者 · ICRA 2026 · 审稿中</span><span data-lang="en">First Author · ICRA 2026 · Under Review</span></div>
+                    <p class="pub-note" data-lang="zh">后续新工作：以真实扫描的高斯数字孪生为数据来源，自动生成机器人可执行的演示数据，并把重建保真度与真机可迁移性放在同一条链路上评估。</p>
+                    <p class="pub-note" data-lang="en">Follow-up work: using a Gaussian digital twin scanned from a real scene as the data source for robot-executable demonstrations, evaluating reconstruction fidelity and physical-robot transferability within one pipeline.</p>
                 </div>
-                <div class="stacked-list">
-                    <div class="project-item">
-                        <div class="project-title" data-lang="zh">Scan2VLA：把交互式高斯数字孪生变成可执行的 VLA 演示数据</div>
-                        <div class="project-title" data-lang="en">Scan2VLA: Interactive Gaussian Digital Twins as a Source of Robot-Executable VLA Demonstrations</div>
-                        <div class="project-meta">Real-to-Sim-to-Real · 3DGS · Isaac Sim · LeRobot · 2026</div>
-                        <p data-lang="zh">后续新工作：以真实扫描的高斯数字孪生为数据来源，自动生成机器人可执行的演示数据，并把重建保真度与真机可迁移性放在同一条链路上评估。</p>
-                        <p data-lang="en">Follow-up work: using a Gaussian digital twin scanned from a real scene as the data source for robot-executable demonstrations, evaluating reconstruction fidelity and physical-robot transferability within one pipeline.</p>
-                    </div>
-                    <div class="project-item">
-                        <div class="project-title" data-lang="zh">OpenPI / pi0.5 ALOHA 后训练链路验证</div>
-                        <div class="project-title" data-lang="en">OpenPI / pi0.5 ALOHA Post-Training Pipeline Validation</div>
-                        <div class="project-meta">OpenPI · LeRobot · ALOHA Sim · LoRA · 2026</div>
-                        <ul>
-                            <li data-lang="zh">基于 50 episodes、20,000 frames、50 Hz、14D state/action 的 ALOHA 数据完成 norm stats 与 500-step LoRA smoke test；该结果验证训练链路，不代表策略质量。</li>
-                            <li data-lang="zh">注册 pi0.5 base 初始化的 5,000-step 正式配置并准备 metrics JSONL；下一步为固定 seeds 的成对 rollout 与离线 critic。</li>
-                            <li data-lang="en">Completed norm statistics and a 500-step LoRA smoke test on 50 ALOHA episodes (20,000 frames at 50 Hz, 14D state/action); this validates the training path, not policy quality.</li>
-                            <li data-lang="en">Registered a 5,000-step pi0.5-base configuration and prepared metrics JSONL; paired fixed-seed rollouts and an offline critic remain next steps.</li>
-                        </ul>
-                    </div>
+                <div class="pub-item">
+                    <div class="pub-title">Instantaneous Strong Connectivity: A Novel Perceptual Paradigm for Swarm Guidance in Communication-Denied Environments</div>
+                    <div class="pub-meta"><span data-lang="zh">第一作者 · IEEE Transactions on Control of Network Systems · 审稿中 · 2026</span><span data-lang="en">First Author · IEEE Transactions on Control of Network Systems · Under Review · 2026</span></div>
+                </div>
+                <div class="pub-item">
+                    <div class="pub-title">Adaptive Encirclement Control Strategy for Swarm Robots Based on Multi-Sensor Dynamic Fusion</div>
+                    <div class="pub-meta"><span data-lang="zh">本科生第一作者 · Control Engineering of China · 已录用 · 2026</span><span data-lang="en">Undergraduate First Author · Control Engineering of China · Accepted · 2026</span></div>
+                </div>
+                <div class="pub-item">
+                    <div class="pub-title">Multi-robot Capture Strategy for Observation-Limited Scenarios</div>
+                    <div class="pub-meta"><span data-lang="zh">本科生第一作者 · ROBOMECH · 已录用 · 2026</span><span data-lang="en">Undergraduate First Author · ROBOMECH · Accepted · 2026</span></div>
+                </div>
+                <div class="pub-item">
+                    <div class="pub-title"><a href="https://www.sciencedirect.com/science/article/pii/S2405896325020579" target="_blank" rel="noopener">Bio-inspired Neighbor Selection Mechanism and Performance Evaluation for UAV Swarms</a></div>
+                    <div class="pub-meta"><span data-lang="zh">第一作者 · IFAC-ACA 2025 · 已发表</span><span data-lang="en">First Author · IFAC-ACA 2025 · Published</span></div>
                 </div>
             </div>
         </section>
@@ -533,6 +519,17 @@
         <section>
             <h2><span class="section-title" data-lang="zh">科研与项目经验</span><span class="section-title" data-lang="en">Research & Project Experience</span></h2>
             <div class="details-grid">
+                <div class="project-item">
+                    <div class="project-title" data-lang="zh">OpenPI / pi0.5 ALOHA 后训练链路验证</div>
+                    <div class="project-title" data-lang="en">OpenPI / pi0.5 ALOHA Post-Training Pipeline Validation</div>
+                    <div class="project-meta">OpenPI · LeRobot · ALOHA Sim · LoRA · 2026</div>
+                    <ul>
+                        <li data-lang="zh">基于 50 episodes、20,000 frames、50 Hz、14D state/action 的 ALOHA 数据完成 norm stats 与 500-step LoRA smoke test；该结果验证训练链路，不代表策略质量。</li>
+                        <li data-lang="zh">注册 pi0.5 base 初始化的 5,000-step 正式配置并准备 metrics JSONL；下一步为固定 seeds 的成对 rollout 与离线 critic。</li>
+                        <li data-lang="en">Completed norm statistics and a 500-step LoRA smoke test on 50 ALOHA episodes (20,000 frames at 50 Hz, 14D state/action); this validates the training path, not policy quality.</li>
+                        <li data-lang="en">Registered a 5,000-step pi0.5-base configuration and prepared metrics JSONL; paired fixed-seed rollouts and an offline critic remain next steps.</li>
+                    </ul>
+                </div>
                 <div class="project-item">
                     <div class="project-title" data-lang="zh">拓扑保持的群体感知研究</div>
                     <div class="project-title" data-lang="en">Topology-Preserving Swarm Perception</div>

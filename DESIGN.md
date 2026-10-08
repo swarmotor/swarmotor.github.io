@@ -25,7 +25,8 @@
 
 - Hero: name, role, location/contact affordances, and one concise positioning statement.
 - Focus: three to four current research/engineering directions.
-- Highlights: selected papers and projects from the resume.
+- Publications: the resume's paper list as full-width entries, newest or most relevant first.
+- Research & Project Experience: project cards in a two-column grid, merged from the resume's research and project entries.
 - Skills: condensed technical stack grouped by purpose.
 - Writing: secondary links to the technical blog articles.
 - Contact: email, phone/WeChat from the resume source.
@@ -33,7 +34,7 @@
 ## Interaction
 
 - Buttons and cards may lift on hover with `transform` and shadow only.
-- Language switching uses the existing `[data-lang]` body class pattern.
+- Language switching uses the `[data-lang]` attribute with an `html.lang-zh` root class; English is the default and Chinese is opt-in.
 - Game background remains decorative and must not block content or navigation.
 
 ## Responsive Rules
